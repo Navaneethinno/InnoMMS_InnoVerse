@@ -1,0 +1,742 @@
+:root {
+  /* Every text input/textarea in the app relies on the browser's own
+     default white background rather than an explicit background-color
+     (only the disabled/.dark variants set one) — with no color-scheme
+     declared at all, Chrome/Edge on a system with dark mode enabled at
+     the OS level applies its own automatic-dark-mode heuristic to native
+     form controls specifically, painting inputs/textareas/selects a flat
+     gray even though the page itself is rendering its normal light
+     theme. Custom div-based controls (FilterSelect, CheckboxPill) aren't
+     native form elements, so they were never touched by it — which is
+     exactly the "every real <input> looks gray, dropdowns stay white"
+     split reported. Declaring color-scheme here (and `dark` under .dark
+     below) tells the browser this page has deliberately handled both
+     schemes itself, so it stops guessing on form controls.
+  */
+  color-scheme: light;
+  --font-size: 16px;
+
+  /* Type scale used by the base h1-h4/label/button/input rules below.
+     This project is on Tailwind v3 (config-based), which does NOT emit
+     --text-* custom properties the way Tailwind v4's CSS-first theme does —
+     these were referenced below (var(--text-2xl) etc.) but never defined
+     anywhere, so every heading's font-size silently failed to apply and
+     fell back to the browser's UA-default h1-h4 sizing instead of this
+     deliberate scale. Defining them here is what actually turns the
+     "type scale" on. Values match Tailwind's own default rem scale so they
+     stay visually consistent with every text-sm/text-lg/etc. utility
+     already used throughout the app. */
+  --text-xs: 0.75rem; /* 12px — captions, meta text, table headers */
+  --text-sm: 0.875rem; /* 14px — body copy, inputs, buttons */
+  --text-base: 1rem; /* 16px — section sub-headers (h4) */
+  --text-lg: 1.125rem; /* 18px — section headers (h3) */
+  --text-xl: 1.25rem; /* 20px — page titles (h2) */
+  --text-2xl: 1.5rem; /* 24px — top-level page titles (h1) */
+
+  /* Surfaces */
+  --background: #e9eff6;
+  --foreground: #172033;
+  --card: #ffffff;
+  --card-foreground: #172033;
+  --card-hover: #f6f9fc;
+  --popover: #ffffff;
+  --popover-foreground: #172033;
+
+  /* Brand */
+  --primary: #2266ee;
+  --primary-hover: #1b54c4;
+  --primary-light: #e9f0fe;
+  --primary-foreground: #ffffff;
+  --secondary: #26ffff;
+  --secondary-foreground: #0b2a2a;
+  --muted: #dedfdf;
+  --muted-foreground: #495255;
+  --accent: #e9f0fe;
+  --accent-foreground: #2266ee;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #ffffff;
+
+  /* Status */
+  --success: #20c997;
+  --warning: #f59e0b;
+  --pending: #ff8a70;
+
+  /* Soft/translucent tint backgrounds for the status + brand colors above.
+     Baked in as their own rgba() tokens rather than relying on Tailwind's
+     bg-x/NN opacity-modifier syntax — that modifier silently no-ops on
+     colors whose Tailwind definition is a plain var(--x) string (ours all
+     are), so bg-success/15 etc. rendered as solid/inherited color instead
+     of a tint. Use these tokens (e.g. bg-[var(--success-soft)]) instead. */
+  --success-soft: rgba(32, 201, 151, 0.15);
+  --warning-soft: rgba(245, 158, 11, 0.12);
+  --destructive-soft: rgba(255, 107, 107, 0.12);
+  --muted-foreground-soft: rgba(73, 82, 85, 0.7);
+
+  /* Brand CTA color (kept as a "gradient" pair, both ends the same solid
+     blue, so bg-brand-gradient still resolves to var(--primary) without
+     touching every call site that already references the utility). */
+  --gradient-start: #2266ee;
+  --gradient-end: #2266ee;
+  /* Dashboard "Done" (edit-mode active) button: royal blue -> cyan. */
+  --dashboard-edit-from: #4169e1;
+  --dashboard-edit-to: #06b6d4;
+
+  /* Surfaces */
+  --border: #dedfdf;
+  --input: transparent;
+  --input-background: #eff1f1;
+  --switch-background: #dedfdf;
+  --ring: #2266ee;
+
+  /* Charts */
+  --chart-1: #2266ee;
+  --chart-2: #20c997;
+  --chart-3: #ff8a70;
+  --chart-4: #26ffff;
+  --chart-5: #f59e0b;
+
+  /* Radius */
+  --radius: 1rem;
+
+  /* Sidebar / Header */
+  --sidebar: rgba(255, 255, 255, 0.6);
+  --sidebar-foreground: #495255;
+  --sidebar-primary: #2266ee;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9f0fe;
+  --sidebar-accent-foreground: #2266ee;
+  --sidebar-border: #dedfdf;
+  --sidebar-ring: #2266ee;
+  --header: #ffffff;
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-shadow: 0 8px 32px rgba(34, 102, 238, 0.1), 0 1.5px 4px rgba(34, 102, 238, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+  --glass-blur: blur(24px) saturate(180%);
+  /* Soft brand-color bleed diffusing across the glass surface — the detail
+     that reads as "frosted glass with light passing through it" rather
+     than a plain translucent panel. Layered as an extra background on top
+     of --glass-bg (see TopBar.jsx / DynamicSidebar.jsx), so it never
+     changes the opacity/blur those already relied on, just what's tinting
+     it. */
+  --glass-gradient: linear-gradient(
+    135deg,
+    rgba(34, 102, 238, 0.16) 0%,
+    rgba(38, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+
+  /* Gradient mesh stops */
+  --mesh-1: #d6e4fd;
+  --mesh-2: #ccfdfd;
+  --mesh-3: #ffd6cc;
+  --mesh-4: #dedfdf;
+
+  --font-weight-medium: 600;
+  --font-weight-normal: 400;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0b1220;
+  --foreground: #f8fafc;
+  --card: #162033;
+  --card-foreground: #f8fafc;
+  --card-hover: #1b2940;
+  --popover: #162033;
+  --popover-foreground: #f8fafc;
+
+  --primary: #4c86f4;
+  --primary-hover: #6fa0f7;
+  --primary-light: #16233d;
+  --primary-foreground: #ffffff;
+  --secondary: #26ffff;
+  --secondary-foreground: #0b1220;
+  --muted: #16233d;
+  --muted-foreground: #a4acae;
+  --accent: #16233d;
+  --accent-foreground: #26ffff;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --pending: #fb8b72;
+
+  --success-soft: rgba(52, 211, 153, 0.16);
+  --warning-soft: rgba(251, 191, 36, 0.16);
+  --destructive-soft: rgba(248, 113, 113, 0.16);
+  --muted-foreground-soft: rgba(164, 172, 174, 0.7);
+
+  --gradient-start: #4c86f4;
+  --gradient-end: #4c86f4;
+  --dashboard-edit-from: #5b7ff0;
+  --dashboard-edit-to: #22d3ee;
+
+  --border: #33393b;
+  --input: #33393b;
+  --switch-background: #33393b;
+  --input-background: #16233d;
+  --ring: #4c86f4;
+
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  --chart-1: #4c86f4;
+  --chart-2: #34d399;
+  --chart-3: #fb8b72;
+  --chart-4: #26ffff;
+  --chart-5: #fbbf24;
+
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #4c86f4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #16233d;
+  --sidebar-accent-foreground: #26ffff;
+  --sidebar-border: #33393b;
+  --sidebar-ring: #4c86f4;
+  --header: #111c2e;
+
+  --glass-bg: rgba(22, 32, 51, 0.65);
+  --glass-border: rgba(36, 50, 71, 0.8);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 1.5px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  --glass-gradient: linear-gradient(
+    135deg,
+    rgba(76, 134, 244, 0.22) 0%,
+    rgba(38, 255, 255, 0.06) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+
+  --mesh-1: #16233d;
+  --mesh-2: #103a3a;
+  --mesh-3: #3a2418;
+  --mesh-4: #33393b;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* The three radial-gradient tints were literal rgba(34, 102, 238, ...)
+       / rgba(38, 255, 255, ...) — the exact RGB of the old fixed
+       primary/secondary (#2266ee / #26ffff) baked in directly, so this
+       whole-page background wash never picked up a tenant's branding
+       colors from BrandThemeProvider no matter what --primary/--secondary
+       were set to. var(--bg-tint-*, <original literal>) lets
+       BrandThemeProvider override them the same way it overrides every
+       other brand token, while every tenant with no branding configured
+       still falls back to the exact original blue/cyan wash. */
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% -10%, var(--bg-tint-primary, rgba(34, 102, 238, 0.12)) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, var(--bg-tint-accent, rgba(184, 240, 224, 0.35)) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 50% at 50% 50%, var(--bg-tint-secondary, rgba(38, 255, 255, 0.08)) 0%, transparent 70%),
+      linear-gradient(135deg, var(--mesh-1) 0%, var(--background) 46%, var(--mesh-2) 100%);
+    background-attachment: fixed;
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  .dark body {
+    background-image: none;
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  h4 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  button {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  input {
+    font-size: var(--text-sm);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+}
+
+/*
+ * Shared interaction feedback. Most primary buttons across the app are
+ * plain `bg-primary` with no hover or press state, so they felt inert.
+ * :where() keeps specificity at utility level, and this layer comes before
+ * utilities, so any button with its own hover:/focus-visible: classes
+ * still wins.
+ */
+@layer components {
+  :where(button).bg-primary {
+    transition:
+      background-color 150ms ease,
+      box-shadow 150ms ease,
+      transform 100ms ease;
+  }
+  :where(button).bg-primary:where(:not(:disabled)):hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 28%, transparent);
+  }
+  :where(button).bg-primary:where(:not(:disabled)):active {
+    transform: translateY(1px);
+    box-shadow: none;
+  }
+  /* Visible keyboard focus everywhere, without a ring on mouse clicks. */
+  :where(button, a, [role="button"], [role="tab"]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Login page: every theme-dependent visual (panel backgrounds, card,
+ * inputs, text, borders, shadows, the illustration crossfade, the toggle)
+ * shares this single transition so light/dark switches as one synchronized
+ * change instead of parts animating on their own timings.
+ */
+.login-theme-transition,
+.login-theme-transition * {
+  transition:
+    background-color 300ms ease-in-out,
+    color 300ms ease-in-out,
+    border-color 300ms ease-in-out,
+    box-shadow 300ms ease-in-out !important;
+}
+
+/* Keep browser-managed credentials readable when the login theme is dark. */
+.dark .login-theme-transition input:-webkit-autofill,
+.dark .login-theme-transition input:-webkit-autofill:hover,
+.dark .login-theme-transition input:-webkit-autofill:focus {
+  background-color: var(--input-background) !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--input-background) inset !important;
+  box-shadow: 0 0 0 1000px var(--input-background) inset !important;
+}
+
+.dark .login-theme-transition input {
+  background-color: var(--input-background) !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground);
+  caret-color: var(--foreground);
+}
+
+/* Chrome/Edge fill a remembered field's own OS-level autofill highlight
+   (a flat gray on this Windows build, yellow on others) over whatever
+   background the input's own class sets, the instant the value matches
+   something the browser remembers typing there before (e.g. "test123"
+   into an Add-record Code/Name field during manual testing) — nothing
+   in this app's CSS puts it there, and it isn't scoped to any one page
+   the way the login-only rule above is. Neutralizing it everywhere for
+   every plain text/textarea input keeps a previously-used value reading
+   as a normal filled field instead of a flatly "disabled"-looking one. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--card) inset !important;
+  box-shadow: 0 0 0 1000px var(--card) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Illustration crossfade — kept on its own opacity transition (same 300ms
+   duration) rather than the blanket rule above, so it never fights the
+   framer-motion-driven entrance animations elsewhere on the page. */
+.login-theme-transition .login-illustration {
+  transition: opacity 300ms ease-in-out !important;
+}
+
+/*
+ * Legacy components across the app hardcode slate/white Tailwind utilities
+ * instead of the theme tokens above. Rather than rewrite every usage, remap
+ * those utilities to the token palette while in dark mode so existing
+ * layout/markup keeps working unchanged in both themes.
+ */
+.dark .text-slate-800,
+.dark .text-slate-700 {
+  color: var(--foreground);
+}
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: var(--muted-foreground);
+}
+.dark .text-slate-400,
+.dark .text-slate-300,
+.dark .text-slate-200,
+.dark .text-slate-100 {
+  color: var(--muted-foreground);
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-slate-200,
+.dark .bg-slate-50\/40,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/80,
+.dark .bg-slate-100\/60,
+.dark .bg-slate-100\/80 {
+  background-color: var(--card-hover);
+}
+
+.dark .bg-white,
+.dark .bg-white\/50,
+.dark .bg-white\/60,
+.dark .bg-white\/70,
+.dark .bg-white\/80,
+.dark .bg-white\/85,
+.dark .bg-white\/90 {
+  background-color: var(--card);
+}
+
+.dark .border-slate-50,
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-100\/80,
+.dark .border-slate-200\/60,
+.dark .border-slate-200\/70 {
+  border-color: var(--border);
+}
+
+.dark .border-white\/80,
+.dark .border-white\/90 {
+  border-color: var(--border);
+}
+
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border);
+}
+
+/*
+ * StatusBadge pills, action-button icons (actionStyles.js) and every other
+ * spot that hardcodes light-mode Tailwind color shades (emerald/amber/blue/
+ * orange/red) instead of the theme tokens above. Same remap strategy as the
+ * slate/white block above: keep the light-mode markup unchanged and swap the
+ * rendered color in dark mode only, so pills stay legible instead of coming
+ * out as a pale near-white fill with barely-readable text on a dark card.
+ */
+.dark .text-emerald-600,
+.dark .text-emerald-700 {
+  color: #6ee7b7;
+}
+.dark .text-amber-600,
+.dark .text-amber-700,
+.dark .text-amber-900 {
+  color: #fcd34d;
+}
+.dark .text-blue-600,
+.dark .text-blue-700 {
+  color: #93c5fd;
+}
+.dark .text-orange-600,
+.dark .text-orange-700 {
+  color: #fdba74;
+}
+.dark .text-red-600,
+.dark .text-red-700 {
+  color: #fca5a5;
+}
+
+.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.16);
+}
+.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.16);
+}
+.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.16);
+}
+.dark .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.16);
+}
+.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.16);
+}
+
+.dark .hover\:bg-emerald-50:hover {
+  background-color: rgba(16, 185, 129, 0.16);
+}
+.dark .hover\:bg-amber-50:hover {
+  background-color: rgba(245, 158, 11, 0.16);
+}
+.dark .hover\:bg-blue-50:hover {
+  background-color: rgba(59, 130, 246, 0.16);
+}
+.dark .hover\:bg-orange-50:hover {
+  background-color: rgba(249, 115, 22, 0.16);
+}
+.dark .hover\:bg-red-50:hover {
+  background-color: rgba(239, 68, 68, 0.16);
+}
+
+.dark .border-emerald-200 {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+.dark .border-amber-200,
+.dark .border-amber-300 {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+.dark .border-blue-200 {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+.dark .border-orange-200 {
+  border-color: rgba(249, 115, 22, 0.35);
+}
+.dark .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* amber-800 dot (DEL_WAIT_AUTH) is a dark shade meant for a light pill —
+   invisible against a dark card, so brighten it like the other status dots. */
+.dark .bg-amber-800 {
+  background-color: #fbbf24;
+}
+
+/* Native <input>/<select>/<textarea> elements across many forms (e.g.
+   InstitutionModulePage's "Add institution module" form) are styled with
+   only a border/radius/padding className and no background utility at all
+   — relying on the browser's own default white form-control background.
+   That default never changes with the app's theme, so every such field
+   stayed a plain white box with barely-readable text against a dark modal.
+   Rather than touch every one of those className strings, give every
+   native form control an explicit dark background/text/border by default
+   in dark mode; anything that already sets its own bg-* utility (already
+   remapped above) simply keeps winning via normal cascade order below. */
+/* Plain native checkboxes/radios across the app (SourceOfFund's "Has
+   employer", InstitutionCurrency's "Is base currency", ProfilePermissionTree's
+   module/menu/action grants, the Customer wizard's boolean fields, etc.)
+   were left with no accent styling, so they rendered the browser's default
+   blue regardless of the tenant's brand color — inconsistent with
+   DataTable.jsx's row-selection checkboxes, which already set
+   accent-[var(--primary)] individually. One global rule here covers every
+   checkbox/radio in the app at once (including ones added later) instead of
+   hunting down each className; a component that already sets its own
+   accent-* utility simply keeps winning via normal cascade/specificity. */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+/* Neither the color-scheme declarations above nor an explicit
+   background-color on inputs (still below, kept for the normal-rendering
+   path) actually reach the pixels when Windows' own "Contrast themes" /
+   Forced Colors Mode is on (Settings > Accessibility > Contrast themes,
+   or a high-contrast theme carried over from an older Windows version) —
+   forced-colors mode is SPECIFICALLY DEFINED to override author
+   background-color on native form controls (input/select/textarea/button)
+   with the OS's own system colors ("Field", "ButtonFace", ...), which on
+   many Windows contrast themes render as a flat mid-gray, and it does
+   this deliberately regardless of !important. It leaves plain, non-form
+   elements (a div styled to look like a dropdown, e.g. FilterSelect)
+   completely alone, which is exactly the split reported: every real
+   input/select/textarea across totally unrelated pages (Digital Product's
+   Add form, the Customer Onboarding wizard, ...) went the same flat gray
+   while every custom div-based control on the same screen stayed white.
+   forced-color-adjust: none opts an element back out of that substitution
+   so it keeps rendering the app's own theme colors even under forced
+   colors — the standard, documented escape hatch for exactly this. */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  forced-color-adjust: none;
+  /* forced-color-adjust: none alone has been unreliable in practice for
+     restoring a plain text <input>'s own background under Windows forced
+     colors — appearance: none additionally hands the control's rendering
+     fully to this stylesheet instead of the UA/OS forced-colors chrome,
+     which is the documented companion fix when forced-color-adjust alone
+     doesn't fully take. */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not(:disabled),
+select:not(:disabled),
+textarea:not(:disabled) {
+  background-color: var(--card);
+  color: var(--foreground);
+}
+
+/* Every disabled field across the app (View-mode wizards, a locked field
+   while its parent is saving, an id already committed and no longer
+   editable, ...) used whatever bg-muted/text-muted-foreground each
+   component's own className happened to set, which is var(--muted)
+   (#dedfdf light / a dark navy in dark mode) at full opacity — a flat,
+   fairly heavy fill that read as "broken" more often than "read-only"
+   (this exact shade is what several "why is this field gray" reports
+   turned out to be, on screens where it was actually the intended
+   disabled look). One global, softer treatment — lighter than --muted,
+   just enough contrast with an active field to read as intentionally
+   non-editable, not broken — replaces every component's own bg-muted/
+   text-muted-foreground disabled styling at once. !important is
+   deliberate: it needs to outrank each component's own disabled:bg-muted
+   utility class, not lose to it. */
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: color-mix(in srgb, var(--muted) 45%, var(--card)) !important;
+  color: var(--muted-foreground) !important;
+  border-color: var(--border) !important;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: var(--input-background);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--muted-foreground);
+}
+.dark select option {
+  background-color: var(--input-background);
+  color: var(--foreground);
+}
+
+/* Slim, rounded, theme-aware scrollbar — applied globally (every
+   scrollable element, not just containers opted in via `.thin-scrollbar`)
+   so dark mode never falls back to the browser's own bulky, always-light
+   scrollbar chrome. That fallback was exactly what happened on every
+   overflow-x-auto strip that never got the opt-in class (DataTable's own
+   table wrapper, StatusFilterTabs' tab row, ...) — a stark white/grey bar
+   sitting on top of a dark card. Using `var(--border)`/`var(--muted-
+   foreground)` (both already redefined for dark mode) means the thumb
+   recolors with the rest of the theme automatically, same as before, just
+   without needing every scroll container to remember to opt in.
+   Firefox uses `scrollbar-width`/`scrollbar-color`; Chromium/Safari use
+   the `::-webkit-scrollbar` pseudo-elements. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}
+/* Without this, Windows Chromium still draws its own up/down (or
+   left/right) arrow buttons at each end of the track alongside the
+   rounded pill thumb above — the two looked like one broken, misshapen
+   control (most visible in the narrow collapsed sidebar rail). */
+*::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+/* Kept as a harmless alias — every scroll container gets this styling by
+   default now, but existing `.thin-scrollbar` usages still work. */
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Legacy utility retained for consumers that intentionally need no chrome. */
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+/* SegmentedSwitch (Individual | Corporate): the thumb slides and stretches
+   with a slight overshoot; the view underneath fades/lifts in on change. */
+.segmented-thumb {
+  transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), width 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.segmented-view-enter {
+  animation: segmented-view-in 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes segmented-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segmented-thumb {
+    transition: none;
+  }
+  .segmented-view-enter {
+    animation: none;
+  }
+}
+
+/* Field a KYC requirement link scrolled to (CustomerOnboardingWizard). */
+.field-flash {
+  border-radius: 0.75rem;
+  animation: field-flash 1.6s ease-out;
+}
+@keyframes field-flash {
+  0%,
+  35% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 35%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 4px transparent;
+    background: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-flash {
+    animation: none;
+  }
+}

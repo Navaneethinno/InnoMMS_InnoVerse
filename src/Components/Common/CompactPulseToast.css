@@ -1,0 +1,171 @@
+.cpt-layer {
+  position: fixed;
+  top: 14px;
+  left: 0;
+  right: 0;
+  z-index: 2147483000; /* stays above modal overlays; raise further if needed */
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cpt-toast {
+  /* The bubble itself stays a fixed dark chrome regardless of light/dark
+     mode (a deliberate "always pops off the page" snackbar look, same as
+     the ring pulse) — but the ring/icon colors below pull from the app's
+     own --primary/--destructive tokens instead of hardcoded hex, so a
+     tenant's brand color (or a future palette change) is reflected here
+     automatically instead of needing this component edited too. */
+  --ink: #0f1b33;
+  --ring-a: var(--primary);
+  --ring-b: color-mix(in srgb, var(--primary) 55%, white);
+  --error-a: var(--destructive);
+  --error-b: color-mix(in srgb, var(--destructive) 55%, white);
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 16px;
+  padding: 16px 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  font-family: "Manrope", -apple-system, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: auto;
+
+  opacity: 0;
+  transform: translateY(-14px) scale(0.9);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cpt-toast.cpt-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.cpt-ring {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, var(--ring-a), var(--ring-b));
+}
+
+.cpt-error .cpt-ring {
+  background: radial-gradient(circle, var(--error-a), var(--error-b));
+}
+
+.cpt-ring svg {
+  width: 12px;
+  height: 12px;
+  stroke: #fff;
+}
+
+.cpt-ring::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ring-b);
+  opacity: 0;
+}
+
+.cpt-error .cpt-ring::before {
+  border-color: var(--error-b);
+}
+
+/* Dismiss button — bigger than the pulse ring since it's the one
+   interactive hit target on the toast (per "increase button" — was
+   small enough it could get missed). A muted background instead of a
+   distinct color so it doesn't compete with the ring for attention as
+   "the important part" of the toast. */
+.cpt-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.cpt-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.cpt-close svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+}
+
+.cpt-show .cpt-ring::before {
+  animation: cpt-ring-pulse 1.4s ease-out 0.1s 2;
+}
+
+@keyframes cpt-ring-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cpt-toast,
+  .cpt-ring::before {
+    transition: none !important;
+    animation: none !important;
+  }
+  .cpt-toast.cpt-show {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Refusal with several reasons (data[0].problems): headline + list. The
+   single-line pill stays nowrap; a list wraps within a readable width. */
+.cpt-toast:has(.cpt-text-list) {
+  align-items: flex-start;
+  white-space: normal;
+  max-width: min(560px, calc(100vw - 32px));
+}
+
+.cpt-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cpt-problems {
+  margin: 0;
+  padding-left: 16px;
+  list-style: disc;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.cpt-problems li + li {
+  margin-top: 3px;
+}
