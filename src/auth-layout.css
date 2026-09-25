@@ -1,0 +1,96 @@
+/* Give the signup form more breathing room without changing the dashboard cards. */
+.min-h-screen.bg-background.px-5.py-6 .max-w-md {
+  max-width: 42rem;
+}
+
+body[data-auth-mode="signup"] .min-h-screen.bg-background.px-5.py-6 > .mx-auto.grid > .hidden {
+  display: none;
+}
+
+body[data-auth-mode="signup"] .min-h-screen.bg-background.px-5.py-6 > .mx-auto.grid {
+  display: block;
+  max-width: 58rem;
+}
+
+body[data-auth-mode="signup"] .min-h-screen.bg-background.px-5.py-6 > .mx-auto.grid > .mx-auto.w-full.max-w-md {
+  width: 100%;
+  max-width: 58rem;
+  margin: 2rem auto;
+}
+
+@media (min-width: 768px) {
+  body[data-auth-mode="signup"] .min-h-screen.bg-background.px-5.py-6 > .mx-auto.grid > .mx-auto.w-full.max-w-md {
+    padding-left: 19rem;
+    position: relative;
+  }
+
+  body[data-auth-mode="signup"] .registration-steps {
+    position: absolute;
+    left: 2rem;
+    top: 2rem;
+    width: 14rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 1.25rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    background: var(--primary-light);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+  }
+
+  body[data-auth-mode="signup"] .registration-steps__title {
+    margin: 0 0 0.35rem;
+    color: var(--foreground);
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  body[data-auth-mode="signup"] .registration-step {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    padding: 0.45rem 0.5rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: transparent;
+    color: var(--foreground);
+    text-align: left;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.3;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  body[data-auth-mode="signup"] .registration-step:hover,
+  body[data-auth-mode="signup"] .registration-step:focus-visible {
+    background: rgba(99, 102, 241, 0.08);
+    outline: none;
+  }
+
+  body[data-auth-mode="signup"] .registration-step.is-active {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+  }
+
+  body[data-auth-mode="signup"] .registration-step__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.06);
+    color: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  body[data-auth-mode="signup"] .step-group {
+    scroll-margin-top: 1.5rem;
+  }
+}
