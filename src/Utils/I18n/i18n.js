@@ -28,9 +28,6 @@ void i18n
       "auth",
       "login",
       "layout",
-      
-      
-      
       "dashboard",
       "forgotPassword",
       "setup",
@@ -38,8 +35,6 @@ void i18n
       "sidebar",
       "routes",
       "statusLabels",
-      
-      
       "myProfile",
       "category",
     ],

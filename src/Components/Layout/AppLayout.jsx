@@ -12,6 +12,8 @@ import { SidebarStateProvider, useSidebar } from "./SidebarContext";
 import { DynamicSidebar, SIDEBAR_WIDTHS } from "@/Pages/Sidebar/DynamicSidebar";
 import { PageBreadcrumbs } from "./PageBreadcrumbs";
 import { useIsMobile } from "@/Hooks/useIsMobile";
+import { usePagePermission } from "@/Hooks/usePermission";
+import { NoAccess } from "@/Components/Common/NoAccess";
 function Layout() {
   // Reflow the page in sync with the sidebar's actual visual state
   // (pinned-open OR currently hovered) rather than the pinned preference
@@ -40,7 +42,7 @@ function Layout() {
         <TopBar />
         <WorkspaceContainer>
           <PageBreadcrumbs />
-          <Outlet />
+          <PageAccessGate />
         </WorkspaceContainer>
       </div>
     </div>
@@ -119,7 +121,16 @@ export function AppLayout() {
     <SidebarStateProvider>
       <AuthEvents />
       <InactivityLogout />
-      <Layout />
+        <Layout />
     </SidebarStateProvider>
   );
+}
+
+// A sidebar menu the user holds without its View grant never loads — the
+// backend would only answer "Permission Denied". Pages that aren't menus
+// (dashboard, notifications, my profile) pass straight through.
+function PageAccessGate() {
+  const can = usePagePermission();
+  if (can.menu && !can("View")) return <NoAccess />;
+  return <Outlet />;
 }

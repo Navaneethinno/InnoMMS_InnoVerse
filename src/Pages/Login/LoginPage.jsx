@@ -59,9 +59,9 @@ const cardItem = {
 export function LoginPage() {
   const { t } = useTranslation("login");
   const [username, setUsername] = useState(
-    import.meta.env.VITE_DEFAULT_LOGIN_USERNAME || "SuperAdmin1",
+    import.meta.env.DEV ? import.meta.env.VITE_DEFAULT_LOGIN_USERNAME || "" : "",
   );
-  const [password, setPassword] = useState(import.meta.env.VITE_DEFAULT_LOGIN_PASSWORD || "");
+  const [password, setPassword] = useState(import.meta.env.DEV ? import.meta.env.VITE_DEFAULT_LOGIN_PASSWORD || "" : "");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

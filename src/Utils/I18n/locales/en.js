@@ -4,6 +4,8 @@
 // (Services/Translation/EnglishTranslation.json etc.) rather than the
 // original single inline `resources` object holding every language.
 export const common = {
+  noAccessTitle: "You don't have access to this screen",
+  noAccessHint: "Your profile doesn't grant View on this menu. Ask an administrator for access.",
   saveAsDraft: "Save as draft",
   saveChanges: "Save changes",
   narration: "Narration",
@@ -319,6 +321,8 @@ export const category = {
 };
 
 export default {
+  noAccessTitle: "You don't have access to this screen",
+  noAccessHint: "Your profile doesn't grant View on this menu. Ask an administrator for access.",
   myProfile,
   common,
   auth,

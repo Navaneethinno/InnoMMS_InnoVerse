@@ -2,6 +2,8 @@
 // language. appName is left as the brand name (not translated), matching
 // how "Innoverse" isn't translated in the confirmed backend example either.
 export const common = {
+  noAccessTitle: "Você não tem acesso a esta tela",
+  noAccessHint: "Seu perfil não concede Visualizar neste menu. Peça acesso a um administrador.",
   saveAsDraft: "Salvar como rascunho",
   saveChanges: "Salvar alterações",
   narration: "Narração",
