@@ -147,6 +147,71 @@ export const login = {
   hidePassword: "Hide password",
   enterCredentials: "Please enter your username and password",
   invalidCredentials: "Invalid credentials. Please try again.",
+  getStarted: "Sign up",
+  noAccount: "New to InnoMMS?",
+};
+
+// Self-service merchant signup — a 3-step registration wizard (business,
+// contact, secure) rebuilt in the InnoMMS design system. The submit handler
+// is a TODO (see SignupPage); these are the visible strings.
+export const signup = {
+  documentTitle: "Sign up · InnoMMS",
+  portalName: "Merchant Portal",
+  eyebrow: "GET STARTED",
+  title: "Create your merchant account",
+  subtitle: "Set up your workspace in a few minutes.",
+  backToSignIn: "Back to sign in",
+  haveAccount: "Already have an account?",
+  signInLink: "Sign in",
+  privacyNote: "Your information stays private and secure.",
+
+  // Stepper.
+  registrationSteps: "Registration steps",
+  step1Title: "Business details",
+  step1Hint: "Tell us about your business.",
+  step2Title: "Contact details",
+  step2Hint: "How we'll reach you.",
+  step3Title: "Secure account",
+  step3Hint: "Choose a password.",
+
+  // Fields.
+  username: "Username",
+  usernamePlaceholder: "Choose a username",
+  businessName: "Business name",
+  businessNamePlaceholder: "e.g. Northstar Foods",
+  regNumber: "Registration number",
+  regNumberPlaceholder: "REG-2024-XXXXX",
+  contactName: "Contact name",
+  contactNamePlaceholder: "Jane Smith",
+  email: "Email address",
+  emailPlaceholder: "you@business.com",
+  phone: "Phone number",
+  phonePlaceholder: "+1 555 000 0000",
+  password: "Password",
+  passwordPlaceholder: "At least 8 characters",
+  confirmPassword: "Confirm password",
+  confirmPlaceholder: "Repeat your password",
+  optional: "Optional",
+  showPassword: "Show password",
+  hidePassword: "Hide password",
+
+  // Navigation.
+  next: "Next",
+  back: "Back",
+  stepOf: "Step {{current}} of {{total}}",
+  createAccount: "Create account",
+  creating: "Creating account…",
+
+  // Validation.
+  required: "This field is required",
+  emailInvalid: "Enter a valid email address",
+  passwordShort: "Use at least 8 characters",
+  passwordMismatch: "Passwords do not match",
+
+  // Stub submit notice.
+  notWiredTitle: "Not connected yet",
+  notWiredBody:
+    "Sign-up isn't wired to the backend yet. Your details look valid — an administrator will enable account creation soon.",
 };
 
 export const forgotPassword = {
@@ -321,12 +386,11 @@ export const category = {
 };
 
 export default {
-  noAccessTitle: "You don't have access to this screen",
-  noAccessHint: "Your profile doesn't grant View on this menu. Ask an administrator for access.",
   myProfile,
   common,
   auth,
   login,
+  signup,
   layout,
   forgotPassword,
   setup,

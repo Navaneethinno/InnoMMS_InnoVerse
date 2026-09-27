@@ -58,10 +58,15 @@ const cardItem = {
 };
 export function LoginPage() {
   const { t } = useTranslation("login");
+  // Optional dev-only prefill: set VITE_DEFAULT_LOGIN_USERNAME /
+  // VITE_DEFAULT_LOGIN_PASSWORD in a local (gitignored) .env. Never falls
+  // back to a real credential in the source, so nothing ships in the bundle.
   const [username, setUsername] = useState(
     import.meta.env.DEV ? import.meta.env.VITE_DEFAULT_LOGIN_USERNAME || "" : "",
   );
-  const [password, setPassword] = useState(import.meta.env.DEV ? import.meta.env.VITE_DEFAULT_LOGIN_PASSWORD || "" : "");
+  const [password, setPassword] = useState(
+    import.meta.env.DEV ? import.meta.env.VITE_DEFAULT_LOGIN_PASSWORD || "" : "",
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -268,6 +273,16 @@ export function LoginPage() {
                 )}
               </button>
             </motion.form>
+            <motion.p variants={cardItem} className="mt-5 text-center text-xs text-muted-foreground">
+              {t("noAccount")}{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/signup")}
+                className="font-semibold text-primary transition hover:text-primary/80"
+              >
+                {t("getStarted")}
+              </button>
+            </motion.p>
           </motion.div>
         </motion.div>
       </div>

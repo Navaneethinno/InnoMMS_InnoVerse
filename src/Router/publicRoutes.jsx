@@ -10,6 +10,9 @@ const SetupPage = lazy(() =>
 const ForgotPasswordPage = lazy(() =>
   import("@/Pages/Login/ForgotPasswordPage").then((m) => ({ default: m.ForgotPasswordPage })),
 );
+const SignupPage = lazy(() =>
+  import("@/Pages/Login/SignupPage").then((m) => ({ default: m.SignupPage })),
+);
 // "/" is no longer a public redirect — the protected route group now
 // registers its own "/" route (Dashboard), guarded by ProtectRoute, so an
 // unauthenticated visit to "/" goes straight to /login (matching payse's
@@ -17,6 +20,7 @@ const ForgotPasswordPage = lazy(() =>
 // /dashboard first.
 export const publicRoutes = [
   { path: "/login", element: pageElement(LoginPage) },
+  { path: "/signup", element: pageElement(SignupPage) },
   { path: "/setup", element: pageElement(SetupPage) },
   { path: "/forgot-password", element: pageElement(ForgotPasswordPage) },
   { path: "/access-denied", element: <AccessDenied /> },

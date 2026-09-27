@@ -142,6 +142,66 @@ export const login = {
   hidePassword: "Ocultar senha",
   enterCredentials: "Por favor, insira seu usuário e senha",
   invalidCredentials: "Credenciais inválidas. Tente novamente.",
+  getStarted: "Registar",
+  noAccount: "Novo no InnoMMS?",
+};
+
+// Cadastro self-service do comerciante — a estrutura de marca e a visita
+// guiada, espelhando o layout de /signup do innoverse-customer. O formulário
+// de onboarding em si está esboçado por enquanto (ver o TODO em SignupPage).
+export const signup = {
+  documentTitle: "Registar · InnoMMS",
+  portalName: "Portal do Comerciante",
+  eyebrow: "COMEÇAR",
+  title: "Crie a sua conta de comerciante",
+  subtitle: "Configure o seu espaço de trabalho em poucos minutos.",
+  backToSignIn: "Voltar ao início de sessão",
+  haveAccount: "Já tem uma conta?",
+  signInLink: "Entrar",
+  privacyNote: "As suas informações mantêm-se privadas e seguras.",
+
+  registrationSteps: "Passos do registo",
+  step1Title: "Dados do negócio",
+  step1Hint: "Fale-nos sobre o seu negócio.",
+  step2Title: "Dados de contacto",
+  step2Hint: "Como iremos contactá-lo.",
+  step3Title: "Proteger conta",
+  step3Hint: "Escolha uma palavra-passe.",
+
+  username: "Nome de utilizador",
+  usernamePlaceholder: "Escolha um nome de utilizador",
+  businessName: "Nome do negócio",
+  businessNamePlaceholder: "ex.: Northstar Foods",
+  regNumber: "Número de registo",
+  regNumberPlaceholder: "REG-2024-XXXXX",
+  contactName: "Nome do contacto",
+  contactNamePlaceholder: "Joana Silva",
+  email: "Endereço de e-mail",
+  emailPlaceholder: "voce@empresa.com",
+  phone: "Número de telefone",
+  phonePlaceholder: "+351 900 000 000",
+  password: "Palavra-passe",
+  passwordPlaceholder: "Pelo menos 8 caracteres",
+  confirmPassword: "Confirmar palavra-passe",
+  confirmPlaceholder: "Repita a palavra-passe",
+  optional: "Opcional",
+  showPassword: "Mostrar palavra-passe",
+  hidePassword: "Ocultar palavra-passe",
+
+  next: "Seguinte",
+  back: "Anterior",
+  stepOf: "Passo {{current}} de {{total}}",
+  createAccount: "Criar conta",
+  creating: "A criar conta…",
+
+  required: "Este campo é obrigatório",
+  emailInvalid: "Introduza um endereço de e-mail válido",
+  passwordShort: "Use pelo menos 8 caracteres",
+  passwordMismatch: "As palavras-passe não coincidem",
+
+  notWiredTitle: "Ainda não ligado",
+  notWiredBody:
+    "O registo ainda não está ligado ao backend. Os seus dados parecem válidos — um administrador irá ativar a criação de contas em breve.",
 };
 
 export const forgotPassword = {
@@ -316,6 +376,7 @@ export default {
   common,
   auth,
   login,
+  signup,
   layout,
   forgotPassword,
   setup,

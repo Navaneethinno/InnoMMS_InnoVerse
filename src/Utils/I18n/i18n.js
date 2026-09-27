@@ -27,6 +27,7 @@ void i18n
       "common",
       "auth",
       "login",
+      "signup",
       "layout",
       "dashboard",
       "forgotPassword",
