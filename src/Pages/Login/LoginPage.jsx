@@ -19,8 +19,6 @@ import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
 import { Logo } from "@/Components/Common/Logo";
 import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
 import { UiTooltip } from "@/Components/Common/UiTooltip";
-import loginIllustrationLight from "@/assets/login-illustration.png";
-import loginIllustrationDark from "@/assets/login-illustration-dark.png";
 function GradientMesh() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
@@ -119,55 +117,17 @@ export function LoginPage() {
         </button>
         </UiTooltip>
       </div>
+      {/* Plain themed background (no illustration asset) — a soft gradient
+          wash in the brand color, light/dark aware. */}
       <div
         className="absolute inset-0 z-0 overflow-hidden"
-        style={{ background: mode === "dark" ? "#0b1220" : "#eef2fb" }}
-      >
-        {/* Entrance: the illustration settles in first (a beat before the
-            branding/form card), then keeps a very slow ambient "breathing"
-            scale loop going — the idle life the strategy's globe-rotation/
-            floating-shield loops give a fully layered scene, adapted to a
-            single flat illustration instead of separate animatable layers. */}
-        <motion.div
-          className="absolute inset-0"
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-        >
-          <motion.div
-            className="absolute inset-0"
-            animate={{ scale: [1, 1.015, 1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}
-          >
-            {/* Both illustrations share identical sizing/position — only
-                opacity crossfades, so the image geometry never changes
-                between themes. */}
-            <img
-              src={loginIllustrationLight}
-              alt="InnoMMS — Innovate. Secure. Empower."
-              aria-hidden={mode === "dark"}
-              className="login-illustration absolute inset-0 h-full w-full object-cover object-right"
-              style={{ opacity: mode === "dark" ? 0 : 1 }}
-            />
-            <img
-              src={loginIllustrationDark}
-              alt="InnoMMS — Innovate. Secure. Empower."
-              aria-hidden={mode !== "dark"}
-              className="login-illustration absolute inset-0 h-full w-full object-cover object-right"
-              style={{ opacity: mode === "dark" ? 1 : 0 }}
-            />
-          </motion.div>
-        </motion.div>
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              mode === "dark"
-                ? "linear-gradient(90deg, rgba(11,18,32,0.96) 0%, rgba(11,18,32,0.7) 34%, rgba(11,18,32,0.08) 70%)"
-                : "linear-gradient(90deg, rgba(238,242,251,0.98) 0%, rgba(238,242,251,0.76) 32%, rgba(238,242,251,0.04) 72%)",
-          }}
-        />
-      </div>
+        style={{
+          background:
+            mode === "dark"
+              ? "radial-gradient(1000px 700px at 80% 20%, rgba(76,134,244,0.16), transparent 60%), #0b1220"
+              : "radial-gradient(1000px 700px at 80% 20%, rgba(34,102,238,0.12), transparent 60%), #eef2fb",
+        }}
+      />
       <div className="relative z-10 flex min-h-screen w-full items-center justify-start overflow-hidden px-5 py-24 sm:px-12 lg:w-[52%] lg:px-[6vw] lg:py-12">
         <GradientMesh />
         <motion.div
