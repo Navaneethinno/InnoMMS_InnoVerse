@@ -137,28 +137,30 @@ export const auth = {
 // adding "Welcome back" etc. doesn't collide with those existing keys.
 export const login = {
   tagline: "Fintech Administration Platform",
+  merchantPortal: "Merchant Portal",
+  // Left hero column.
+  secureBadge: "Secure merchant workspace",
+  heroTitle: "Run your business with a clearer view of every day.",
+  heroDescription:
+    "Manage your merchant account, keep your business details current, and grow into the InnoMMS ecosystem from one calm workspace.",
+  // Right sign-in card.
   welcomeBack: "Welcome back",
-  subtitle: "Sign in to manage your secure workspace.",
-  formLabel: "Sign in",
-  username: "Username",
+  signInTitle: "Sign in to your portal",
+  subtitle: "Your business workspace is ready when you are.",
+  usernameLabel: "Username, mobile number or email",
+  usernamePlaceholder: "Enter a registered login",
   password: "Password",
-  forgotPassword: "Forgot Password?",
+  passwordPlaceholder: "At least 8 characters",
+  forgotPassword: "Forgot password?",
+  signIn: "Sign in",
   signInSecurely: "Sign in securely",
   authenticating: "Authenticating…",
   showPassword: "Show password",
   hidePassword: "Hide password",
   enterCredentials: "Please enter your username and password",
   invalidCredentials: "Invalid credentials. Please try again.",
-  getStarted: "Sign up",
+  getStarted: "Create account",
   noAccount: "New to InnoMMS?",
-  // Left hero panel (mirrors the customer portal's sign-in layout).
-  heroBadge: "WELCOME TO INNOMMS",
-  heroFirst: "Your workspace.",
-  heroAccent: "One secure place.",
-  heroDescription: "A little less to manage, a little more room to move your business forward.",
-  cardTitle: "Built around you.",
-  cardDescription:
-    "One place for your administration. Simple, secure, and always moving forward.",
 };
 
 // Self-service merchant signup — a 3-step registration wizard (business,

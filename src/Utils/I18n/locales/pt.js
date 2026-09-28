@@ -132,27 +132,28 @@ export const auth = {
 
 export const login = {
   tagline: "Plataforma de Administração Fintech",
+  merchantPortal: "Portal do Comerciante",
+  secureBadge: "Espaço seguro do comerciante",
+  heroTitle: "Administre o seu negócio com uma visão mais clara de cada dia.",
+  heroDescription:
+    "Gira a sua conta de comerciante, mantenha os dados atualizados e cresça no ecossistema InnoMMS a partir de um espaço tranquilo.",
   welcomeBack: "Bem-vindo de volta",
-  subtitle: "Entre para gerir o seu espaço de trabalho seguro.",
-  formLabel: "Entrar",
-  username: "Usuário",
+  signInTitle: "Entre no seu portal",
+  subtitle: "O seu espaço de trabalho está pronto quando você estiver.",
+  usernameLabel: "Utilizador, telemóvel ou e-mail",
+  usernamePlaceholder: "Introduza um acesso registado",
   password: "Senha",
+  passwordPlaceholder: "Pelo menos 8 caracteres",
   forgotPassword: "Esqueceu a senha?",
+  signIn: "Entrar",
   signInSecurely: "Entrar com segurança",
   authenticating: "Autenticando…",
   showPassword: "Mostrar senha",
   hidePassword: "Ocultar senha",
   enterCredentials: "Por favor, insira seu usuário e senha",
   invalidCredentials: "Credenciais inválidas. Tente novamente.",
-  getStarted: "Registar",
+  getStarted: "Criar conta",
   noAccount: "Novo no InnoMMS?",
-  heroBadge: "BEM-VINDO À INNOMMS",
-  heroFirst: "O seu espaço.",
-  heroAccent: "Um só lugar seguro.",
-  heroDescription: "Menos para gerir, mais espaço para fazer o seu negócio avançar.",
-  cardTitle: "Pensado para si.",
-  cardDescription:
-    "Um lugar para a sua administração. Simples, seguro e sempre a avançar.",
 };
 
 // Cadastro self-service do comerciante — a estrutura de marca e a visita
