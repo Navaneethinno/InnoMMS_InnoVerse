@@ -133,6 +133,8 @@ export const auth = {
 export const login = {
   tagline: "Plataforma de Administração Fintech",
   welcomeBack: "Bem-vindo de volta",
+  subtitle: "Entre para gerir o seu espaço de trabalho seguro.",
+  formLabel: "Entrar",
   username: "Usuário",
   password: "Senha",
   forgotPassword: "Esqueceu a senha?",
@@ -144,6 +146,13 @@ export const login = {
   invalidCredentials: "Credenciais inválidas. Tente novamente.",
   getStarted: "Registar",
   noAccount: "Novo no InnoMMS?",
+  heroBadge: "BEM-VINDO À INNOMMS",
+  heroFirst: "O seu espaço.",
+  heroAccent: "Um só lugar seguro.",
+  heroDescription: "Menos para gerir, mais espaço para fazer o seu negócio avançar.",
+  cardTitle: "Pensado para si.",
+  cardDescription:
+    "Um lugar para a sua administração. Simples, seguro e sempre a avançar.",
 };
 
 // Cadastro self-service do comerciante — a estrutura de marca e a visita

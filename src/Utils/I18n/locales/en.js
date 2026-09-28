@@ -138,6 +138,8 @@ export const auth = {
 export const login = {
   tagline: "Fintech Administration Platform",
   welcomeBack: "Welcome back",
+  subtitle: "Sign in to manage your secure workspace.",
+  formLabel: "Sign in",
   username: "Username",
   password: "Password",
   forgotPassword: "Forgot Password?",
@@ -149,6 +151,14 @@ export const login = {
   invalidCredentials: "Invalid credentials. Please try again.",
   getStarted: "Sign up",
   noAccount: "New to InnoMMS?",
+  // Left hero panel (mirrors the customer portal's sign-in layout).
+  heroBadge: "WELCOME TO INNOMMS",
+  heroFirst: "Your workspace.",
+  heroAccent: "One secure place.",
+  heroDescription: "A little less to manage, a little more room to move your business forward.",
+  cardTitle: "Built around you.",
+  cardDescription:
+    "One place for your administration. Simple, secure, and always moving forward.",
 };
 
 // Self-service merchant signup — a 3-step registration wizard (business,
