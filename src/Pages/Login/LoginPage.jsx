@@ -196,6 +196,7 @@ export function LoginPage() {
                 {t("getStarted")}
               </button>
             </p>
+            <p className="mt-6 text-center text-xs text-muted-foreground">© 2026 Innovitegra Solutions Private Limited</p>
           </div>
         </motion.div>
       </main>
