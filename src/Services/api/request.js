@@ -55,3 +55,42 @@ export async function apiRequest(path, body = {}) {
 // Rows out of a list/get response, tolerant of the few envelope shapes seen.
 export const rowsOf = (response) =>
   Array.isArray(response?.data) ? response.data : (response?.data?.data ?? response?.data?.list ?? []);
+
+// The public (no-login) portal APIs, e.g. merchant self-onboarding under
+// /merchant/web: same envelope and error text as apiRequest, but the caller
+// passes the portal's own Authorization header instead of a Bearer token.
+// A FormData body goes out as multipart; `responseType: "blob"` returns the
+// file itself. Errors carry `status` (409 means a conflict the screen offers
+// a way out of).
+export async function portalRequest(path, body = {}, { authorization, responseType } = {}) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 30000);
+  const multipart = body instanceof FormData;
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers: {
+        ...(multipart ? {} : { "Content-Type": "application/json" }),
+        Deviceinfo: JSON.stringify(DEVICE_INFO),
+        ...(authorization ? { Authorization: authorization } : {}),
+        ...apiLanguageHeader(),
+      },
+      body: multipart ? body : JSON.stringify(body),
+      signal: controller.signal,
+    });
+    const isJson = (response.headers.get("content-type") ?? "").includes("application/json");
+    if (responseType === "blob" && response.ok && !isJson) return await response.blob();
+    const payload = isJson ? await response.json().catch(() => null) : null;
+    if (!response.ok || String(payload?.status).toLowerCase() === "fail") {
+      const error = new Error(getApiErrorMessage(payload, `Request failed with status ${response.status}`));
+      error.status = response.status;
+      throw error;
+    }
+    return payload;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") throw new Error("Request timed out");
+    throw error instanceof Error ? error : new Error("Unexpected API error");
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
