@@ -178,7 +178,6 @@ export const signup = {
   yourProgress: "O seu progresso",
   subType: "Tipo de comerciante",
   companyType: "Tipo de empresa",
-  noSubTypeDefault: "Sem subtipo (padrão)",
   nothingPublished: "A integração ainda não está aberta para este tipo. Volte mais tarde.",
   email: "Endereço de email",
   emailPlaceholder: "voce@empresa.com",
@@ -198,9 +197,6 @@ export const signup = {
   readyToFinish: "Tudo o que é obrigatório está preenchido.",
   finishSetup: "Concluir",
   back: "Voltar",
-  skipForNow: "Saltar por agora",
-  save: "Guardar",
-  saveContinue: "Guardar e continuar",
   discardTitle: "Descartar esta candidatura?",
   discardBody: "Tudo o que foi preenchido, incluindo ficheiros carregados, será eliminado. Depois pode recomeçar ou candidatar-se noutra função.",
   discard: "Descartar",
@@ -210,6 +206,9 @@ export const signup = {
   replaceFile: "Substituir",
   uploadFile: "Carregar ficheiro",
   fileTooLarge: "O ficheiro deve ter menos de {{size}} KB",
+  standard: "Padrão",
+  notReadyYet: "Ainda faltam respostas obrigatórias. Volte para as completar.",
+  next: "Seguinte",
 };
 
 export const forgotPassword = {

@@ -41,7 +41,7 @@ const Lines = ({ text }) => (
 export function MerchantOnboardingForm({ flow, onDone }) {
   const { t } = useTranslation("signup");
   const [confirmDiscard, setConfirmDiscard] = useState(false);
-  const { wizard, section, sections, activeSection, setActiveSection, editable, busy, problem } = flow;
+  const { screen, section, progress, editable, busy, problem } = flow;
 
   if (flow.unavailable) {
     return (
@@ -51,8 +51,8 @@ export function MerchantOnboardingForm({ flow, onDone }) {
     );
   }
 
-  // Picker: the one role choice (sub type / company type) and the contact.
-  if (!wizard) {
+  // Start: the category (sub type) and the contact.
+  if (!screen) {
     if (flow.resuming || (!flow.options && !flow.optionsError)) {
       return (
         <div className="flex justify-center py-12">
@@ -81,25 +81,28 @@ export function MerchantOnboardingForm({ flow, onDone }) {
         {flow.conflict && (
           <Notice tone="amber">
             <Lines text={flow.conflict} />
-            <button type="button" disabled={busy === "start"} onClick={() => void flow.start({ contactOnly: true })} className={quietButton}>
+            <button type="button" disabled={busy === "start"} onClick={() => void flow.start({ carryOn: true })} className={quietButton}>
               {busy === "start" ? <Spinner size={13} /> : <RotateCcw size={14} />} {t("openInProgress")}
             </button>
           </Notice>
         )}
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
-            {label} <span className="text-red-500">*</span>
-          </label>
-          {flow.choices.length ? (
-            <FilterSelect
-              value={flow.choice ?? ""}
-              onChange={(v) => flow.setPick({ ...flow.pick, choice: v })}
-              options={flow.choices.map((c) => ({ value: c.value, label: c.isDefault ? t("noSubTypeDefault") : c.label }))}
-            />
-          ) : (
-            <p className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">{t("nothingPublished")}</p>
-          )}
-        </div>
+        {/* The category is only asked when there's a real choice. */}
+        {flow.choices.length !== 1 && (
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-foreground">
+              {label} <span className="text-red-500">*</span>
+            </label>
+            {flow.choices.length ? (
+              <FilterSelect
+                value={flow.choice ?? ""}
+                onChange={(v) => flow.setPick({ ...flow.pick, choice: v })}
+                options={flow.choices.map((c) => ({ value: c.value, label: c.isDefault ? t("standard") : c.label }))}
+              />
+            ) : (
+              <p className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">{t("nothingPublished")}</p>
+            )}
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground">
@@ -128,7 +131,7 @@ export function MerchantOnboardingForm({ flow, onDone }) {
       <div className="py-10 text-center">
         <CircleCheck size={40} className="mx-auto text-primary" />
         <h2 className="mt-4 text-xl font-bold text-foreground">{t("allSet")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{flow.completedMessage || wizard.onboarding?.status_name}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{flow.completedMessage || flow.onboarding?.status_name}</p>
         <button type="button" onClick={onDone} className={`${primaryButton} mt-6`}>
           {t("backToSignIn")} <ArrowRight size={14} />
         </button>
@@ -136,12 +139,62 @@ export function MerchantOnboardingForm({ flow, onDone }) {
     );
   }
 
-  if (!section) return <p className="py-10 text-center text-sm text-muted-foreground">{t("nothingToFill")}</p>;
+  const discardControls = (
+    <>
+      <button type="button" onClick={() => setConfirmDiscard(true)} className={quietButton}>
+        <RotateCcw size={14} /> {t("discardStartOver")}
+      </button>
+      <ConfirmDialog
+        open={confirmDiscard}
+        title={t("discardTitle")}
+        description={t("discardBody")}
+        confirmLabel={t("discard")}
+        destructive
+        pending={busy === "discard"}
+        onClose={() => setConfirmDiscard(false)}
+        onConfirm={async () => {
+          if (await flow.discard()) setConfirmDiscard(false);
+        }}
+      />
+    </>
+  );
+  const backButton = progress.previous_section ? (
+    <button type="button" disabled={busy === "back"} onClick={() => void flow.back()} className={quietButton}>
+      {busy === "back" ? <Spinner size={13} /> : <ArrowLeft size={14} />} {t("back")}
+    </button>
+  ) : (
+    <span />
+  );
+
+  // No section left: the last one is done. Finish when everything required
+  // is in place; otherwise Back lets the merchant complete what's missing.
+  if (!section) {
+    return (
+      <div className="space-y-5">
+        {problem && (
+          <Notice>
+            <Lines text={problem} />
+          </Notice>
+        )}
+        <div className="rounded-2xl border border-primary/30 bg-primary-light p-5">
+          <p className="font-semibold text-foreground">{progress.ready_to_submit ? t("readyToFinish") : t("notReadyYet")}</p>
+          {progress.ready_to_submit && (
+            <button type="button" disabled={busy === "submit"} onClick={() => void flow.submit()} className={`${primaryButton} mt-4`}>
+              {busy === "submit" ? <RefreshCw size={14} className="animate-spin" /> : <Check size={14} />} {t("finishSetup")}
+            </button>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          {backButton}
+          {discardControls}
+        </div>
+      </div>
+    );
+  }
 
   const typeCaption = section.fields?.find((f) => f.key === section.type_field)?.label ?? t("type");
   const visibleFields = (section.fields ?? []).filter((f) => f.key !== section.type_field);
   const sectionIssues = (section.issues ?? []).filter((i) => !i.field);
-  const isLast = activeSection >= sections.length - 1;
 
   const fileRulesFor = (row) => {
     const typeId = section.type_field ? row?.[section.type_field] : undefined;
@@ -217,12 +270,10 @@ export function MerchantOnboardingForm({ flow, onDone }) {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium text-muted-foreground">{t("stepOf", { current: activeSection + 1, total: sections.length })}</p>
+          {progress.position != null && <p className="text-xs font-medium text-muted-foreground">{t("stepOf", { current: progress.position, total: progress.total })}</p>}
           <h2 className="mt-1 text-lg font-bold text-foreground">{section.label ?? section.name}</h2>
         </div>
-        <button type="button" onClick={() => setConfirmDiscard(true)} className={quietButton}>
-          <RotateCcw size={14} /> {t("discardStartOver")}
-        </button>
+        {discardControls}
       </div>
 
       {problem && (
@@ -257,43 +308,12 @@ export function MerchantOnboardingForm({ flow, onDone }) {
         renderRow(flow.draft ?? {}, undefined)
       )}
 
-      {wizard.progress?.ready_to_submit && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-light p-4">
-          <p className="text-sm font-semibold text-foreground">{t("readyToFinish")}</p>
-          <button type="button" disabled={busy === "submit"} onClick={() => void flow.submit()} className={primaryButton}>
-            {busy === "submit" ? <RefreshCw size={14} className="animate-spin" /> : <Check size={14} />} {t("finishSetup")}
-          </button>
-        </div>
-      )}
-
       <div className="flex items-center justify-between gap-3 pt-2">
-        <button type="button" disabled={activeSection === 0} onClick={() => setActiveSection((i) => Math.max(0, i - 1))} className={`${quietButton} disabled:invisible`}>
-          <ArrowLeft size={14} /> {t("back")}
+        {backButton}
+        <button type="button" disabled={busy === "next"} onClick={() => void flow.next()} className={primaryButton}>
+          {busy === "next" ? <RefreshCw size={14} className="animate-spin" /> : null} {t("next")} <ArrowRight size={14} />
         </button>
-        <div className="flex items-center gap-2">
-          {!isLast && (
-            <button type="button" onClick={() => setActiveSection((i) => Math.min(sections.length - 1, i + 1))} className="px-3 py-2.5 text-sm font-semibold text-muted-foreground hover:text-foreground">
-              {t("skipForNow")}
-            </button>
-          )}
-          <button type="button" disabled={busy === "save"} onClick={() => void flow.saveSection()} className={primaryButton}>
-            {busy === "save" ? <RefreshCw size={14} className="animate-spin" /> : null} {isLast ? t("save") : t("saveContinue")} {!isLast && <ArrowRight size={14} />}
-          </button>
-        </div>
       </div>
-
-      <ConfirmDialog
-        open={confirmDiscard}
-        title={t("discardTitle")}
-        description={t("discardBody")}
-        confirmLabel={t("discard")}
-        destructive
-        pending={busy === "discard"}
-        onClose={() => setConfirmDiscard(false)}
-        onConfirm={async () => {
-          if (await flow.discard()) setConfirmDiscard(false);
-        }}
-      />
     </div>
   );
 }

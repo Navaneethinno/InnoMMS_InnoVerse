@@ -3,10 +3,11 @@ import { merchantOnboardingApi } from "@/Services/Onboarding/merchantOnboarding.
 import { notifications } from "@/Utils/Lib/notifications";
 
 // The merchant self-onboarding engine behind Sign up, for one kind
-// (individual | corporate): the picker that starts or resumes an onboarding,
-// then the section-by-section form, redrawn from the server's reply after
-// every save. Every text the merchant reads about the outcome (success,
-// refusal, notice, per-field issues) comes from the API as received.
+// (individual | corporate), on the "Merchant web: onboarding API": the
+// server walks the merchant through ONE section at a time. add / get / next
+// / back all reply with the same screen (registration, progress, section);
+// the page only draws that section and sends its answers back. Every text
+// about the outcome (success, refusal, issues) comes from the API.
 
 const storageKey = (kind) => `innomms:merchant-onboarding:${kind}`;
 const readReference = (kind) => {
@@ -20,7 +21,7 @@ const storeReference = (kind, referenceId) => {
   try {
     window.localStorage.setItem(storageKey(kind), referenceId);
   } catch {
-    /* Resuming later still works through add with the same contact. */
+    /* Starting again with the same contact still carries on. */
   }
 };
 const forgetReference = (kind) => {
@@ -34,7 +35,7 @@ const forgetReference = (kind) => {
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 const isBlank = (value) => value === "" || value === undefined || value === null;
 
-// A field's default_value pre-fills it while it is empty.
+// A field's default_value pre-fills it while nothing is saved.
 function withDefaults(fields, row) {
   const filled = { ...row };
   for (const field of fields ?? []) {
@@ -43,23 +44,17 @@ function withDefaults(fields, row) {
   return filled;
 }
 
-// Answers go back as the section's whole `data`: empty answers left out, and
-// the read-only `*_name` companions of a chosen option not sent back.
-function cleanRow(row, fieldKeys) {
-  const cleaned = {};
-  for (const [key, value] of Object.entries(row ?? {})) {
-    if (isBlank(value)) continue;
-    if (key.endsWith("_name") && !fieldKeys.has(key)) continue;
-    cleaned[key] = value;
-  }
-  return cleaned;
+// Only keys that are in the section's fields go back (plus the entry kind
+// and "same as" of a list section); empty answers are left out.
+function cleanRow(row, keys) {
+  return Object.fromEntries(Object.entries(row ?? {}).filter(([key, value]) => keys.has(key) && !isBlank(value)));
 }
 
 const seedOf = (section) =>
   section
     ? section.multi_row
-      ? (section.values?.length ? section.values : [{}]).map((row) => withDefaults(section.fields, row))
-      : withDefaults(section.fields, section.values ?? {})
+      ? (Array.isArray(section.values) ? section.values : []).map((row) => withDefaults(section.fields, row))
+      : withDefaults(section.fields, Array.isArray(section.values) ? {} : (section.values ?? {}))
     : null;
 
 const EMPTY_PICK = { choice: null, email: "", phone_number: "" };
@@ -69,26 +64,26 @@ export function useMerchantOnboarding(kind) {
   const [options, setOptions] = useState(null);
   const [optionsError, setOptionsError] = useState("");
   const [pick, setPick] = useState(EMPTY_PICK);
-  const [wizard, setWizard] = useState(null);
+  const [screen, setScreen] = useState(null);
   const [resuming, setResuming] = useState(() => Boolean(readReference(kind)));
-  const [activeSection, setActiveSection] = useState(0);
-  // Unsaved answers per section code; a section without an entry shows what
-  // the server has. Kept while moving between steps, dropped once saved.
-  const [drafts, setDrafts] = useState({});
-  const [busy, setBusy] = useState(null); // "start" | "save" | "submit" | "discard"
+  // The answers being edited on the section shown, until Next sends them.
+  // Reset whenever a new screen arrives.
+  const [draft, setDraft] = useState(null);
+  const [busy, setBusy] = useState(null); // "start" | "next" | "back" | "submit" | "discard"
   const [problem, setProblem] = useState("");
-  // A 409 on start: the contact already has an unfinished onboarding in
-  // another role, or has completed this one. Holds the API's message.
+  // A 409 on start: the contact already has a different registration open,
+  // or has finished this role. Holds the API's message.
   const [conflict, setConflict] = useState("");
   const [unavailable, setUnavailable] = useState("");
   const [completedMessage, setCompletedMessage] = useState("");
 
-  const applyWizard = (form) => {
-    setWizard(form);
-    if (form?.onboarding?.reference_id) storeReference(kind, form.onboarding.reference_id);
+  const show = (next) => {
+    setScreen(next);
+    setDraft(seedOf(next?.section));
+    if (next?.onboarding?.reference_id) storeReference(kind, next.onboarding.reference_id);
   };
 
-  // A 403 means the institution doesn't offer web onboarding: a page state.
+  // A 403 means the institution hasn't switched the web on: a page state.
   const reportError = (error) => {
     if (error.status === 403) {
       setUnavailable(error.message);
@@ -109,8 +104,8 @@ export function useMerchantOnboarding(kind) {
     const referenceId = readReference(kind);
     if (referenceId) {
       api
-        .loadWizard(referenceId)
-        .then(({ data }) => applyWizard(data))
+        .get(referenceId)
+        .then(({ data }) => show(data))
         .catch((error) => (error.status === 403 ? setUnavailable(error.message) : forgetReference(kind)))
         .finally(() => setResuming(false));
     }
@@ -118,35 +113,20 @@ export function useMerchantOnboarding(kind) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // What can be started (handoff 17): party type is MERCHANT (the API) and
-  // ownership comes from the kind. Individual offers the sub types with a
-  // published definition, and "No sub type" (value "") only when the default
-  // definition is published; corporate offers its company types.
-  const party = options?.party_types?.[0];
-  const ownership = party?.ownerships?.[0];
-  const choices =
-    kind === "individual"
-      ? [
-          ...(ownership?.definition_id ? [{ value: "", label: null, isDefault: true }] : []),
-          ...(ownership?.sub_types ?? []).map((s) => ({ value: String(s.id), label: s.name })),
-        ]
-      : (party?.company_types ?? []).map((c) => ({ value: String(c.id), label: c.name }));
+  // The categories on offer (sub types). When the ownership also has a
+  // definition_id, registering with no category ("Standard") is allowed too,
+  // sent as no sub_type_id. The page hides the choice when there's only one.
+  const ownership = options?.party_types?.[0]?.ownerships?.[0];
+  const choices = [
+    ...(ownership?.definition_id ? [{ value: "", isDefault: true }] : []),
+    ...(ownership?.sub_types ?? []).map((s) => ({ value: String(s.id), label: s.name })),
+  ];
   const choice = pick.choice ?? choices[0]?.value ?? null;
 
-  const sections = wizard?.sections ?? [];
-  const section = sections[activeSection];
-  const editable = wizard?.onboarding?.editable !== false;
-
-  const kept = section ? drafts[section.code] : undefined;
-  const effectiveDraft = kept !== undefined && Array.isArray(kept) === Boolean(section?.multi_row) ? kept : seedOf(section);
-  // Builds on the latest stored draft, so several updates in one handler
-  // (a parent change clearing its dependent fields) all land.
-  const setDraft = (update) =>
-    setDrafts((all) => {
-      const current = all[section.code];
-      const base = current !== undefined && Array.isArray(current) === Boolean(section.multi_row) ? current : seedOf(section);
-      return { ...all, [section.code]: update(base) };
-    });
+  const onboarding = screen?.onboarding;
+  const section = screen?.section ?? null;
+  const progress = screen?.progress ?? {};
+  const editable = onboarding?.editable !== false;
 
   const run = async (name, work) => {
     setProblem("");
@@ -162,27 +142,20 @@ export function useMerchantOnboarding(kind) {
     }
   };
 
-  // `contactOnly` resumes whatever this contact has in progress in this flow
-  // (the API resumes a call with only the contact and no sub type).
-  const start = ({ contactOnly = false } = {}) =>
+  // `carryOn` sends only the contact: the API then carries on whatever this
+  // contact has open in this kind.
+  const start = ({ carryOn = false } = {}) =>
     run("start", async () => {
       setConflict("");
-      const contact = {
+      const payload = {
+        ...(!carryOn && choice ? { sub_type_id: Number(choice) } : {}),
         ...(pick.email.trim() ? { email: pick.email.trim() } : {}),
         ...(pick.phone_number.trim() ? { phone_number: pick.phone_number.trim() } : {}),
       };
-      const role = contactOnly
-        ? {}
-        : kind === "individual"
-          ? { ownership_sub_type_id: choice ? Number(choice) : null }
-          : { company_type_id: choice ? Number(choice) : undefined };
       try {
-        const { data: form, message } = await api.start({ ...role, ...contact });
+        const { data, message } = await api.start(payload);
         notifications.success(message);
-        if (form?.notice) notifications.info(form.notice);
-        setDrafts({});
-        applyWizard(form);
-        setActiveSection(0);
+        show(data);
         return true;
       } catch (error) {
         if (error.status === 409) setConflict(error.message);
@@ -193,88 +166,92 @@ export function useMerchantOnboarding(kind) {
   const setValue = (rowIndex, key, value) =>
     setDraft((prev) =>
       rowIndex === undefined
-        ? Array.isArray(prev)
-          ? prev
-          : { ...prev, [key]: value }
+        ? { ...(Array.isArray(prev) ? {} : prev), [key]: value }
         : (Array.isArray(prev) ? prev : []).map((row, i) => (i === rowIndex ? { ...row, [key]: value } : row)),
     );
   const addRow = () => setDraft((prev) => [...(Array.isArray(prev) ? prev : []), withDefaults(section?.fields, {})]);
   const removeRow = (rowIndex) => setDraft((prev) => (Array.isArray(prev) ? prev : []).filter((_, i) => i !== rowIndex));
 
-  const issueFor = (key, rowIndex) =>
-    section?.issues?.find((i) => i.field === key && (rowIndex === undefined || i.row === rowIndex))?.message;
+  const issueFor = (key, rowIndex) => section?.issues?.find((i) => i.field === key && (rowIndex === undefined || i.row === rowIndex))?.message;
 
-  const saveSection = () =>
-    run("save", async () => {
-      const fieldKeys = new Set((section.fields ?? []).map((f) => f.key));
-      const data = Array.isArray(effectiveDraft) ? effectiveDraft.map((row) => cleanRow(row, fieldKeys)) : cleanRow(effectiveDraft, fieldKeys);
+  // Next: save the section's answers (they replace what was saved there)
+  // and show whatever comes back: the next section, or the same one with
+  // what is still missing (moved: false), or none when this was the last.
+  const next = () =>
+    run("next", async () => {
+      const keys = new Set([
+        ...(section.fields ?? []).map((f) => f.key),
+        ...(section.type_field ? [section.type_field, "same_as_address_type_id"] : []),
+      ]);
+      const data = Array.isArray(draft) ? draft.map((row) => cleanRow(row, keys)) : cleanRow(draft, keys);
       try {
-        const { data: form, message } = await api.saveSection({
-          reference_id: wizard.onboarding.reference_id,
+        const { data: reply, message } = await api.next({
+          reference_id: onboarding.reference_id,
           section_code: section.code,
           data,
-          expected_updated_time: wizard.onboarding.updated_time,
+          expected_updated_time: onboarding.updated_time,
         });
-        setDrafts(({ [section.code]: _saved, ...rest }) => rest);
-        applyWizard(form);
-        notifications.success(message);
-        const next = (form.sections ?? []).findIndex((s) => s.code === form?.progress?.next_section);
-        if (next >= 0) setActiveSection(next);
+        if (reply?.moved) notifications.success(message);
+        show(reply);
         return true;
       } catch (error) {
-        // Changed elsewhere since it was loaded: redraw from the latest.
+        // Changed elsewhere in the meantime: redraw from the latest.
         if (error.status === 409) {
-          const fresh = await api.loadWizard(wizard.onboarding.reference_id).catch(() => null);
-          if (fresh) {
-            setDrafts({});
-            applyWizard(fresh.data);
-          }
+          const fresh = await api.get(onboarding.reference_id).catch(() => null);
+          if (fresh) show(fresh.data);
         }
         throw error;
       }
     });
 
+  const back = () =>
+    run("back", async () => {
+      const { data } = await api.back(onboarding.reference_id, section?.code);
+      show(data);
+      return true;
+    });
+
   const submit = () =>
     run("submit", async () => {
-      const { data: form, message } = await api.submit({ reference_id: wizard.onboarding.reference_id });
-      applyWizard(form);
+      const { data, message } = await api.submit({
+        reference_id: onboarding.reference_id,
+        level_no: 0,
+        expected_updated_time: onboarding.updated_time,
+      });
+      show(data);
       forgetReference(kind);
       setCompletedMessage(message);
       notifications.success(message);
       return true;
     });
 
-  const reset = () => {
-    setDrafts({});
-    forgetReference(kind);
-    setWizard(null);
-    setActiveSection(0);
-    setProblem("");
-    setConflict("");
-    setCompletedMessage("");
-    setPick(EMPTY_PICK);
-  };
-
-  // Throw the unfinished onboarding away on the server, then back to the
-  // picker: the contact can start afresh or in another role.
+  // Throw the unfinished registration away, then back to the start: the
+  // contact can register afresh or in another role.
   const discard = () =>
     run("discard", async () => {
-      const { message } = await api.discard(wizard.onboarding.reference_id);
+      const { message } = await api.discard(onboarding.reference_id);
       notifications.success(message);
-      reset();
+      forgetReference(kind);
+      setScreen(null);
+      setDraft(null);
+      setConflict("");
+      setCompletedMessage("");
+      setPick(EMPTY_PICK);
       return true;
     });
 
-  // File fields: stored first; the returned path becomes the field's value,
-  // saved with the section. The row's document type applies its own limits.
-  const typeIdOf = (row) => (section?.type_field ? (row ?? effectiveDraft)?.[section.type_field] : undefined);
+  // File questions: stored first; the returned path is the answer. The
+  // entry's kind (type_id) applies its own formats and size.
+  const typeIdOf = (row) => (section?.type_field ? row?.[section.type_field] : undefined);
   const uploadFile = (key, file, row) =>
-    api.uploadFile({ referenceId: wizard.onboarding.reference_id, sectionCode: section.code, field: key, typeId: typeIdOf(row), file });
-  const downloadFile = (path) => api.downloadFile(wizard.onboarding.reference_id, path);
+    api.uploadFile({ referenceId: onboarding.reference_id, sectionCode: section.code, field: key, typeId: typeIdOf(row), file });
+  const downloadFile = (path) => api.downloadFile(onboarding.reference_id, path);
 
+  // A dependent list shows only the options whose parent_id is the answer
+  // to its parent question.
   const optionsFor = (field, row) => {
     if (!field.parent_key) return field.options;
-    const parentValue = row ? row[field.parent_key] : effectiveDraft?.[field.parent_key];
+    const parentValue = (row ?? draft)?.[field.parent_key];
     return (field.options ?? []).filter((o) => String(o.parent_id) === String(parentValue));
   };
 
@@ -287,13 +264,12 @@ export function useMerchantOnboarding(kind) {
     pick,
     setPick,
     resuming,
-    wizard,
-    sections,
+    screen,
+    onboarding,
     section,
+    progress,
     editable,
-    activeSection,
-    setActiveSection,
-    draft: effectiveDraft,
+    draft,
     busy,
     problem,
     conflict,
@@ -304,7 +280,8 @@ export function useMerchantOnboarding(kind) {
     addRow,
     removeRow,
     issueFor,
-    saveSection,
+    next,
+    back,
     submit,
     discard,
     uploadFile,

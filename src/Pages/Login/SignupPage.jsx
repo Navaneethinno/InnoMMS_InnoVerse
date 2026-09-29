@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
-import { Check, Moon, ShieldCheck, Sun } from "lucide-react";
+import { Moon, ShieldCheck, Sun } from "lucide-react";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
 import { Logo } from "@/Components/Common/Logo";
 import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
@@ -14,18 +14,17 @@ import { MerchantOnboardingForm } from "./Signup/MerchantOnboardingForm";
 const KINDS = ["individual", "corporate"];
 
 // One kind's onboarding (keyed by kind, so switching starts that kind's own
-// flow, which resumes its own application if one is stored): the side panel
-// shows the kind switch before starting, then the sections and progress.
+// flow, which resumes its own registration if one is stored): the side
+// panel shows the kind switch before starting, then the progress.
 function SignupFlow({ kind, onKindChange, onDone }) {
   const { t } = useTranslation("signup");
   const flow = useMerchantOnboarding(kind);
-  const { wizard, sections, activeSection, setActiveSection } = flow;
-  const percent = wizard?.progress?.percent;
+  const { screen, progress } = flow;
 
   return (
     <div className="grid gap-0 md:grid-cols-[300px_1fr]">
       <aside className="border-b border-border/70 bg-muted/40 p-6 md:border-b-0 md:border-r">
-        {!wizard ? (
+        {!screen ? (
           <>
             <p className="mb-3 text-sm font-bold text-foreground">{t("applyAs")}</p>
             <SegmentedSwitch
@@ -37,39 +36,17 @@ function SignupFlow({ kind, onKindChange, onDone }) {
           </>
         ) : (
           <>
-            <div className="mb-3 flex items-end justify-between">
-              <p className="text-sm font-bold text-foreground">{t("yourProgress")}</p>
-              {percent != null && <span className="text-sm font-bold text-primary">{percent}%</span>}
+            <p className="text-sm font-bold text-foreground">{t("yourProgress")}</p>
+            {screen.customer_type?.name && <p className="mt-1 text-xs text-muted-foreground">{screen.customer_type.name}</p>}
+            <div className="mt-4 flex items-end justify-between">
+              <span className="text-3xl font-bold text-primary">{progress.percent ?? 0}%</span>
+              {progress.position != null && (
+                <span className="pb-1 text-xs text-muted-foreground">{t("stepOf", { current: progress.position, total: progress.total })}</span>
+              )}
             </div>
-            {percent != null && (
-              <div className="mb-4 h-1 w-full overflow-hidden rounded-full bg-border">
-                <div className="h-full rounded-full bg-brand-gradient transition-all" style={{ width: `${percent}%` }} />
-              </div>
-            )}
-            <ol className="space-y-1">
-              {sections.map((s, i) => {
-                const done = s.state === "complete";
-                const current = i === activeSection;
-                return (
-                  <li key={s.code}>
-                    <button
-                      type="button"
-                      onClick={() => setActiveSection(i)}
-                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition ${current ? "bg-primary-light" : "hover:bg-background/60"}`}
-                    >
-                      <span
-                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold ${
-                          done ? "border-primary bg-primary text-primary-foreground" : current ? "border-primary text-primary" : "border-border text-muted-foreground"
-                        }`}
-                      >
-                        {done && !current ? <Check size={13} strokeWidth={3} /> : i + 1}
-                      </span>
-                      <span className={`min-w-0 truncate text-sm ${current ? "font-bold text-foreground" : "text-muted-foreground"}`}>{s.label ?? s.name}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
+              <div className="h-full rounded-full bg-brand-gradient transition-all" style={{ width: `${progress.percent ?? 0}%` }} />
+            </div>
           </>
         )}
         <div className="mt-6 hidden items-center gap-1.5 text-xs text-muted-foreground md:flex">

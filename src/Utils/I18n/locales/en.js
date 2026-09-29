@@ -185,7 +185,6 @@ export const signup = {
   yourProgress: "Your progress",
   subType: "Merchant type",
   companyType: "Company type",
-  noSubTypeDefault: "No sub type (default)",
   nothingPublished: "Onboarding isn't open for this kind yet. Please check back later.",
   email: "Email address",
   emailPlaceholder: "you@business.com",
@@ -205,9 +204,6 @@ export const signup = {
   readyToFinish: "Everything required is in place.",
   finishSetup: "Finish setup",
   back: "Back",
-  skipForNow: "Skip for now",
-  save: "Save",
-  saveContinue: "Save & continue",
   discardTitle: "Discard this application?",
   discardBody: "Everything entered so far, including uploaded files, will be deleted. You can then start again or apply in another role.",
   discard: "Discard",
@@ -217,6 +213,9 @@ export const signup = {
   replaceFile: "Replace",
   uploadFile: "Upload file",
   fileTooLarge: "The file must be under {{size}} KB",
+  standard: "Standard",
+  notReadyYet: "Some required answers are still missing. Go back to complete them.",
+  next: "Next",
 };
 
 export const forgotPassword = {

@@ -20,27 +20,22 @@ export const DRAFT_STATUS_CODE = Number(import.meta.env.VITE_DRAFT_STATUS_CODE ?
 // position. Maker-checker entities use lifecycleEndpoints(base) to get their
 // 13 routes (list, get, get_active, add, edit, submit, auth, deauth, delete,
 // delete_auth, deactivate, reactivate, audit, pending).
-// Merchant self-onboarding (Sign up): the public merchant portal API under
-// /merchant/web. No login: every call carries the portal's own Basic
+// Merchant self-onboarding (Sign up): the public merchant web API
+// (/merchant/{kind}/web). No login: every call carries the portal's own Basic
 // credential (VITE_MERCHANT_PORTAL_AUTHORIZATION, the full header value), and
 // options/add name the institution (VITE_INST_PROFILE_ID).
 export const MERCHANT_PORTAL_AUTHORIZATION = import.meta.env.VITE_MERCHANT_PORTAL_AUTHORIZATION || "";
 export const MERCHANT_INST_PROFILE_ID = Number(import.meta.env.VITE_INST_PROFILE_ID) || null;
-const onboardingPaths = (base) => ({
-  OPTIONS: `${base}/options`,
-  ADD: `${base}/add`,
-  EDIT: `${base}/edit`,
-  GET: `${base}/get`,
-  SUBMIT: `${base}/submit`,
-  UPLOAD: `${base}/upload`,
-  FILE: `${base}/file`,
-  DISCARD: `${base}/discard`,
-});
+// /merchant/{kind}/web/{call}: one section per reply, next / back between them.
+const onboardingPaths = (kind) =>
+  Object.fromEntries(
+    ["options", "add", "get", "next", "back", "upload", "file", "submit", "discard"].map((call) => [call.toUpperCase(), `/merchant/${kind}/web/${call}`]),
+  );
 
 export const API_ENDPOINTS = {
   MERCHANT_ONBOARDING: {
-    INDIVIDUAL: onboardingPaths("/merchant/web/individual"),
-    CORPORATE: onboardingPaths("/merchant/web/corporate"),
+    INDIVIDUAL: onboardingPaths("individual"),
+    CORPORATE: onboardingPaths("corporate"),
   },
 
   AUTH: {
