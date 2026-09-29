@@ -5,7 +5,9 @@ import { CheckboxPill } from "@/Components/Common/CheckboxPill";
 import { ConfirmDialog } from "@/Components/Common/ConfirmDialog";
 import { FilterSelect } from "@/Components/Common/FilterSelect";
 import { Spinner } from "@/Components/Common/Spinner";
-import { OnboardingField, fieldControl } from "./OnboardingField";
+import { useContactVerification } from "@/Hooks/Onboarding/useContactVerification";
+import { OtpModal, VerifiableField } from "./ContactVerification";
+import { OnboardingField } from "./OnboardingField";
 
 const primaryButton =
   "inline-flex items-center gap-2 rounded-xl bg-brand-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60";
@@ -41,6 +43,9 @@ const Lines = ({ text }) => (
 export function MerchantOnboardingForm({ flow, onDone }) {
   const { t } = useTranslation("signup");
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  // Email and phone are each verified on their own (a code popup); at least
+  // one must be verified before onboarding can start.
+  const verification = useContactVerification();
   const { screen, section, progress, editable, busy, problem } = flow;
 
   if (flow.unavailable) {
@@ -67,7 +72,7 @@ export function MerchantOnboardingForm({ flow, onDone }) {
         </Notice>
       );
     }
-    const hasContact = flow.pick.email.trim() || flow.pick.phone_number.trim();
+    const hasContact = verification.isVerified("email", flow.pick.email) || verification.isVerified("phone", flow.pick.phone_number);
     const label = flow.kind === "individual" ? t("subType") : t("companyType");
     return (
       <div className="space-y-5">
@@ -104,23 +109,32 @@ export function MerchantOnboardingForm({ flow, onDone }) {
           </div>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground">
-              <Mail size={13} /> {t("email")}
-            </label>
-            <input type="email" className={fieldControl} value={flow.pick.email} onChange={(e) => flow.setPick({ ...flow.pick, email: e.target.value })} placeholder={t("emailPlaceholder")} />
-          </div>
-          <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground">
-              <Phone size={13} /> {t("phone")}
-            </label>
-            <input type="tel" className={fieldControl} value={flow.pick.phone_number} onChange={(e) => flow.setPick({ ...flow.pick, phone_number: e.target.value })} placeholder={t("phonePlaceholder")} />
-          </div>
+          <VerifiableField
+            channel="email"
+            type="email"
+            icon={Mail}
+            label={t("email")}
+            placeholder={t("emailPlaceholder")}
+            value={flow.pick.email}
+            onChange={(value) => flow.setPick({ ...flow.pick, email: value })}
+            verification={verification}
+          />
+          <VerifiableField
+            channel="phone"
+            type="tel"
+            icon={Phone}
+            label={t("phone")}
+            placeholder={t("phonePlaceholder")}
+            value={flow.pick.phone_number}
+            onChange={(value) => flow.setPick({ ...flow.pick, phone_number: value })}
+            verification={verification}
+          />
         </div>
         <p className="text-xs text-muted-foreground">{t("contactHint")}</p>
         <button type="button" disabled={!hasContact || flow.choice === null || busy === "start"} onClick={() => void flow.start()} className={primaryButton}>
           {busy === "start" ? <RefreshCw size={14} className="animate-spin" /> : null} {t("startOnboarding")} <ArrowRight size={14} />
         </button>
+        <OtpModal verification={verification} />
       </div>
     );
   }

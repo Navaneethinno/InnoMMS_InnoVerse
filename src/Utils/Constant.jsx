@@ -37,6 +37,10 @@ export const API_ENDPOINTS = {
   // up), before anyone signs in. Same credential as merchant onboarding.
   MERCHANT_BRANDING: "/merchant/web/branding",
 
+  // Contact verification (OTP) before Sign up starts. Not live yet: while
+  // these are null the mock in Services/Otp/otp.api.js is used.
+  OTP: { SEND: null, VERIFY: null },
+
   MERCHANT_ONBOARDING: {
     INDIVIDUAL: onboardingPaths("individual"),
     CORPORATE: onboardingPaths("corporate"),
@@ -97,4 +101,11 @@ export const API_ENDPOINTS = {
   EXAMPLE: {
     CATEGORY: lifecycleEndpoints("/master_config/category"),
   },
+};
+
+// One-time code for contact verification (same as the customer portal).
+export const OTP_CONFIG = {
+  length: 4,
+  resendSeconds: 45,
+  expiresMinutes: 10,
 };
