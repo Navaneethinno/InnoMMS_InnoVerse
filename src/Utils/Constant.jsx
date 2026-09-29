@@ -33,6 +33,10 @@ const onboardingPaths = (kind) =>
   );
 
 export const API_ENDPOINTS = {
+  // The institution's approved colours for the public pages (login, sign
+  // up), before anyone signs in. Same credential as merchant onboarding.
+  MERCHANT_BRANDING: "/merchant/web/branding",
+
   MERCHANT_ONBOARDING: {
     INDIVIDUAL: onboardingPaths("individual"),
     CORPORATE: onboardingPaths("corporate"),
