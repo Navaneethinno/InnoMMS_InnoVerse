@@ -187,7 +187,7 @@ export function useMerchantOnboarding(kind) {
       try {
         const { data: reply, message } = await api.next({
           reference_id: onboarding.reference_id,
-          section_code: section.code,
+          section_key: section.key,
           data,
           expected_updated_time: onboarding.updated_time,
         });
@@ -206,7 +206,7 @@ export function useMerchantOnboarding(kind) {
 
   const back = () =>
     run("back", async () => {
-      const { data } = await api.back(onboarding.reference_id, section?.code);
+      const { data } = await api.back(onboarding.reference_id, section?.key);
       show(data);
       return true;
     });
@@ -242,17 +242,15 @@ export function useMerchantOnboarding(kind) {
 
   // File questions: stored first; the returned path is the answer. The
   // entry's kind (type_id) applies its own formats and size.
-  const typeIdOf = (row) => (section?.type_field ? row?.[section.type_field] : undefined);
-  const uploadFile = (key, file, row) =>
-    api.uploadFile({ referenceId: onboarding.reference_id, sectionCode: section.code, field: key, typeId: typeIdOf(row), file });
+  const uploadFile = (key, file, side) => api.uploadFile({ referenceId: onboarding.reference_id, field: key, side, file });
   const downloadFile = (path) => api.downloadFile(onboarding.reference_id, path);
 
   // A dependent list shows only the options whose parent_id is the answer
   // to its parent question.
   const optionsFor = (field, row) => {
-    if (!field.parent_key) return field.options;
-    const parentValue = (row ?? draft)?.[field.parent_key];
-    return (field.options ?? []).filter((o) => String(o.parent_id) === String(parentValue));
+    if (!field.parent_field) return field.choices ?? [];
+    const parentValue = (row ?? draft)?.[field.parent_field];
+    return (field.choices ?? []).filter((o) => String(o.parent) === String(parentValue));
   };
 
   return {

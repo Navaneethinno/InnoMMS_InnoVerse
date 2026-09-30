@@ -27,19 +27,18 @@ function createMerchantOnboardingApi(paths) {
     // or the same one with its issues when something is still missing.
     next: async (payload) => result(await call(paths.NEXT, payload)),
     // The section before the one being left, with its saved answers. Saves nothing.
-    back: async (referenceId, sectionCode) => result(await call(paths.BACK, { reference_id: referenceId, section_code: sectionCode })),
+    back: async (referenceId, sectionKey) => result(await call(paths.BACK, { reference_id: referenceId, section_key: sectionKey })),
     submit: async (payload) => result(await call(paths.SUBMIT, payload)),
     // Throws away an unfinished registration (answers and files) so the
     // contact can start afresh or in another role. A finished one can't be.
     discard: async (referenceId) => result(await call(paths.DISCARD, { reference_id: referenceId })),
     // Stores one file for a `file` question; resolves to { path, file_name, ... }.
     // `path` is then the question's answer.
-    uploadFile: async ({ referenceId, sectionCode, field, typeId, file }) => {
+    uploadFile: async ({ referenceId, field, side, file }) => {
       const form = new FormData();
       form.append("reference_id", referenceId);
-      form.append("section_code", sectionCode);
       form.append("field", field);
-      if (typeId != null && typeId !== "") form.append("type_id", String(typeId));
+      if (side) form.append("side", side);
       form.append("file", file);
       return firstOf(await call(paths.UPLOAD, form));
     },

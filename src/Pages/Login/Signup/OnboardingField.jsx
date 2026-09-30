@@ -1,152 +1,27 @@
 import { useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Eye, FileText, Upload, X } from "lucide-react";
 import { CheckboxPill } from "@/Components/Common/CheckboxPill";
 import { FilterSelect } from "@/Components/Common/FilterSelect";
 import { Spinner } from "@/Components/Common/Spinner";
 import { notifications } from "@/Utils/Lib/notifications";
+export const fieldControl = "w-full rounded-xl border border-border bg-background/70 px-3.5 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 disabled:opacity-60";
 
-export const fieldControl =
-  "w-full rounded-xl border border-border bg-background/70 px-3.5 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 disabled:opacity-60";
-
-// A `file` field: the file is uploaded straight away (upload(file) resolves
-// to { path, file_name }) and the stored path becomes the field's value.
-// "View" fetches it back through the API.
-function FileField({ value, onChange, disabled, file }) {
-  const { t } = useTranslation("signup");
-  const inputRef = useRef(null);
-  const [uploading, setUploading] = useState(false);
-  const [name, setName] = useState("");
-  const accept = file?.formats?.map((f) => `.${f}`).join(",");
-
-  const choose = async (picked) => {
-    if (!picked) return;
-    if (file?.maxBytes && picked.size > file.maxBytes) {
-      notifications.error(t("fileTooLarge", { size: Math.round(file.maxBytes / 1024) }));
-      return;
-    }
-    setUploading(true);
-    try {
-      const stored = await file.upload(picked);
-      setName(stored?.file_name ?? picked.name);
-      onChange(stored?.path ?? "");
-    } catch (error) {
-      notifications.error(error.message);
-    } finally {
-      setUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  };
-
-  const view = async () => {
-    try {
-      const blob = await file.download(value);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank", "noopener");
-      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch (error) {
-      notifications.error(error.message);
-    }
-  };
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={(e) => void choose(e.target.files?.[0])} />
-      {value ? (
-        <span className="inline-flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2 text-sm">
-          <FileText size={14} className="shrink-0 text-primary" />
-          <span className="truncate">{name || value.split("/").pop()}</span>
-          <button type="button" onClick={() => void view()} className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
-            <Eye size={12} /> {t("view")}
-          </button>
-          {!disabled && (
-            <button type="button" onClick={() => onChange("")} aria-label={t("remove")} className="text-muted-foreground hover:text-red-500">
-              <X size={13} />
-            </button>
-          )}
-        </span>
-      ) : null}
-      {!disabled && (
-        <button
-          type="button"
-          disabled={uploading}
-          onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-dashed border-primary/50 px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-primary-light disabled:opacity-60"
-        >
-          {uploading ? <Spinner size={13} /> : <Upload size={14} />} {value ? t("replaceFile") : t("uploadFile")}
-        </button>
-      )}
-      {file?.formats && <span className="basis-full text-[11px] text-muted-foreground">{file.formats.join(", ").toUpperCase()}</span>}
-    </div>
-  );
+function FileField({ value, onChange, disabled, field, file }) {
+  const ref = useRef(null), [uploading, setUploading] = useState(false);
+  const upload = async (picked, side) => { if (!picked) return; if (field.options?.max_size_kb && picked.size > field.options.max_size_kb * 1024) return notifications.error(`File must be at most ${field.options.max_size_kb} KB.`); setUploading(true); try { const stored = await file.upload(picked, side); onChange(side ? { ...(value ?? {}), [side]: stored?.path } : stored?.path); } catch (error) { notifications.error(error.message); } finally { setUploading(false); ref.current && (ref.current.value = ""); } };
+  const view = async (path) => { try { const url = URL.createObjectURL(await file.download(path)); window.open(url, "_blank", "noopener"); setTimeout(() => URL.revokeObjectURL(url), 60000); } catch (error) { notifications.error(error.message); } };
+  const sides = field.options?.sides === "front_back" ? ["front", "back"] : [null];
+  return <div className="space-y-2">{sides.map((side) => { const path = side ? value?.[side] : value; return <div key={side ?? "file"} className="flex items-center gap-2"><input ref={side ? undefined : ref} type="file" className="hidden" accept={(field.options?.allowed_types ?? []).join(",")} onChange={(e) => void upload(e.target.files?.[0], side)} id={`${field.key}-${side ?? "file"}`} /><label htmlFor={`${field.key}-${side ?? "file"}`} className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-dashed border-primary/50 px-3 py-2 text-sm font-semibold text-primary"><Upload size={14} />{uploading ? <Spinner size={13} /> : side ? `Upload ${side}` : "Upload file"}</label>{path && <><span className="truncate text-xs">{String(path).split("/").pop()}</span><button type="button" onClick={() => void view(path)} className="text-primary"><Eye size={14} /></button><button type="button" disabled={disabled} onClick={() => onChange(side ? { ...value, [side]: "" } : "")}><X size={14} /></button></>}</div>; })}</div>;
 }
 
-// One wizard field exactly as the institution's onboarding configuration
-// describes it: `field.input` picks the control, nothing is hard-coded per
-// field name.
 export function OnboardingField({ field, value, onChange, error, options, file }) {
-  const disabled = Boolean(field.read_only);
-  const control = (() => {
-    switch (field.input) {
-      case "checkbox":
-        return <CheckboxPill checked={Boolean(value)} onChange={onChange} label={field.label} disabled={disabled} />;
-      case "select":
-        return (
-          <FilterSelect
-            disabled={disabled}
-            value={value != null ? String(value) : ""}
-            onChange={(v) => onChange(v === "" ? "" : Number(v))}
-            options={[{ value: "", label: `— ${field.label} —` }, ...(options ?? field.options ?? []).map((o) => ({ value: String(o.id), label: o.name }))]}
-          />
-        );
-      case "date":
-      case "datetime":
-        return (
-          <input
-            type={field.input === "date" ? "date" : "datetime-local"}
-            className={fieldControl}
-            value={value ?? ""}
-            disabled={disabled}
-            onChange={(e) => onChange(e.target.value)}
-          />
-        );
-      case "number":
-      case "decimal":
-        return (
-          <input
-            type="number"
-            step={field.input === "decimal" ? "any" : "1"}
-            className={fieldControl}
-            value={value ?? ""}
-            disabled={disabled}
-            onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
-          />
-        );
-      case "file":
-        return <FileField value={value ?? ""} onChange={onChange} disabled={disabled} file={file} />;
-      default:
-        return <input type="text" className={fieldControl} value={value ?? ""} disabled={disabled} onChange={(e) => onChange(e.target.value)} />;
-    }
-  })();
-
-  if (field.input === "checkbox") {
-    return (
-      <div data-field={field.key}>
-        {control}
-        {field.help_text && <p className="mt-1 text-[11px] text-muted-foreground">{field.help_text}</p>}
-        {error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}
-      </div>
-    );
-  }
-  return (
-    <div data-field={field.key}>
-      <label className="mb-1.5 block text-sm font-medium text-foreground">
-        {field.label}
-        {field.mandatory && <span className="text-red-500"> *</span>}
-      </label>
-      {control}
-      {field.help_text && <p className="mt-1 text-[11px] text-muted-foreground">{field.help_text}</p>}
-      {error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}
-    </div>
-  );
+  const disabled = Boolean(field.read_only), type = field.field_type;
+  const list = options ?? field.choices ?? [];
+  let control;
+  if (type === "DROPDOWN" || type === "RADIO") control = type === "DROPDOWN" ? <FilterSelect disabled={disabled} value={value ?? ""} onChange={onChange} options={[{ value: "", label: `— ${field.label} —` }, ...list.map((x) => ({ value: String(x.value), label: x.label }))]} /> : <div className="space-y-2">{list.map((x) => <label key={x.value} className="flex gap-2 text-sm"><input type="radio" disabled={disabled} checked={String(value) === String(x.value)} onChange={() => onChange(x.value)} />{x.label}</label>)}</div>;
+  else if (type === "CHECKBOXES") control = <div className="space-y-2">{list.map((x) => <CheckboxPill key={x.value} label={x.label} disabled={disabled} checked={(value ?? []).map(String).includes(String(x.value))} onChange={(on) => onChange(on ? [...(value ?? []), x.value] : (value ?? []).filter((v) => String(v) !== String(x.value)))} />)}</div>;
+  else if (type === "YES_NO") control = <CheckboxPill label={value ? (field.options?.yes_label ?? "Yes") : (field.options?.no_label ?? "No")} disabled={disabled} checked={Boolean(value)} onChange={onChange} />;
+  else if (type === "FILE") control = <FileField value={value} onChange={onChange} disabled={disabled} field={field} file={file} />;
+  else { const inputType = type === "DATE" ? "date" : type === "EMAIL" ? "email" : type === "PHONE" ? "tel" : type === "NUMBER" ? "number" : "text"; control = <input type={inputType} className={fieldControl} disabled={disabled} value={value ?? ""} placeholder={field.hint ?? ""} min={field.options?.min} max={field.options?.max} minLength={field.options?.min_length} maxLength={field.options?.max_length} onChange={(e) => onChange(type === "NUMBER" && e.target.value !== "" ? Number(e.target.value) : e.target.value)} />; }
+  return <div data-field={field.key}><label className="mb-1.5 block text-sm font-medium text-foreground">{field.label}{field.required && <span className="text-red-500"> *</span>}{field.kyc_level_no && <span className="ml-2 text-xs font-normal text-muted-foreground">KYC level {field.kyc_level_no}</span>}</label>{control}{field.help_text && <p className="mt-1 text-[11px] text-muted-foreground">{field.help_text}</p>}{error && <p className="mt-1 text-xs font-medium text-red-600">{error}</p>}</div>;
 }

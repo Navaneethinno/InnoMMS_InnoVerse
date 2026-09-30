@@ -261,11 +261,11 @@ export function MerchantOnboardingForm({ flow, onDone }) {
               value={row?.[field.key]}
               options={flow.optionsFor(field, row)}
               error={flow.issueFor(field.key, rowIndex)}
-              file={field.input === "file" ? { ...fileRulesFor(row), upload: (file) => flow.uploadFile(field.key, file, row), download: flow.downloadFile } : undefined}
+              file={field.field_type === "FILE" ? { ...fileRulesFor(row), upload: (file, side) => flow.uploadFile(field.key, file, side), download: flow.downloadFile } : undefined}
               onChange={(v) => {
                 flow.setValue(rowIndex, field.key, v);
                 // A dependent list's options belong to its parent's value.
-                visibleFields.filter((child) => child.parent_key === field.key).forEach((child) => flow.setValue(rowIndex, child.key, ""));
+                visibleFields.filter((child) => child.parent_field === field.key).forEach((child) => flow.setValue(rowIndex, child.key, ""));
               }}
             />
           ))}
