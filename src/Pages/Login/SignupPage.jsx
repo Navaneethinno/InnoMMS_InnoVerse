@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
-import { Moon, ShieldCheck, Sun } from "lucide-react";
+import { Circle, CircleCheck, CircleDot, Moon, ShieldCheck, Sun } from "lucide-react";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
 import { Logo } from "@/Components/Common/Logo";
 import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
@@ -20,6 +20,9 @@ function SignupFlow({ kind, onKindChange, onDone }) {
   const { t } = useTranslation("signup");
   const flow = useMerchantOnboarding(kind);
   const { screen, progress } = flow;
+  const steps = Array.isArray(progress.steps) ? progress.steps : [];
+  const activeStep = steps.find((step) => step.current) ?? steps.find((step) => step.key === progress.next_section);
+  const percent = Math.min(100, Math.max(0, Number(progress.percent) || 0));
 
   return (
     <div className="grid gap-0 md:grid-cols-[300px_1fr]">
@@ -39,14 +42,32 @@ function SignupFlow({ kind, onKindChange, onDone }) {
             <p className="text-sm font-bold text-foreground">{t("yourProgress")}</p>
             {screen.customer_type?.name && <p className="mt-1 text-xs text-muted-foreground">{screen.customer_type.name}</p>}
             <div className="mt-4 flex items-end justify-between">
-              <span className="text-3xl font-bold text-primary">{progress.percent ?? 0}%</span>
+              <span className="text-3xl font-bold text-primary">{percent}%</span>
               {progress.position != null && (
                 <span className="pb-1 text-xs text-muted-foreground">{t("stepOf", { current: progress.position, total: progress.total })}</span>
               )}
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
-              <div className="h-full rounded-full bg-brand-gradient transition-all" style={{ width: `${progress.percent ?? 0}%` }} />
+              <div className="h-full rounded-full bg-brand-gradient transition-all" style={{ width: `${percent}%` }} />
             </div>
+            {steps.length > 0 && (
+              <ol className="mt-5 space-y-4">
+                {steps.map((step) => {
+                  const isCurrent = step.current || step.key === activeStep?.key;
+                  const isComplete = ["complete", "completed"].includes(step.state);
+                  const Icon = isComplete ? CircleCheck : isCurrent ? CircleDot : Circle;
+                  return (
+                    <li key={step.key} aria-current={isCurrent ? "step" : undefined} className="flex gap-2.5">
+                      <Icon size={16} className={`mt-0.5 shrink-0 ${isComplete || isCurrent ? "text-primary" : "text-muted-foreground"}`} />
+                      <div className="min-w-0">
+                        <p className={`text-sm ${isCurrent ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{step.heading}</p>
+                        {step.subheading && <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{step.subheading}</p>}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
           </>
         )}
         <div className="mt-6 hidden items-center gap-1.5 text-xs text-muted-foreground md:flex">

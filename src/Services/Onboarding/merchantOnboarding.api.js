@@ -8,7 +8,8 @@ import { API_ENDPOINTS, MERCHANT_INST_PROFILE_ID, MERCHANT_PORTAL_AUTHORIZATION 
 // { data: <the screen or result>, message } so the page can show the API's
 // own message.
 const firstOf = (payload) => (Array.isArray(payload?.data) ? payload.data[0] : payload?.data) ?? null;
-const result = (payload) => ({ data: firstOf(payload), message: payload?.message ?? "" });
+const screenOf = (payload) => firstOf(payload) ?? (payload?.progress ? payload : null);
+const result = (payload) => ({ data: screenOf(payload), message: payload?.message ?? "" });
 
 function createMerchantOnboardingApi(paths) {
   const call = async (path, body, options) =>

@@ -47,6 +47,8 @@ export function MerchantOnboardingForm({ flow, onDone }) {
   // one must be verified before onboarding can start.
   const verification = useContactVerification();
   const { screen, section, progress, editable, busy, problem } = flow;
+  const steps = Array.isArray(progress.steps) ? progress.steps : [];
+  const currentStep = steps.find((step) => step.current) ?? steps.find((step) => step.key === progress.next_section);
 
   if (flow.unavailable) {
     return (
@@ -285,7 +287,8 @@ export function MerchantOnboardingForm({ flow, onDone }) {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           {progress.position != null && <p className="text-xs font-medium text-muted-foreground">{t("stepOf", { current: progress.position, total: progress.total })}</p>}
-          <h2 className="mt-1 text-lg font-bold text-foreground">{section.label ?? section.name}</h2>
+          <h2 className="mt-1 text-lg font-bold text-foreground">{currentStep?.heading ?? section.label ?? section.name}</h2>
+          {currentStep?.subheading && <p className="mt-1 text-sm text-muted-foreground">{currentStep.subheading}</p>}
         </div>
         {discardControls}
       </div>
