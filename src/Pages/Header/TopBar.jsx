@@ -9,6 +9,7 @@ import { useSidebar } from "../../Components/Layout/SidebarContext";
 import { SIDEBAR_WIDTHS } from "@/Pages/Sidebar/DynamicSidebar";
 import { useAuth } from "@/Hooks/useAuth";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
+import { useBrandTheme } from "@/Hooks/Providers/BrandThemeProvider";
 import { useIsMobile } from "@/Hooks/useIsMobile";
 import { UiTooltip } from "@/Components/Common/UiTooltip";
 export function TopBar() {
@@ -26,6 +27,7 @@ export function TopBar() {
   }, []);
   const { collapsed, hovering, toggleMobile } = useSidebar();
   const { mode, toggleMode } = useColorMode();
+  const { displayName } = useBrandTheme();
   const logout = useAuth((s) => s.logout);
   const user = useAuth((s) => s.user);
   const isMobile = useIsMobile();
@@ -78,7 +80,7 @@ export function TopBar() {
         >
           <Logo size="sm" />
           <span className="hidden sm:block text-xs font-bold text-transparent bg-clip-text bg-brand-gradient leading-none tracking-tight">
-            InnoMMS
+            {displayName ?? "InnoMMS"}
           </span>
         </button>
 

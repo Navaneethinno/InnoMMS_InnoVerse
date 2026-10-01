@@ -1,90 +1,116 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
-import { fetchMerchantBranding } from "@/Services/Onboarding/merchantBranding.api";
+import { fetchMerchantBranding, fetchMerchantBrandingFile } from "@/Services/Onboarding/merchantBranding.api";
 import { deriveBrandThemeVars } from "@/Utils/Lib/colorTheme";
+import { asBrand, brandColors, normalizeBranding } from "@/Utils/Lib/branding";
 
 const STORAGE_KEY = "innoverse-brand-theme";
 const PORTAL_STORAGE_KEY = "innomms-portal-brand-theme";
+// Small brand images as data URLs, by stored path, so a reload shows them
+// straight away.
+const ASSETS_KEY = "innomms-brand-assets";
+const MAX_CACHED_IMAGE = 400 * 1024;
+const DEFAULT_TITLE = document.title;
 const BrandThemeContext = createContext(null);
 
-function readStoredColors(key = STORAGE_KEY) {
-  if (typeof window === "undefined") return null;
+const readJson = (key) => {
   try {
     const raw = window.localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
-}
+};
+const writeJson = (key, value) => {
+  try {
+    if (value) window.localStorage.setItem(key, JSON.stringify(value));
+    else window.localStorage.removeItem(key);
+  } catch {
+    // Caching is only a nicety.
+  }
+};
 
 // Clears every custom property this provider may have set, letting
-// theme.css's :root/.dark fallback values take back over untouched — this
-// is the "no tenant colors yet / logged out" state, not a second palette.
-function clearBrandVars() {
-  const root = document.documentElement;
-  const tokens = [
-    "--primary",
-    "--primary-hover",
-    "--primary-light",
-    "--primary-foreground",
-    "--secondary",
-    "--secondary-foreground",
-    "--ring",
-    "--sidebar-primary",
-    "--sidebar-primary-foreground",
-    "--accent-foreground",
-    "--chart-1",
-    "--chart-4",
-    "--gradient-start",
-    "--gradient-end",
-    "--glass-gradient",
-    "--mesh-1",
-    "--mesh-2",
-    "--bg-tint-primary",
-    "--bg-tint-secondary",
-    "--bg-tint-accent",
-  ];
-  tokens.forEach((token) => root.style.removeProperty(token));
-}
+// theme.css's :root/.dark fallback values take back over untouched.
+const BRAND_TOKENS = [
+  "--primary",
+  "--primary-hover",
+  "--primary-light",
+  "--primary-foreground",
+  "--secondary",
+  "--secondary-foreground",
+  "--ring",
+  "--sidebar-primary",
+  "--sidebar-primary-foreground",
+  "--accent-foreground",
+  "--chart-1",
+  "--chart-4",
+  "--gradient-start",
+  "--gradient-end",
+  "--glass-gradient",
+  "--mesh-1",
+  "--mesh-2",
+  "--bg-tint-primary",
+  "--bg-tint-secondary",
+  "--bg-tint-accent",
+];
 
 function applyBrandVars(colors, mode) {
   const root = document.documentElement;
-  clearBrandVars();
+  BRAND_TOKENS.forEach((token) => root.style.removeProperty(token));
   if (!colors) return;
-  const vars = deriveBrandThemeVars(colors, mode);
-  Object.entries(vars).forEach(([token, value]) => root.style.setProperty(token, value));
+  Object.entries(deriveBrandThemeVars(colors, mode)).forEach(([token, value]) => root.style.setProperty(token, value));
 }
 
-// Applies a tenant's primary/secondary brand colors (from the login
-// response) as inline CSS custom properties on <html>, which take
-// precedence over theme.css's :root/.dark rules without touching those
-// rules at all — so every existing component that already reads
-// var(--primary) etc. themes correctly with zero changes, and any tenant
-// with no colors configured (or before login resolves) transparently falls
-// back to the current fixed light/dark palette in theme.css.
+function setFavicon(href) {
+  let link = document.querySelector("link[rel~='icon']");
+  if (!href) {
+    if (link?.dataset.brand) link.remove();
+    return;
+  }
+  if (!link) {
+    link = Object.assign(document.createElement("link"), { rel: "icon" });
+    document.head.appendChild(link);
+  }
+  link.dataset.brand = "1";
+  link.href = href;
+}
+
+const blobToDataUrl = (blob) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+
+const IMAGE_FIELDS = ["logo", "logoDark", "favicon", "loginBackground"];
+
+// Applies the institution's branding: colours as inline CSS custom
+// properties on <html> (dark-mode colours in dark mode), plus its name,
+// logo, favicon and login background. Inline properties beat theme.css's
+// :root/.dark rules, so every component reading var(--primary) etc. follows
+// the brand with no changes.
 //
 // Before sign-in (and after sign-out) the portal wears the institution's
-// merchant-portal branding (POST /merchant/web/branding), loaded once at
-// start and cached so a reload paints in those colours straight away. The
-// signed-in user's colours (login reply) take precedence while signed in.
+// public merchant-portal branding (POST /merchant/web/branding), cached so a
+// reload paints straight away. The login reply's branding takes precedence
+// while signed in. Images come from the public branding file endpoint, so
+// they show on the login page too.
 export function BrandThemeProvider({ children }) {
   const { mode } = useColorMode();
-  const [colors, setColors] = useState(readStoredColors);
-  const [portalColors, setPortalColors] = useState(() => readStoredColors(PORTAL_STORAGE_KEY));
+  const [userBrand, setUserBrand] = useState(() => asBrand(readJson(STORAGE_KEY)));
+  const [portalBrand, setPortalBrand] = useState(() => asBrand(readJson(PORTAL_STORAGE_KEY)));
+  const [images, setImages] = useState(() => readJson(ASSETS_KEY) ?? {});
 
   useEffect(() => {
     let cancelled = false;
     fetchMerchantBranding()
-      .then((branding) => {
+      .then((raw) => {
         if (cancelled) return;
-        const next = branding ? { primary: branding.primary_color || null, secondary: branding.secondary_color || null } : null;
-        setPortalColors(next?.primary || next?.secondary ? next : null);
-        try {
-          if (next?.primary || next?.secondary) window.localStorage.setItem(PORTAL_STORAGE_KEY, JSON.stringify(next));
-          else window.localStorage.removeItem(PORTAL_STORAGE_KEY);
-        } catch {
-          // Caching is only a nicety.
-        }
+        const next = normalizeBranding(raw);
+        setPortalBrand(next);
+        writeJson(PORTAL_STORAGE_KEY, next);
       })
       // No branding reachable: theme.css's own colours stay.
       .catch(() => {});
@@ -93,29 +119,69 @@ export function BrandThemeProvider({ children }) {
     };
   }, []);
 
-  const active = colors ?? portalColors;
-  useEffect(() => {
-    applyBrandVars(active, mode);
-  }, [active, mode]);
+  const brand = userBrand ?? portalBrand;
 
-  const setBrandTheme = useCallback((nextColors) => {
-    setColors(nextColors ?? null);
-    try {
-      if (nextColors) {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextColors));
-      } else {
-        window.localStorage.removeItem(STORAGE_KEY);
-      }
-    } catch {
-      // Storage failures should not prevent the in-memory theme from updating.
-    }
+  useEffect(() => {
+    applyBrandVars(brandColors(brand, mode), mode);
+  }, [brand, mode]);
+
+  // Images by stored path; each path is fetched once.
+  useEffect(() => {
+    const wanted = new Set(IMAGE_FIELDS.map((field) => brand?.[field]).filter(Boolean));
+    const missing = [...wanted].filter((path) => !images[path]);
+    if (!missing.length) return undefined;
+    let cancelled = false;
+    void Promise.all(
+      missing.map(async (path) => {
+        try {
+          const blob = await fetchMerchantBrandingFile(path);
+          const small = blob.size <= MAX_CACHED_IMAGE;
+          return { path, url: small ? await blobToDataUrl(blob) : URL.createObjectURL(blob), small };
+        } catch {
+          return null;
+        }
+      }),
+    ).then((loaded) => {
+      const found = loaded.filter(Boolean);
+      if (cancelled || !found.length) return;
+      setImages((prev) => ({ ...prev, ...Object.fromEntries(found.map((f) => [f.path, f.url])) }));
+      const cached = readJson(ASSETS_KEY) ?? {};
+      found.filter((f) => f.small).forEach((f) => (cached[f.path] = f.url));
+      writeJson(ASSETS_KEY, Object.fromEntries(Object.entries(cached).filter(([path]) => wanted.has(path))));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [brand, images]);
+
+  const imageUrl = (path) => (path ? (images[path] ?? null) : null);
+  const logoUrl = imageUrl(mode === "dark" && brand?.logoDark ? brand.logoDark : brand?.logo);
+  const faviconUrl = imageUrl(brand?.favicon);
+  const loginBackgroundUrl = imageUrl(brand?.loginBackground);
+
+  useEffect(() => {
+    document.title = brand?.displayName ?? DEFAULT_TITLE;
+    setFavicon(faviconUrl);
+  }, [brand?.displayName, faviconUrl]);
+
+  const setBrandTheme = useCallback((next) => {
+    const value = asBrand(next);
+    setUserBrand(value);
+    writeJson(STORAGE_KEY, value);
   }, []);
 
   const clearBrandTheme = useCallback(() => setBrandTheme(null), [setBrandTheme]);
 
   const value = useMemo(
-    () => ({ colors, setBrandTheme, clearBrandTheme }),
-    [colors, setBrandTheme, clearBrandTheme],
+    () => ({
+      colors: brandColors(brand, mode),
+      displayName: brand?.displayName ?? null,
+      logoUrl,
+      loginBackgroundUrl,
+      setBrandTheme,
+      clearBrandTheme,
+    }),
+    [brand, mode, logoUrl, loginBackgroundUrl, setBrandTheme, clearBrandTheme],
   );
 
   return <BrandThemeContext.Provider value={value}>{children}</BrandThemeContext.Provider>;

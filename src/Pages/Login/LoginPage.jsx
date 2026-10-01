@@ -6,6 +6,7 @@ import { AlertCircle, ArrowRight, Eye, EyeOff, Moon, RefreshCw, ShieldCheck, Sun
 import { useAuth } from "../../Hooks/useAuth";
 import { apiMessage, notifications } from "../../Utils/Lib/notifications";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
+import { useBrandTheme } from "@/Hooks/Providers/BrandThemeProvider";
 import { Logo } from "@/Components/Common/Logo";
 import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
 import { UiTooltip } from "@/Components/Common/UiTooltip";
@@ -27,6 +28,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const login = useAuth((state) => state.login);
   const { mode, toggleMode } = useColorMode();
+  const { displayName, loginBackgroundUrl } = useBrandTheme();
 
   const submit = async (e) => {
     e.preventDefault();
@@ -52,13 +54,17 @@ export function LoginPage() {
     "w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm text-foreground caret-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-primary focus:ring-4 focus:ring-primary/10";
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div
+      className="flex min-h-screen flex-col bg-background bg-cover bg-center"
+      // The institution's login background (branding), when it has one.
+      style={loginBackgroundUrl ? { backgroundImage: `url(${loginBackgroundUrl})` } : undefined}
+    >
       {/* Top bar. */}
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
         <div className="flex items-center gap-3">
           <Logo size="md" />
           <div>
-            <p className="text-sm font-bold tracking-tight text-foreground">InnoMMS</p>
+            <p className="text-sm font-bold tracking-tight text-foreground">{displayName ?? "InnoMMS"}</p>
             <p className="text-xs text-muted-foreground">{t("merchantPortal")}</p>
           </div>
         </div>

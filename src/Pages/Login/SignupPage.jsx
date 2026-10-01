@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 import { Circle, CircleCheck, CircleDot, Moon, ShieldCheck, Sun } from "lucide-react";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
+import { useBrandTheme } from "@/Hooks/Providers/BrandThemeProvider";
 import { Logo } from "@/Components/Common/Logo";
 import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
 import { SegmentedSwitch } from "@/Components/Common/SegmentedSwitch";
@@ -92,6 +93,7 @@ export function SignupPage() {
   const { t } = useTranslation("signup");
   const navigate = useNavigate();
   const { mode, toggleMode } = useColorMode();
+  const { displayName } = useBrandTheme();
   const [kind, setKind] = useState("individual");
 
   useEffect(() => {
@@ -117,7 +119,7 @@ export function SignupPage() {
         <div className="flex items-center gap-3">
           <Logo size="md" />
           <div>
-            <p className="text-sm font-bold tracking-tight text-foreground">InnoMMS</p>
+            <p className="text-sm font-bold tracking-tight text-foreground">{displayName ?? "InnoMMS"}</p>
             <p className="text-xs text-muted-foreground">{t("portalName")}</p>
           </div>
         </div>

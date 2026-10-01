@@ -26,9 +26,9 @@ export function useAuth(selector) {
       // The authenticated user's permission/navigation dataset, persisted
       // separately from Master reference data (see Redux/MenuSlice.js).
       dispatch(setMenuArray(response.menu_array));
-      // Tenant's primary/secondary brand colors from the login response, if
-      // present — falls back to theme.css's fixed palette when absent.
-      setBrandTheme(response.theme);
+      // The institution's branding from the login response (the portal's
+      // public branding, then theme.css's palette, when there is none).
+      setBrandTheme(response.branding);
       // Returns the backend's own message (e.g. "Login Successful") rather
       // than a bare boolean, so the UI can show it instead of a hardcoded
       // string — see LoginPage.jsx's use of apiMessage().
@@ -63,10 +63,8 @@ export function useAuth(selector) {
       if (Array.isArray(response.menu_array) && response.menu_array.length > 0) {
         dispatch(setMenuArray(response.menu_array));
       }
-      // Like menu_array, refresh_token doesn't re-send theme colors; only
-      // overwrite the already-persisted brand theme if this response
-      // actually carries one.
-      if (response.theme) setBrandTheme(response.theme);
+      // Only replace the branding when this response carries one.
+      if (response.branding) setBrandTheme(response.branding);
       return true;
     } catch {
       clearAuthSession();
