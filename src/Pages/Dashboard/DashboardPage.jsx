@@ -79,8 +79,8 @@ export function DashboardPage() {
             aria-pressed={editing}
             className={
               editing
-                ? "flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-md transition-all hover:bg-[var(--primary-hover)]"
-                : "flex items-center gap-1.5 rounded-xl border bg-card px-4 py-2 text-xs font-bold transition-colors hover:bg-[var(--primary-light)]"
+                ? "hidden items-center gap-1.5 rounded-xl bg-primary px-4 py-2 lg:flex text-xs font-bold text-primary-foreground shadow-md transition-all hover:bg-[var(--primary-hover)]"
+                : "hidden items-center gap-1.5 rounded-xl border bg-card px-4 py-2 lg:flex text-xs font-bold transition-colors hover:bg-[var(--primary-light)]"
             }
             style={editing ? undefined : { color: "var(--primary)", borderColor: "var(--primary-light)" }}
           >
