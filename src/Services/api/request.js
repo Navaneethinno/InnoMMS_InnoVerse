@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/Utils/Constant";
+import { API_BASE_URL, MERCHANT_DIGITAL_PRODUCT_ID } from "@/Utils/Constant";
 import { clearAuthSession, getAccessToken } from "@/Services/api/authStorage";
 import { getApiErrorMessage, getStatusErrorMessage } from "@/Services/api/apiErrors";
 import { DEVICE_INFO } from "@/Services/Auth/auth.service";
@@ -73,6 +73,7 @@ export async function portalRequest(path, body = {}, { authorization, responseTy
         ...(multipart ? {} : { "Content-Type": "application/json" }),
         Deviceinfo: JSON.stringify(DEVICE_INFO),
         ...(authorization ? { Authorization: authorization } : {}),
+        ...(MERCHANT_DIGITAL_PRODUCT_ID ? { "X-Digital-Product-Id": String(MERCHANT_DIGITAL_PRODUCT_ID) } : {}),
         ...apiLanguageHeader(),
       },
       body: multipart ? body : JSON.stringify(body),

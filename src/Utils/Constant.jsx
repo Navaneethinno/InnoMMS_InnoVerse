@@ -26,10 +26,11 @@ export const DRAFT_STATUS_CODE = Number(import.meta.env.VITE_DRAFT_STATUS_CODE ?
 // options/add name the institution (VITE_INST_PROFILE_ID).
 export const MERCHANT_PORTAL_AUTHORIZATION = import.meta.env.VITE_MERCHANT_PORTAL_AUTHORIZATION || "";
 export const MERCHANT_INST_PROFILE_ID = Number(import.meta.env.VITE_INST_PROFILE_ID) || null;
+export const MERCHANT_DIGITAL_PRODUCT_ID = Number(import.meta.env.VITE_MERCHANT_DIGITAL_PRODUCT_ID) || null;
 // /merchant/{kind}/web/{call}: one section per reply, next / back between them.
 const onboardingPaths = (kind) =>
   Object.fromEntries(
-    ["options", "add", "get", "next", "back", "upload", "file", "submit", "discard"].map((call) => [call.toUpperCase(), `/merchant/${kind}/web/${call}`]),
+    ["options", "add", "get", "next", "back", "upload", "file", "submit", "discard", "respond", "respond_upload"].map((call) => [call.toUpperCase(), `/merchant/${kind}/web/${call}`]),
   );
 
 export const API_ENDPOINTS = {

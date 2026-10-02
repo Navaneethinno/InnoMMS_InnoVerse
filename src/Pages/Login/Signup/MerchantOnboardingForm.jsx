@@ -8,6 +8,7 @@ import { Spinner } from "@/Components/Common/Spinner";
 import { useContactVerification } from "@/Hooks/Onboarding/useContactVerification";
 import { OtpModal, VerifiableField } from "./ContactVerification";
 import { OnboardingField } from "./OnboardingField";
+import { ReviewPanel } from "./ReviewPanel";
 
 const primaryButton =
   "inline-flex items-center gap-2 rounded-xl bg-brand-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60";
@@ -140,6 +141,9 @@ export function MerchantOnboardingForm({ flow, onDone }) {
       </div>
     );
   }
+
+  // Submitted applications are locked; the review block is their entire UI.
+  if (flow.screen?.review) return <ReviewPanel flow={flow} onDone={onDone} />;
 
   // Finished (submitted): no more editing.
   if (!editable) {
@@ -328,7 +332,7 @@ export function MerchantOnboardingForm({ flow, onDone }) {
       <div className="flex items-center justify-between gap-3 pt-2">
         {backButton}
         <button type="button" disabled={busy === "next"} onClick={() => void flow.next()} className={primaryButton}>
-          {busy === "next" ? <RefreshCw size={14} className="animate-spin" /> : null} {t("next")} <ArrowRight size={14} />
+          {busy === "next" ? <><RefreshCw size={14} className="animate-spin" /> Verifying your document…</> : <>{t("next")} <ArrowRight size={14} /></>}
         </button>
       </div>
     </div>

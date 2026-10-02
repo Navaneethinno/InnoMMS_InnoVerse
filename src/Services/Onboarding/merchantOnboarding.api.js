@@ -22,7 +22,7 @@ function createMerchantOnboardingApi(paths) {
     // Starts a registration, or carries on the open one for this contact.
     start: async (payload) => result(await call(paths.ADD, withInstitution(payload))),
     // Reopens a registration at the section where it stopped.
-    get: async (referenceId) => result(await call(paths.GET, { reference_id: referenceId })),
+    get: async (referenceId, sectionKey) => result(await call(paths.GET, { reference_id: referenceId, ...(sectionKey ? { section_key: sectionKey } : {}) })),
     // Saves the section being left (data replaces what was saved there;
     // leave it out to move on unchanged) and replies with the next section,
     // or the same one with its issues when something is still missing.
@@ -30,6 +30,16 @@ function createMerchantOnboardingApi(paths) {
     // The section before the one being left, with its saved answers. Saves nothing.
     back: async (referenceId, sectionKey) => result(await call(paths.BACK, { reference_id: referenceId, section_key: sectionKey })),
     submit: async (payload) => result(await call(paths.SUBMIT, payload)),
+    respond: async (payload) => result(await call(paths.RESPOND, payload)),
+    respondUpload: async ({ referenceId, requestId, field, side, file }) => {
+      const form = new FormData();
+      form.append("reference_id", referenceId);
+      form.append("request_id", String(requestId));
+      if (field) form.append("field", field);
+      if (side) form.append("side", side);
+      form.append("file", file);
+      return firstOf(await call(paths.RESPOND_UPLOAD, form));
+    },
     // Throws away an unfinished registration (answers and files) so the
     // contact can start afresh or in another role. A finished one can't be.
     discard: async (referenceId) => result(await call(paths.DISCARD, { reference_id: referenceId })),

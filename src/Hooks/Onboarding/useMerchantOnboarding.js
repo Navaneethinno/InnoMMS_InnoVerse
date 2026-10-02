@@ -116,11 +116,14 @@ export function useMerchantOnboarding(kind) {
   // The categories on offer (sub types). When the ownership also has a
   // definition_id, registering with no category ("Standard") is allowed too,
   // sent as no sub_type_id. The page hides the choice when there's only one.
-  const ownership = options?.party_types?.[0]?.ownerships?.[0];
-  const choices = [
-    ...(ownership?.definition_id ? [{ value: "", isDefault: true }] : []),
-    ...(ownership?.sub_types ?? []).map((s) => ({ value: String(s.id), label: s.name })),
-  ];
+  const party = options?.party_types?.[0];
+  const ownership = party?.ownerships?.[0];
+  const choices = kind === "corporate"
+    ? (party?.company_types ?? []).map((item) => ({ value: String(item.id), label: item.name }))
+    : [
+        ...(ownership?.definition_id ? [{ value: "", isDefault: true }] : []),
+        ...(ownership?.sub_types ?? []).map((item) => ({ value: String(item.id), label: item.name })),
+      ];
   const choice = pick.choice ?? choices[0]?.value ?? null;
 
   const onboarding = screen?.onboarding;
@@ -148,7 +151,7 @@ export function useMerchantOnboarding(kind) {
     run("start", async () => {
       setConflict("");
       const payload = {
-        ...(!carryOn && choice ? { sub_type_id: Number(choice) } : {}),
+        ...(!carryOn && choice ? { [kind === "corporate" ? "company_type_id" : "sub_type_id"]: Number(choice) } : {}),
         ...(pick.email.trim() ? { email: pick.email.trim() } : {}),
         ...(pick.phone_number.trim() ? { phone_number: pick.phone_number.trim() } : {}),
       };
@@ -219,7 +222,6 @@ export function useMerchantOnboarding(kind) {
         expected_updated_time: onboarding.updated_time,
       });
       show(data);
-      forgetReference(kind);
       setCompletedMessage(message);
       notifications.success(message);
       return true;
@@ -244,6 +246,20 @@ export function useMerchantOnboarding(kind) {
   // entry's kind (type_id) applies its own formats and size.
   const uploadFile = (key, file, side) => api.uploadFile({ referenceId: onboarding.reference_id, field: key, side, file });
   const downloadFile = (path) => api.downloadFile(onboarding.reference_id, path);
+
+  const loadReviewSection = async (sectionKey) => {
+    const { data } = await api.get(onboarding.reference_id, sectionKey);
+    return data?.section ?? null;
+  };
+  const respond = (requestId, payload) =>
+    run("respond", async () => {
+      const { data, message } = await api.respond({ reference_id: onboarding.reference_id, request_id: requestId, ...payload });
+      show(data);
+      notifications.success(message);
+      return true;
+    });
+  const respondUpload = (requestId, file, field, side) =>
+    api.respondUpload({ referenceId: onboarding.reference_id, requestId, file, field, side });
 
   // A dependent list shows only the options whose parent_id is the answer
   // to its parent question.
@@ -284,6 +300,9 @@ export function useMerchantOnboarding(kind) {
     discard,
     uploadFile,
     downloadFile,
+    loadReviewSection,
+    respond,
+    respondUpload,
     optionsFor,
   };
 }
