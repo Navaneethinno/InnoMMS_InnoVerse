@@ -2,7 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "motion/react";
-import { AlertCircle, ArrowRight, Eye, EyeOff, Moon, RefreshCw, ShieldCheck, Sun } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Moon,
+  RefreshCw,
+  ShieldCheck,
+  Sun,
+} from "lucide-react";
 import { useAuth } from "../../Hooks/useAuth";
 import { apiMessage, notifications } from "../../Utils/Lib/notifications";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
@@ -10,17 +19,19 @@ import { useBrandTheme } from "@/Hooks/Providers/BrandThemeProvider";
 import { Logo } from "@/Components/Common/Logo";
 import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
 import { UiTooltip } from "@/Components/Common/UiTooltip";
+import { merchantAccountApi, merchantSession } from "@/Services/Merchant/merchantAccount.api";
+import { Navigate } from "react-router-dom";
 
-export function LoginPage() {
+export function LoginPage({ merchant = false }) {
   const { t } = useTranslation("login");
   // Optional dev-only prefill: set VITE_DEFAULT_LOGIN_USERNAME /
   // VITE_DEFAULT_LOGIN_PASSWORD in a local (gitignored) .env. Never falls
   // back to a real credential in the source, so nothing ships in the bundle.
   const [username, setUsername] = useState(
-    import.meta.env.DEV ? import.meta.env.VITE_DEFAULT_LOGIN_USERNAME || "" : "",
+    import.meta.env.DEV && !merchant ? import.meta.env.VITE_DEFAULT_LOGIN_USERNAME || "" : "",
   );
   const [password, setPassword] = useState(
-    import.meta.env.DEV ? import.meta.env.VITE_DEFAULT_LOGIN_PASSWORD || "" : "",
+    import.meta.env.DEV && !merchant ? import.meta.env.VITE_DEFAULT_LOGIN_PASSWORD || "" : "",
   );
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,6 +41,8 @@ export function LoginPage() {
   const { mode, toggleMode } = useColorMode();
   const { displayName, loginBackgroundUrl } = useBrandTheme();
 
+  if (merchant && merchantSession.read()?.access_token) return <Navigate to="/account" replace />;
+
   const submit = async (e) => {
     e.preventDefault();
     if (!username || !password) {
@@ -38,15 +51,28 @@ export function LoginPage() {
     }
     setError("");
     setLoading(true);
-    const result = await login({ username, password });
-    setLoading(false);
-    if (result.success) {
-      notifications.success(apiMessage(result, "Signed in successfully"));
-      navigate("/dashboard");
+    if (merchant) {
+      try {
+        const result = await merchantAccountApi.login(username.trim(), password);
+        notifications.success(apiMessage(result, "Signed in successfully"));
+        navigate("/account", { replace: true });
+      } catch (error) {
+        setError(error.message || t("invalidCredentials"));
+        notifications.error(error.message || t("invalidCredentials"));
+      } finally {
+        setLoading(false);
+      }
     } else {
-      const msg = result.message || t("invalidCredentials");
-      setError(msg);
-      notifications.error(msg);
+      const result = await login({ username, password });
+      setLoading(false);
+      if (result.success) {
+        notifications.success(apiMessage(result, "Signed in successfully"));
+        navigate("/dashboard");
+      } else {
+        const msg = result.message || t("invalidCredentials");
+        setError(msg);
+        notifications.error(msg);
+      }
     }
   };
 
@@ -64,7 +90,9 @@ export function LoginPage() {
         <div className="flex items-center gap-3">
           <Logo size="md" />
           <div>
-            <p className="text-sm font-bold tracking-tight text-foreground">{displayName ?? "InnoMMS"}</p>
+            <p className="text-sm font-bold tracking-tight text-foreground">
+              {displayName ?? "InnoMMS"}
+            </p>
             <p className="text-xs text-muted-foreground">{t("merchantPortal")}</p>
           </div>
         </div>
@@ -77,7 +105,11 @@ export function LoginPage() {
               aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              {mode === "dark" ? <Sun size={16} strokeWidth={1.8} /> : <Moon size={16} strokeWidth={1.8} />}
+              {mode === "dark" ? (
+                <Sun size={16} strokeWidth={1.8} />
+              ) : (
+                <Moon size={16} strokeWidth={1.8} />
+              )}
             </button>
           </UiTooltip>
         </div>
@@ -111,14 +143,19 @@ export function LoginPage() {
           className="order-1 w-full justify-self-center lg:order-2 lg:justify-self-end"
         >
           <div className="w-full max-w-md rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_30px_80px_rgba(30,64,125,0.14),0_10px_24px_rgba(15,23,42,0.06)] sm:p-9">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">{t("welcomeBack")}</p>
-            <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">{t("signInTitle")}</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+              {t("welcomeBack")}
+            </p>
+            <h2 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">
+              {t("signInTitle")}
+            </h2>
             <p className="mt-1.5 text-sm text-muted-foreground">{t("subtitle")}</p>
 
             <form onSubmit={submit} noValidate className="mt-7 space-y-5">
               <div>
                 <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                  {t("usernameLabel")} <span className="text-red-500">*</span>
+                  {merchant ? "Email or mobile number" : t("usernameLabel")}{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   value={username}
@@ -153,7 +190,9 @@ export function LoginPage() {
                 <div className="mt-1.5 text-right">
                   <button
                     type="button"
-                    onClick={() => navigate("/forgot-password")}
+                    onClick={() =>
+                      navigate(merchant ? "/forgot-password" : "/admin/forgot-password")
+                    }
                     className="text-xs font-semibold text-primary transition hover:text-primary/80"
                   >
                     {t("forgotPassword")}
@@ -202,7 +241,21 @@ export function LoginPage() {
                 {t("getStarted")}
               </button>
             </p>
-            <p className="mt-6 text-center text-xs text-muted-foreground">© 2026 Innovitegra Solutions Private Limited</p>
+            {merchant && (
+              <p className="mt-3 text-center text-sm text-muted-foreground">
+                Already approved?{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate("/activate")}
+                  className="font-semibold text-primary transition hover:text-primary/80"
+                >
+                  Activate access
+                </button>
+              </p>
+            )}
+            <p className="mt-6 text-center text-xs text-muted-foreground">
+              © 2026 Innovitegra Solutions Private Limited
+            </p>
           </div>
         </motion.div>
       </main>

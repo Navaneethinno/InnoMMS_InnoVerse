@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { merchantAccountApi, merchantSession } from "@/Services/Merchant/merchantAccount.api";
+import { CreditCard, History, LogOut, Moon, ShieldCheck, Sun, Wallet } from "lucide-react";
+import { Logo } from "@/Components/Common/Logo";
+import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
+import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
+import { useBrandTheme } from "@/Hooks/Providers/BrandThemeProvider";
 
-const field = "w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm";
+const field =
+  "w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10";
 const button =
-  "rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50";
+  "rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/20 transition hover:bg-primary-hover disabled:opacity-50";
 const money = (amount, currency) => `${amount ?? "0"} ${currency ?? ""}`;
 const date = (value) => (value ? new Date(value).toLocaleString() : "");
 const dataItems = (value) =>
@@ -12,6 +18,8 @@ const dataItems = (value) =>
 
 export function MerchantAccountPage() {
   const navigate = useNavigate();
+  const { mode, toggleMode } = useColorMode();
+  const { displayName } = useBrandTheme();
   const [session, setSession] = useState(() => merchantSession.read());
   const [tab, setTab] = useState("payments");
   const [wallets, setWallets] = useState([]);
@@ -33,7 +41,14 @@ export function MerchantAccountPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
-  const [security, setSecurity] = useState({ passwordCurrent: "", passwordNext: "", pinCurrent: "", pinNext: "", otp: "", otpRef: "" });
+  const [security, setSecurity] = useState({
+    passwordCurrent: "",
+    passwordNext: "",
+    pinCurrent: "",
+    pinNext: "",
+    otp: "",
+    otpRef: "",
+  });
   useEffect(() => {
     const sync = () => setSession(merchantSession.read());
     window.addEventListener("merchant:session", sync);
@@ -44,11 +59,15 @@ export function MerchantAccountPage() {
   }, [navigate, session]);
   useEffect(() => {
     if (!session?.access_token) return;
-    void merchantAccountApi.me().then(({ data }) => {
-      if (data?.name && data.name !== session.name) merchantSession.save({ ...session, name: data.name });
-    }).catch((error) => setError(error.message));
-  // The session is refreshed by the request helper when needed.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    void merchantAccountApi
+      .me()
+      .then(({ data }) => {
+        if (data?.name && data.name !== session.name)
+          merchantSession.save({ ...session, name: data.name });
+      })
+      .catch((error) => setError(error.message));
+    // The session is refreshed by the request helper when needed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.access_token]);
   const run = async (name, action) => {
     setBusy(name);
@@ -77,7 +96,12 @@ export function MerchantAccountPage() {
       .history({
         page,
         limit: 20,
-        ...Object.fromEntries(Object.entries({ ...filters, txn_type: tab === "payments" ? "MERCHANT_PAYMENT" : filters.txn_type }).filter(([, value]) => value)),
+        ...Object.fromEntries(
+          Object.entries({
+            ...filters,
+            txn_type: tab === "payments" ? "MERCHANT_PAYMENT" : filters.txn_type,
+          }).filter(([, value]) => value),
+        ),
       })
       .then(({ data }) => {
         if (active)
@@ -142,7 +166,14 @@ export function MerchantAccountPage() {
           ? await merchantAccountApi.passwordChange(security.passwordCurrent, security.passwordNext)
           : await merchantAccountApi.pinChange(security.pinCurrent, security.pinNext);
       setMessage(result.message);
-      setSecurity({ passwordCurrent: "", passwordNext: "", pinCurrent: "", pinNext: "", otp: "", otpRef: "" });
+      setSecurity({
+        passwordCurrent: "",
+        passwordNext: "",
+        pinCurrent: "",
+        pinNext: "",
+        otp: "",
+        otpRef: "",
+      });
     });
   const startPinReset = () =>
     run("pinReset", async () => {
@@ -158,30 +189,77 @@ export function MerchantAccountPage() {
         pin: security.pinNext,
       });
       setMessage(result.message);
-      setSecurity({ passwordCurrent: "", passwordNext: "", pinCurrent: "", pinNext: "", otp: "", otpRef: "" });
+      setSecurity({
+        passwordCurrent: "",
+        passwordNext: "",
+        pinCurrent: "",
+        pinNext: "",
+        otp: "",
+        otpRef: "",
+      });
     });
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5">
+    <div className="relative min-h-screen bg-background text-foreground">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top_left,var(--primary-light),transparent_65%)]"
+        aria-hidden="true"
+      />
+      <header className="relative border-b border-border/70 bg-card/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-8">
+          <div className="flex items-center gap-3">
+            <Logo size="md" />
+            <div>
+              <p className="text-sm font-bold tracking-tight text-foreground">
+                {displayName ?? "InnoMMS"}
+              </p>
+              <p className="text-xs text-muted-foreground">Merchant Portal</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <LanguageDropdown />
+            <button
+              type="button"
+              onClick={toggleMode}
+              aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground"
+            >
+              {mode === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:text-primary"
+            >
+              <LogOut size={14} /> Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+      <main className="relative mx-auto max-w-6xl space-y-6 px-5 py-8 sm:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-primary">
-              InnoMMS Merchant Portal
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+              Your workspace
             </p>
-            <h1 className="text-2xl font-bold">{session?.name || "Your account"}</h1>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight">
+              Welcome, {session?.name || "merchant"}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Your wallets, customer payments, refunds, and account security in one place.
+            </p>
           </div>
           <button
             type="button"
-            onClick={() => void signOut()}
-            className="rounded-xl border border-border px-4 py-2 text-sm"
+            onClick={() => void signOut(true)}
+            className="text-xs font-semibold text-muted-foreground hover:text-primary"
           >
-            Sign out
+            Sign out all devices
           </button>
-          <button type="button" onClick={() => void signOut(true)} className="text-xs font-semibold text-muted-foreground">Sign out all devices</button>
         </div>
-      </header>
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-        <nav className="flex flex-wrap gap-2">
+        <nav
+          className="flex flex-wrap gap-2 rounded-2xl border border-border/70 bg-card/80 p-2 shadow-sm"
+          aria-label="Merchant account sections"
+        >
           {[
             ["payments", "Payments received"],
             ["history", "History"],
@@ -195,8 +273,15 @@ export function MerchantAccountPage() {
                 setSelected(null);
                 setReceipt(null);
               }}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold ${tab === key ? "bg-primary text-primary-foreground" : "border border-border bg-card"}`}
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${tab === key ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
             >
+              {key === "payments" ? (
+                <CreditCard size={15} />
+              ) : key === "history" ? (
+                <History size={15} />
+              ) : (
+                <ShieldCheck size={15} />
+              )}
               {label}
             </button>
           ))}
@@ -212,17 +297,20 @@ export function MerchantAccountPage() {
           </p>
         )}
         {tab !== "security" && (
-          <section className="grid gap-3 md:grid-cols-2">
+          <section className="grid gap-4 md:grid-cols-2" aria-label="Wallets">
             {wallets.map((wallet) => (
               <div
                 key={wallet.acct_id ?? wallet.acct_num}
-                className="rounded-2xl border border-border bg-card p-5"
+                className="rounded-[1.5rem] border border-border/70 bg-card/90 p-6 shadow-[0_12px_35px_rgba(30,64,125,0.08)]"
               >
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-primary-light text-primary">
+                  <Wallet size={19} />
+                </div>
                 <p className="text-sm text-muted-foreground">
                   {wallet.product_name ?? wallet.acct_prod_name ?? "Wallet"}
                 </p>
-                <p className="mt-1 font-mono text-lg font-bold">{wallet.acct_num}</p>
-                <p className="mt-3 text-sm">
+                <p className="mt-1 font-mono text-xl font-bold tracking-tight">{wallet.acct_num}</p>
+                <p className="mt-4 border-t border-border/70 pt-4 text-sm">
                   Available: <strong>{money(wallet.avail_bal, wallet.currency_code)}</strong>
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -233,7 +321,7 @@ export function MerchantAccountPage() {
           </section>
         )}
         {tab !== "security" && (
-          <section className="rounded-2xl border border-border bg-card p-5">
+          <section className="rounded-[1.5rem] border border-border/70 bg-card/90 p-6 shadow-[0_12px_35px_rgba(30,64,125,0.08)]">
             <h2 className="text-lg font-bold">
               {tab === "payments" ? "Payments received" : "Transaction history"}
             </h2>
@@ -329,7 +417,7 @@ export function MerchantAccountPage() {
           </section>
         )}
         {selected && tab !== "security" && (
-          <section className="rounded-2xl border border-border bg-card p-5">
+          <section className="rounded-[1.5rem] border border-border/70 bg-card/90 p-6 shadow-[0_12px_35px_rgba(30,64,125,0.08)]">
             <h2 className="text-lg font-bold">Transaction {selected.rrn}</h2>
             <p className="mt-2 text-sm">
               {selected.txn_type} · {selected.status} · {date(selected.tran_date_time)}
@@ -423,18 +511,24 @@ export function MerchantAccountPage() {
           </section>
         )}
         {receipt && (
-          <section className="rounded-2xl border border-border bg-card p-5">
+          <section className="rounded-[1.5rem] border border-border/70 bg-card/90 p-6 shadow-[0_12px_35px_rgba(30,64,125,0.08)]">
             <h2 className="text-lg font-bold">
               Receipt{" "}
               {receipt.print_count > 0 && <span className="text-sm text-amber-600">DUPLICATE</span>}
             </h2>
             <dl className="mt-3 divide-y divide-border text-sm">
-              {Object.entries(receipt).filter(([key]) => key !== "print_count").map(([key, value]) => (
-                <div key={key} className="flex flex-wrap justify-between gap-2 py-2">
-                  <dt className="text-muted-foreground">{key.replaceAll("_", " ")}</dt>
-                  <dd className="max-w-full break-all text-right font-medium">{value && typeof value === "object" ? JSON.stringify(value) : String(value ?? "")}</dd>
-                </div>
-              ))}
+              {Object.entries(receipt)
+                .filter(([key]) => key !== "print_count")
+                .map(([key, value]) => (
+                  <div key={key} className="flex flex-wrap justify-between gap-2 py-2">
+                    <dt className="text-muted-foreground">{key.replaceAll("_", " ")}</dt>
+                    <dd className="max-w-full break-all text-right font-medium">
+                      {value && typeof value === "object"
+                        ? JSON.stringify(value)
+                        : String(value ?? "")}
+                    </dd>
+                  </div>
+                ))}
             </dl>
             <button
               type="button"
@@ -447,8 +541,12 @@ export function MerchantAccountPage() {
         )}
         {tab === "security" && (
           <section className="grid gap-5 md:grid-cols-2">
-            {session?.pin_locked && <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-800 md:col-span-2">Your transaction PIN is locked. Use the PIN reset option below.</p>}
-            <div className="space-y-3 rounded-2xl border border-border bg-card p-5">
+            {session?.pin_locked && (
+              <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-800 md:col-span-2">
+                Your transaction PIN is locked. Use the PIN reset option below.
+              </p>
+            )}
+            <div className="space-y-3 rounded-[1.5rem] border border-border/70 bg-card/90 p-6 shadow-[0_12px_35px_rgba(30,64,125,0.08)]">
               <h2 className="font-bold">Change password</h2>
               <input
                 className={field}
@@ -472,7 +570,7 @@ export function MerchantAccountPage() {
                 Change password
               </button>
             </div>
-            <div className="space-y-3 rounded-2xl border border-border bg-card p-5">
+            <div className="space-y-3 rounded-[1.5rem] border border-border/70 bg-card/90 p-6 shadow-[0_12px_35px_rgba(30,64,125,0.08)]">
               <h2 className="font-bold">Transaction PIN</h2>
               <input
                 className={field}
@@ -480,7 +578,9 @@ export function MerchantAccountPage() {
                 inputMode="numeric"
                 placeholder="Current PIN"
                 value={security.pinCurrent}
-                onChange={(e) => setSecurity((s) => ({ ...s, pinCurrent: e.target.value.replace(/\D/g, "") }))}
+                onChange={(e) =>
+                  setSecurity((s) => ({ ...s, pinCurrent: e.target.value.replace(/\D/g, "") }))
+                }
               />
               <input
                 className={field}
@@ -488,7 +588,9 @@ export function MerchantAccountPage() {
                 inputMode="numeric"
                 placeholder="New PIN"
                 value={security.pinNext}
-                onChange={(e) => setSecurity((s) => ({ ...s, pinNext: e.target.value.replace(/\D/g, "") }))}
+                onChange={(e) =>
+                  setSecurity((s) => ({ ...s, pinNext: e.target.value.replace(/\D/g, "") }))
+                }
               />
               <button type="button" className={button} onClick={() => void changeSecret("pin")}>
                 Change PIN
