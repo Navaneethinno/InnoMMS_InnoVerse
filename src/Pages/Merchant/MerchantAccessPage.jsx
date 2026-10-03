@@ -7,6 +7,8 @@ import { Logo } from "@/Components/Common/Logo";
 import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
 import { useColorMode } from "@/Hooks/Providers/ColorModeProvider";
 import { useBrandTheme } from "@/Hooks/Providers/BrandThemeProvider";
+import merchantDashboardBg from "@/assets/merchant-dashboard-bg.png";
+import merchantDashboardDarkBg from "@/assets/merchant-dashboard-night-bg.png";
 
 const input =
   "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10";
@@ -83,11 +85,38 @@ export function MerchantAccessPage({ mode = "activate" }) {
     });
   };
   return (
-    <div
-      className="flex min-h-screen flex-col bg-background bg-cover bg-center"
-      style={loginBackgroundUrl ? { backgroundImage: `url(${loginBackgroundUrl})` } : undefined}
-    >
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
+    <div className="relative isolate flex min-h-screen flex-col bg-background">
+      {loginBackgroundUrl ? (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${loginBackgroundUrl})`,
+          }}
+        />
+      ) : (
+        <>
+          <div
+            aria-hidden="true"
+            className={`absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-700 ease-in-out motion-reduce:transition-none ${
+              colorMode === "dark" ? "opacity-0" : "opacity-100"
+            }`}
+            style={{
+              backgroundImage: `url(${merchantDashboardBg})`,
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className={`absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-700 ease-in-out motion-reduce:transition-none ${
+              colorMode === "dark" ? "opacity-100" : "opacity-0"
+            }`}
+            style={{
+              backgroundImage: `url(${merchantDashboardDarkBg})`,
+            }}
+          />
+        </>
+      )}
+      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
         <div className="flex items-center gap-3">
           <Logo size="md" />
           <div>
@@ -107,7 +136,7 @@ export function MerchantAccessPage({ mode = "activate" }) {
           </button>
         </div>
       </header>
-      <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-5 pb-16 sm:px-8 lg:grid-cols-2 lg:gap-16">
+      <main className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-5 pb-16 sm:px-8 lg:grid-cols-2 lg:gap-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

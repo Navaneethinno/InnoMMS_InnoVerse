@@ -9,7 +9,6 @@ import {
   EyeOff,
   Moon,
   RefreshCw,
-  ShieldCheck,
   Sun,
 } from "lucide-react";
 import { useAuth } from "../../Hooks/useAuth";
@@ -21,6 +20,8 @@ import { LanguageDropdown } from "@/Components/Common/LanguageDropdown";
 import { UiTooltip } from "@/Components/Common/UiTooltip";
 import { merchantAccountApi, merchantSession } from "@/Services/Merchant/merchantAccount.api";
 import { Navigate } from "react-router-dom";
+import merchantDashboardBg from "@/assets/merchant-dashboard-bg.png";
+import merchantDashboardDarkBg from "@/assets/merchant-dashboard-night-bg.png";
 
 export function LoginPage({ merchant = false }) {
   const { t } = useTranslation("login");
@@ -80,13 +81,39 @@ export function LoginPage({ merchant = false }) {
     "w-full rounded-xl border border-border bg-background px-4 py-3.5 text-sm text-foreground caret-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-primary focus:ring-4 focus:ring-primary/10";
 
   return (
-    <div
-      className="flex min-h-screen flex-col bg-background bg-cover bg-center"
-      // The institution's login background (branding), when it has one.
-      style={loginBackgroundUrl ? { backgroundImage: `url(${loginBackgroundUrl})` } : undefined}
-    >
+    <div className="relative isolate flex min-h-screen flex-col bg-background">
+      {loginBackgroundUrl ? (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${loginBackgroundUrl})`,
+          }}
+        />
+      ) : (
+        <>
+          <div
+            aria-hidden="true"
+            className={`absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-700 ease-in-out motion-reduce:transition-none ${
+              mode === "dark" ? "opacity-0" : "opacity-100"
+            }`}
+            style={{
+              backgroundImage: `url(${merchantDashboardBg})`,
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className={`absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-700 ease-in-out motion-reduce:transition-none ${
+              mode === "dark" ? "opacity-100" : "opacity-0"
+            }`}
+            style={{
+              backgroundImage: `url(${merchantDashboardDarkBg})`,
+            }}
+          />
+        </>
+      )}
       {/* Top bar. */}
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
+      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
         <div className="flex items-center gap-3">
           <Logo size="md" />
           <div>
@@ -116,33 +143,15 @@ export function LoginPage({ merchant = false }) {
       </header>
 
       {/* Body. */}
-      <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-5 pb-16 sm:px-8 lg:grid-cols-2 lg:gap-16">
-        {/* Left hero. */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="order-2 lg:order-1"
-        >
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-semibold text-primary shadow-sm">
-            <ShieldCheck size={15} /> {t("secureBadge")}
-          </span>
-          <h1 className="mt-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-5xl">
-            {t("heroTitle")}
-          </h1>
-          <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground">
-            {t("heroDescription")}
-          </p>
-        </motion.div>
-
-        {/* Right sign-in card. */}
+      <main className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-center justify-end px-5 pb-16 sm:px-8">
+        {/* Sign-in card. */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.05 }}
-          className="order-1 w-full justify-self-center lg:order-2 lg:justify-self-end"
+          className="order-1 w-full max-w-md justify-self-end"
         >
-          <div className="w-full max-w-md rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_30px_80px_rgba(30,64,125,0.14),0_10px_24px_rgba(15,23,42,0.06)] sm:p-9">
+          <div className="w-full rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_30px_80px_rgba(30,64,125,0.14),0_10px_24px_rgba(15,23,42,0.06)] sm:p-9">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
               {t("welcomeBack")}
             </p>
