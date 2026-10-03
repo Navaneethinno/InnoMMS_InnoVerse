@@ -27,6 +27,7 @@ export const DRAFT_STATUS_CODE = Number(import.meta.env.VITE_DRAFT_STATUS_CODE ?
 export const MERCHANT_PORTAL_AUTHORIZATION = import.meta.env.VITE_MERCHANT_PORTAL_AUTHORIZATION || "";
 export const MERCHANT_INST_PROFILE_ID = Number(import.meta.env.VITE_INST_PROFILE_ID) || null;
 export const MERCHANT_DIGITAL_PRODUCT_ID = Number(import.meta.env.VITE_MERCHANT_DIGITAL_PRODUCT_ID) || null;
+export const MERCHANT_ACCOUNT_BASE = "/merchant/web";
 // /merchant/{kind}/web/{call}: one section per reply, next / back between them.
 const onboardingPaths = (kind) =>
   Object.fromEntries(
