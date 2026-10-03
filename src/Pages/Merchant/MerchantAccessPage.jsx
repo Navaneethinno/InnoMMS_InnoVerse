@@ -14,23 +14,8 @@ const input =
   "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10";
 const button =
   "rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary-hover disabled:opacity-50";
-const validPin = (value) =>
-  /^\d{4,6}$/.test(value) &&
-  !/^(\d)\1+$/.test(value) &&
-  ![
-    "1234",
-    "2345",
-    "3456",
-    "4567",
-    "5678",
-    "6789",
-    "9876",
-    "8765",
-    "7654",
-    "6543",
-    "5432",
-    "4321",
-  ].includes(value);
+// Any 4 to 6 digits (PINs accept any digits, 3 Oct 2026).
+const validPin = (value) => /^\d{4,6}$/.test(value);
 
 export function MerchantAccessPage({ mode = "activate" }) {
   const navigate = useNavigate();
@@ -72,7 +57,7 @@ export function MerchantAccessPage({ mode = "activate" }) {
         throw new Error("Password must be 8–64 characters and contain a letter and a digit.");
       if (!/^\d{6}$/.test(otp)) throw new Error("Enter the six-digit code.");
       if (!reset && !validPin(pin))
-        throw new Error("PIN must be 4–6 digits and cannot repeat or run in sequence.");
+        throw new Error("PIN must be 4–6 digits.");
       const result = reset
         ? await merchantAccountApi.passwordReset({ otp_ref: otpRef, otp, password })
         : await merchantAccountApi.activate({ otp_ref: otpRef, otp, password, pin });
