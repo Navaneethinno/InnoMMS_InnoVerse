@@ -97,6 +97,10 @@ export const loadHistory = async ({ page = 1, limit = 20, acctId = null, txnType
   return { items, total: items.length, page };
 };
 
+// The filters History offers: { categories: [{ code, label }], periods: [{ code,
+// label, from, to }] (CUSTOM has no dates), today }.
+export const loadHistoryFilters = async () => (await portalPost(ACCOUNT.HISTORY_FILTERS)).rows[0] ?? { categories: [], periods: [] };
+
 export const loadTransaction = (rrn) => data(portalPost(ACCOUNT.TRANSACTION, { rrn }));
 
 // `rrn` omitted = the merchant's last receipt. `duplicate` counts a reprint.

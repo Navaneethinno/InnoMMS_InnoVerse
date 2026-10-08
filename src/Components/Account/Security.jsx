@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { KeyRound, LockKeyhole, MonitorSmartphone, ShieldCheck } from "lucide-react";
+import { cn } from "@/Utils/Lib/utils";
 import Button from "@/Components/Common/Button";
 import ConfirmDialog from "@/Components/Common/ConfirmDialog";
 import ErrorState from "@/Components/Common/ErrorState";
@@ -291,7 +292,8 @@ export default function Security() {
           {status}
         </p>
       </div>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+      {/* Three across only when there are three or more cards: two fill the row. */}
+      <div className={cn("grid grid-cols-1 gap-5 md:grid-cols-2", (passwordLogin || separate) && "xl:grid-cols-3")}>
         {passwordLogin && <PasswordCard onChanged={refreshStatus} />}
         {separate && (
           <ChangePinCard

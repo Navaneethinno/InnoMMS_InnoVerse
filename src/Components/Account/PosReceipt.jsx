@@ -4,7 +4,7 @@ import { Download, Printer, Volume2, VolumeX } from "lucide-react";
 import { barcodeBars } from "@/Utils/Lib/barcode";
 import { formatDate, formatMoney, formatTime } from "@/Utils/Lib/format";
 import { downloadReceiptPdf } from "@/Utils/Lib/receiptPdf";
-import { receiptTexts } from "@/Utils/Lib/receiptTransaction";
+import { accountLine, receiptTexts } from "@/Utils/Lib/receiptTransaction";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import "./posReceipt.css";
 
@@ -39,8 +39,6 @@ const readSound = () => {
   }
 };
 
-// "**********0041" -> "Acc ****0041"
-const maskAccount = (account, label) => (account ? `${label} ****${String(account).replace(/\D/g, "").slice(-4) || String(account).slice(-4)}` : "");
 
 function Barcode({ value }) {
   const { bars, total } = barcodeBars(value);
@@ -426,11 +424,11 @@ const PosReceipt = forwardRef(function PosReceipt({ transaction, children, note,
           <Row label={t("receipt.amount")}>{money(tx.amount)}</Row>
           <Row label={t("receipt.fee")}>{money(tx.fee ?? 0)}</Row>
           <Rule />
-          <Row label={t("receipt.from")} sub={maskAccount(tx.from?.account, t("pos.acc"))}>
+          <Row label={t("receipt.from")} sub={accountLine(tx.from?.account, tx.wallet, t("pos.acc"))}>
             {tx.from?.name}
           </Row>
           <Row label={t("receipt.wallet")}>{tx.wallet}</Row>
-          <Row label={t("receipt.to")} sub={maskAccount(tx.to?.account, t("pos.acc"))}>
+          <Row label={t("receipt.to")} sub={accountLine(tx.to?.account, tx.wallet, t("pos.acc"))}>
             {tx.to?.name}
           </Row>
           <Row label={t("receipt.card")}>{tx.card}</Row>

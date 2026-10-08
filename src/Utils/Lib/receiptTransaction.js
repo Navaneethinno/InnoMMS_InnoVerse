@@ -48,3 +48,13 @@ export function receiptTexts(tx, t, brand) {
     footer: tx.footerLines?.length ? tx.footerLines : [t("pos.thanks", { brand: tx.institution || brand }), t("pos.keep")],
   };
 }
+
+// An account under a name on the slip. The merchant's own wallet (`wallet`,
+// the receipt's full number) is shown in full; anyone else's is masked:
+// "**********0041" -> "Acc ****0041".
+const lastFour = (value) => String(value ?? "").replace(/\D/g, "").slice(-4);
+export function accountLine(account, wallet, label) {
+  if (!account) return "";
+  const own = wallet && !String(wallet).includes("*") && lastFour(wallet) && lastFour(wallet) === lastFour(account);
+  return own ? `${label} ${wallet}` : `${label} ****${lastFour(account) || String(account).slice(-4)}`;
+}

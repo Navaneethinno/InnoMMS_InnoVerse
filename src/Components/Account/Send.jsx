@@ -1,5 +1,5 @@
 import { useWalletChanged } from "@/Services/api/liveUpdates";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -10,7 +10,7 @@ import PhoneField from "@/Components/Common/PhoneField";
 import SegmentedTabs from "@/Components/Common/SegmentedTabs";
 import TextField from "@/Components/Common/TextField";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
-import { checkPayee, loadHistory, loadWallets, quotePayment, sendPayment } from "@/Services/Account/account.api";
+import { checkPayee, loadWallets, quotePayment, sendPayment } from "@/Services/Account/account.api";
 import FitText from "@/Components/Common/FitText";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { formatMoney, newReference } from "@/Utils/Lib/format";
@@ -53,8 +53,7 @@ export default function Send() {
   // A number with no account yet: it can still be paid, the money waits.
   const [unknown, setUnknown] = useState(false);
   const [transfersVersion, setTransfersVersion] = useState(0);
-  // The payments received that can be refunded, and the one picked.
-  const [payments, setPayments] = useState(null);
+  // The payment being refunded (RefundPicker lists them).
   const [picked, setPicked] = useState(null);
   const [quote, setQuote] = useState(null);
   const [pin, setPin] = useState("");
@@ -115,26 +114,12 @@ export default function Send() {
   // Merchants send to people only: the server refuses a merchant's number.
   const payeeIsMerchant = payee?.party === "MERCHANT";
 
-  // What customers paid: the lines of money received (credits). The one named
-  // by ?refund is picked once they are loaded.
-  useEffect(() => {
-    if (!refunding) return;
-    loadHistory({ txnType: "MERCHANT_PAYMENT", limit: 50 })
-      .then(({ items }) => {
-        const received = items.filter((item) => item.direction === "CR");
-        setPayments(received);
-        const wanted = refundRrn && received.find((item) => item.rrn === refundRrn);
-        if (wanted) pick(wanted);
-      })
-      .catch((error) => {
-        setPayments([]);
-        setProblem(error.message);
-      });
-  }, [t, refunding, refundRrn]);
-  const pick = (payment) => {
+  // Picking fills in the whole amount; it can be lowered for a part refund.
+  // null goes back to the list.
+  const pick = useCallback((payment) => {
     setPicked(payment);
-    setForm((previous) => ({ ...previous, amount: String(payment.amount ?? "") }));
-  };
+    setForm((previous) => ({ ...previous, amount: payment ? String(payment.amount ?? "") : "" }));
+  }, []);
 
   const switchMode = (next) => {
     setMode(next);
@@ -380,7 +365,9 @@ export default function Send() {
   // payee's (or the payment's) currency, else the first.
   const currency = refunding ? picked?.currency_code : payee?.currency_code;
   const selectedWallet = wallets?.find((w) => w.acct_num === form.from) ?? wallets?.find((w) => w.currency_code === currency) ?? wallets?.[0];
-  const ready = refunding ? Boolean(picked) : (payee || unknown) && !checking && !payeeIsMerchant;
+  // A refund returns at most what was paid.
+  const overRefund = refunding && picked && Number(form.amount) > Number(picked.amount);
+  const ready = refunding ? Boolean(picked) && !overRefund : (payee || unknown) && !checking && !payeeIsMerchant;
   return (
     <div>
       {heading}
@@ -393,7 +380,7 @@ export default function Send() {
       <div className="min-w-0">
       <form noValidate onSubmit={review} className="h-full space-y-5 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
         {refunding ? (
-          <RefundPicker payments={payments} picked={picked} onPick={pick} />
+          <RefundPicker picked={picked} onPick={pick} preselectRrn={refundRrn} />
         ) : (
           <div className="space-y-4">
             <RecentPayees onPick={(phone) => setForm((previous) => ({ ...previous, to: phone }))} />
@@ -423,7 +410,22 @@ export default function Send() {
             </div>
           </div>
         )}
-        <TextField name="amount" label={t("send.amount")} inputMode="decimal" autoComplete="off" value={form.amount} onChange={(event) => setForm((previous) => ({ ...previous, amount: event.target.value.replace(/[^\d.]/g, "") }))} />
+        <div>
+          <TextField
+            name="amount"
+            label={t("send.amount")}
+            inputMode="decimal"
+            autoComplete="off"
+            value={form.amount}
+            error={overRefund ? t("refund.tooMuch", { amount: formatMoney(picked.amount, picked.currency_code) }) : undefined}
+            onChange={(event) => setForm((previous) => ({ ...previous, amount: event.target.value.replace(/[^\d.]/g, "") }))}
+          />
+          {refunding && picked && Number(form.amount) !== Number(picked.amount) && !overRefund && (
+            <button type="button" onClick={() => setForm((previous) => ({ ...previous, amount: String(picked.amount) }))} className="mt-2 text-xs font-bold text-ink underline-offset-2 hover:underline">
+              {t("refund.full", { amount: formatMoney(picked.amount, picked.currency_code) })}
+            </button>
+          )}
+        </div>
         <TextField name="note" label={t("send.note")} maxLength={255} autoComplete="off" value={form.note} onChange={set("note")} />
         <Button type="submit" pending={pending} disabled={!ready || !Number(form.amount)} className="w-full">
           {t("send.review")}
@@ -431,8 +433,9 @@ export default function Send() {
         </Button>
       </form>
       </div>
-      {/* On a phone the wallet comes first, on a wide screen it sits beside the form. */}
-      <WalletPanel wallets={wallets} selected={selectedWallet} footer={<LimitsList wallet={selectedWallet} txnType={refunding ? "MERCHANT_REFUND" : "P2P_TRANSFER"} />} onSelect={(acctNum) => setForm((previous) => ({ ...previous, from: acctNum }))} className="order-first lg:order-none" />
+      {/* On a phone the wallet comes first when sending (a refund starts from the
+          payment), on a wide screen it sits beside the form. */}
+      <WalletPanel wallets={wallets} selected={selectedWallet} footer={<LimitsList wallet={selectedWallet} txnType={refunding ? "MERCHANT_REFUND" : "P2P_TRANSFER"} />} onSelect={(acctNum) => setForm((previous) => ({ ...previous, from: acctNum }))} className={refunding ? undefined : "order-first lg:order-none"} />
       </div>
       {!refunding && <PhoneTransfers version={transfersVersion} onCancelled={() => loadWallets().then(setWallets).catch(() => {})} className="max-w-6xl" />}
     </div>

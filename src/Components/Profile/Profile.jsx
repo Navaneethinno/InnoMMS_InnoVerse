@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Camera, FileText, KeyRound, Phone, ShieldCheck, UserRound } from "lucide-react";
+import { Camera, FileText, IdCard, KeyRound, Phone, ShieldCheck, Store, UserRound } from "lucide-react";
 import Avatar from "@/Components/Common/Avatar";
 import DetailRow from "@/Components/Common/DetailRow";
 import ErrorState from "@/Components/Common/ErrorState";
@@ -12,6 +12,13 @@ import { sectionBlocks } from "@/Utils/Lib/profileAnswers";
 import { formatDate, formatDateTime } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 import AvatarDialog from "./AvatarDialog";
+
+// Each sign-up section's card icon, by what it is about.
+const sectionIcon = (key = "") => {
+  if (key.includes("business")) return Store;
+  if (key.includes("document")) return IdCard;
+  return UserRound;
+};
 import ProfileDocuments from "./ProfileDocuments";
 
 const NONE = "—";
@@ -63,7 +70,7 @@ export default function Profile() {
       {sections.length > 0 && (
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           {sections.map((section) => (
-            <IconCard key={section.key} icon={UserRound} title={section.heading}>
+            <IconCard key={section.key} icon={sectionIcon(section.key)} title={section.heading}>
               {sectionBlocks(section, words).map((rows, index) => (
                 <dl key={index} className={cn(index > 0 && "mt-4 border-t border-slate-200 pt-2")}>
                   {rows.map((row) => (

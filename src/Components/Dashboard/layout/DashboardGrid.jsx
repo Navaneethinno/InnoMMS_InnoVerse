@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { Move } from "lucide-react";
@@ -10,6 +10,22 @@ import { mergeVisible, stackItems, toGridItems } from "./gridLayout";
 import { GRID_COLS, MAX_SPAN, ROW_HEIGHT, WIDGET_REGISTRY } from "./widgetRegistry";
 
 const ResponsiveGrid = WidthProvider(Responsive);
+const PHONE = "(max-width: 767.98px)";
+
+// Below 768px the grid is not used: fixed row heights leave big gaps under
+// short widgets on a narrow screen. Each card is as tall as its content there,
+// never shorter than its smallest grid size (a chart needs the room).
+function usePhone() {
+  const [phone, setPhone] = useState(() => typeof window !== "undefined" && window.matchMedia(PHONE).matches);
+  useEffect(() => {
+    const query = window.matchMedia(PHONE);
+    const update = () => setPhone(query.matches);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return phone;
+}
+const minHeight = (rows) => rows * ROW_HEIGHT + (rows - 1) * 16;
 
 // The widget grid (react-grid-layout). Each card has a cell position and a
 // size. While editing, a card is dragged by its whole surface and the grid
@@ -27,6 +43,7 @@ export function DashboardGrid({ layout, visibleIds, setLayout, editing }) {
   const shown = useMemo(() => layout.filter((it) => visibleIds.has(it.id)), [layout, visibleIds]);
   const items = useMemo(() => toGridItems(WIDGET_REGISTRY, shown, { maxSpan: MAX_SPAN, editing: canEdit }), [shown, canEdit]);
   const stacked = useMemo(() => stackItems(items), [items]);
+  const phone = usePhone();
 
   // Saved only when the user finishes a move or resize; changes the grid
   // makes on its own (mount, width changes) are never written back.
@@ -35,6 +52,22 @@ export function DashboardGrid({ layout, visibleIds, setLayout, editing }) {
     const merged = mergeVisible(layout, next);
     if (JSON.stringify(merged) !== JSON.stringify(layout)) setLayout(merged);
   };
+
+  if (phone) {
+    return (
+      <div className="flex flex-col gap-4">
+        {stacked.map((it) => {
+          const widget = WIDGET_REGISTRY[it.i];
+          const Widget = widget.component;
+          return (
+            <div key={it.i} className="flex flex-col [&>*:first-child]:flex-1" style={{ minHeight: minHeight(widget.minH) }}>
+              <Widget />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <ResponsiveGrid

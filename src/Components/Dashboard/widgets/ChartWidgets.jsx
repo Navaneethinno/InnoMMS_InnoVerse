@@ -28,7 +28,8 @@ export function CashFlowWidget() {
         <p className={`flex min-h-24 flex-1 items-center justify-center px-2 text-center text-xs ${error ? "text-red-600 dark:text-red-300" : "text-slate-500"}`}>{error || t("dash.nothingYet")}</p>
       ) : (
         <>
-          <div className="min-h-24 flex-1">
+          {/* On a phone the card is as tall as its content: the chart needs its own height. */}
+          <div className="min-h-24 flex-1 max-md:h-56 max-md:flex-none">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={rows} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
                 <defs>

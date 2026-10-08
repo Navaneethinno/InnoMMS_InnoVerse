@@ -102,6 +102,8 @@ export const API_ENDPOINTS = {
     QUOTE: accountPath("quote"),
     SEND: accountPath("send"),
     HISTORY: accountPath("history"),
+    // The history filters in the portal's language: categories and periods (with dates).
+    HISTORY_FILTERS: accountPath("history_filters"),
     TRANSACTION: accountPath("transaction"),
     RECEIPT: accountPath("receipt"),
     LIMITS: accountPath("limits"),

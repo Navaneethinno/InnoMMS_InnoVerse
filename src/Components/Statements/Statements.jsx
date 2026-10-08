@@ -75,7 +75,7 @@ export default function Statements() {
   };
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <div className="mb-6">
         <h1 className="text-2xl font-black tracking-tight text-slate-800">{t("statements.title")}</h1>
         <p className="mt-1 text-sm text-slate-500">{t("statements.subtitle")}</p>

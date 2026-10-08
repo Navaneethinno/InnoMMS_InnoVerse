@@ -97,10 +97,10 @@ export default function Inbox() {
       <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-[32px] font-extrabold leading-tight tracking-tight text-ink">{t("inbox.title")}</h1>
+            <h1 className="text-2xl font-black tracking-tight text-slate-800">{t("inbox.title")}</h1>
             {state.unread > 0 && <span className="rounded-full bg-forest px-3 py-1 text-xs font-bold text-lime dark:bg-lime dark:text-on-secondary">{t("dash.unreadCount", { count: state.unread })}</span>}
           </div>
-          <p className="notif-muted mt-1 text-[15px]">{t("inbox.tagline", { defaultValue: "Payments, security alerts and statements from your bank." })}</p>
+          <p className="mt-1 text-sm text-slate-500">{t("inbox.tagline", { defaultValue: "Payments, security alerts and statements from your bank." })}</p>
         </div>
         <Button variant="secondary" pending={busy} disabled={state.unread === 0} onClick={() => void markAll()} className="notif-focus h-11 border-ink/25 py-0">
           <CheckCheck size={16} /> {t("inbox.markAll")}

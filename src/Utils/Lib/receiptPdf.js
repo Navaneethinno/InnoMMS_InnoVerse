@@ -1,6 +1,6 @@
 import { barcodeBars } from "./barcode";
 import { formatDate, formatMoney, formatTime } from "./format";
-import { receiptTexts } from "./receiptTransaction";
+import { accountLine, receiptTexts } from "./receiptTransaction";
 
 // The receipt as a PDF, laid out like the thermal slip on screen: 80 mm wide,
 // as tall as it needs to be, monospaced text, dashed rules, the barcode. jsPDF
@@ -9,8 +9,6 @@ const WIDTH = 80;
 const MARGIN = 6;
 const INNER = WIDTH - MARGIN * 2;
 const LINE = 4.4; // mm per 8pt line
-
-const maskAccount = (account, label) => (account ? `${label} ****${String(account).replace(/\D/g, "").slice(-4) || String(account).slice(-4)}` : "");
 
 // Lays the receipt out on `doc` (measuring text as it goes) and returns the
 // height used. Called twice: once on a scratch page to learn the height, then
@@ -94,10 +92,10 @@ function layout(doc, { tx, t, brand, logo }) {
   row(t("receipt.fee"), money(tx.fee ?? 0));
   rule();
   row(t("receipt.from"), tx.from?.name);
-  sub(maskAccount(tx.from?.account, t("pos.acc")));
+  sub(accountLine(tx.from?.account, tx.wallet, t("pos.acc")));
   row(t("receipt.wallet"), tx.wallet);
   row(t("receipt.to"), tx.to?.name);
-  sub(maskAccount(tx.to?.account, t("pos.acc")));
+  sub(accountLine(tx.to?.account, tx.wallet, t("pos.acc")));
   row(t("receipt.card"), tx.card);
   row(t("receipt.reason"), tx.reason);
   rule();

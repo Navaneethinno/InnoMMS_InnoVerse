@@ -31,10 +31,11 @@ export const WIDGET_REGISTRY = {
   income_spending: { component: IncomeSpendingWidget, titleKey: "dash.incomeSpending", w: 1, h: 5, minH: 4 },
   quick_send: { component: QuickActionsWidget, titleKey: "dash.quickActions", w: 1, h: 5, minH: 4 },
   notifications: { component: NotificationsWidget, titleKey: "dash.notificationsWidget", w: 1, h: 5, minH: 4 },
-  cash_flow: { component: CashFlowWidget, titleKey: "dash.cashFlow", w: 2, h: 9, minH: 6 },
+  // Side by side, the same height: no gap under either.
+  cash_flow: { component: CashFlowWidget, titleKey: "dash.cashFlow", w: 2, h: 10, minH: 6 },
+  recent_transactions: { component: RecentTransactionsWidget, titleKey: "dash.recentTransactions", w: 2, h: 10, minH: 5 },
   wallets: { component: WalletsWidget, titleKey: "dash.accounts", w: 1, h: 6, minH: 3 },
   cards: { component: CardsWidget, titleKey: "dash.cardsWidget", w: 1, h: 6, minH: 4 },
-  recent_transactions: { component: RecentTransactionsWidget, titleKey: "dash.recentTransactions", w: 2, h: 10, minH: 5 },
   statements: { component: StatementsWidget, titleKey: "dash.statementsWidget", w: 1, h: 6, minH: 4 },
 };
 

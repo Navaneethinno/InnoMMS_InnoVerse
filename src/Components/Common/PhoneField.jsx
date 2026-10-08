@@ -14,21 +14,38 @@ const OTHER = "__other__";
 export default function PhoneField({ label, value, onChange, countries = [], allowOther = false, error, disabled, name = "phone", placeholder }) {
   const { t } = useTranslation();
   const primary = countries.find((country) => country.primary) ?? countries[0];
-  // A value already there (the form was left and came back) is split into its prefix and digits again.
-  const [initial] = useState(() => {
-    const matched = value ? [...countries].sort((x, y) => String(y.dial).length - String(x.dial).length).find((item) => String(value).startsWith(item.dial)) : null;
-    if (matched) return { alpha2: matched.alpha2, digits: String(value).slice(String(matched.dial).length) };
-    return { alpha2: value && allowOther ? OTHER : (primary?.alpha2 ?? ""), digits: value ? String(value) : "" };
-  });
+  // A whole number is split into its prefix and digits: the one already there
+  // (the form was left and came back), and any set from outside later (a recent
+  // number picked, the form cleared).
+  const split = (whole) => {
+    const matched = whole ? [...countries].sort((x, y) => String(y.dial).length - String(x.dial).length).find((item) => String(whole).startsWith(item.dial)) : null;
+    if (matched) return { alpha2: matched.alpha2, digits: String(whole).slice(String(matched.dial).length) };
+    return { alpha2: whole && allowOther ? OTHER : (primary?.alpha2 ?? ""), digits: whole ? String(whole) : "" };
+  };
+  const [initial] = useState(() => split(value));
   const [alpha2, setAlpha2] = useState(initial.alpha2);
   const [digits, setDigits] = useState(initial.digits);
+  // The value this field last reported (or was given): a different one came from outside.
+  const [known, setKnown] = useState(value ?? "");
+  if ((value ?? "") !== known) {
+    const next = split(value);
+    setKnown(value ?? "");
+    if (next.digits !== digits || (value && next.alpha2 !== alpha2)) {
+      if (value) setAlpha2(next.alpha2);
+      setDigits(next.digits);
+    }
+  }
 
   if (!countries.length) {
     return <TextField name={name} label={label} type="tel" inputMode="tel" autoComplete="tel" placeholder={placeholder} value={value ?? ""} disabled={disabled} error={error} onChange={(event) => onChange(event.target.value)} />;
   }
   const other = alpha2 === OTHER;
   const country = countries.find((item) => item.alpha2 === alpha2) ?? primary;
-  const emit = (isOther, nextCountry, nextDigits) => onChange(nextDigits ? (isOther ? nextDigits : `${nextCountry.dial}${nextDigits}`) : "");
+  const emit = (isOther, nextCountry, nextDigits) => {
+    const whole = nextDigits ? (isOther ? nextDigits : `${nextCountry.dial}${nextDigits}`) : "";
+    setKnown(whole);
+    onChange(whole);
+  };
   const options = [
     ...countries.map((item) => ({ value: item.alpha2, label: `${item.alpha2} ${item.dial}` })),
     ...(allowOther ? [{ value: OTHER, label: t("phone.other", { defaultValue: "Other" }) }] : []),
