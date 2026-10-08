@@ -66,6 +66,7 @@ const statementPath = channelPath("statement");
 const dashboardPath = channelPath("dashboard");
 const profilePath = channelPath("profile");
 const kycPath = channelPath("kyc");
+const contactsPath = channelPath("contacts");
 export const API_ENDPOINTS = {
   // WebSocket path (the host is API_BASE_URL with ws/wss).
   LIVE: "/merchant/web/live",
@@ -111,6 +112,8 @@ export const API_ENDPOINTS = {
     PHONE_TRANSFERS: accountPath("phone_transfers"),
     PHONE_TRANSFER_CANCEL: accountPath("phone_transfer_cancel"),
   },
+  // Which of a list of numbers are e-taku customers (at most 500 at once).
+  CONTACTS: { MATCH: contactsPath("match") },
   // The signed-in menu and the features this merchant has.
   MENU: "/merchant/web/menu",
   // The inbox of everything the institution sent the merchant.
@@ -152,6 +155,8 @@ export const STORAGE_KEYS = {
   // "1" while the merchant has collapsed the sidebar; cleared at every sign-in
   // so it starts open and pinned.
   sidebarCollapsed: "innoverse-merchant:sidebar-collapsed",
+  // The numbers this merchant sent money to lately, newest first.
+  recentPayees: "innoverse-merchant:recent-payees",
   onboardingTour: (kind) => `innoverse-merchant:tour:${kind}`,
   onboardingReference: (kind) => `innoverse-merchant:onboarding:${kind}`,
 };

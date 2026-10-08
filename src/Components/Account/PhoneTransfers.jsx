@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Hourglass } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
+import SegmentedTabs from "@/Components/Common/SegmentedTabs";
 import { cancelPhoneTransfer, loadPhoneTransfers } from "@/Services/Account/account.api";
 import { notifications } from "@/Utils/Lib/notifications";
 import { formatDateTime, formatMoney } from "@/Utils/Lib/format";
@@ -75,20 +76,7 @@ export default function PhoneTransfers({ version = 0, onCancelled, className }) 
     <section className={cn("mt-8", className)}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{t("send.waitingTitle", { defaultValue: "Money waiting for a number" })}</h2>
-        <div role="tablist" className="inline-flex rounded-xl bg-ink/5 p-1">
-          {TABS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              role="tab"
-              aria-selected={tab === item.key}
-              onClick={() => setTab(item.key)}
-              className={cn("rounded-lg px-4 py-1.5 text-xs font-bold transition", tab === item.key ? "bg-surface text-ink shadow-sm" : "text-slate-500 hover:text-ink")}
-            >
-              {t(item.label[0], { defaultValue: item.label[1] })}
-            </button>
-          ))}
-        </div>
+        <SegmentedTabs items={TABS.map((item) => ({ key: item.key, label: t(item.label[0], { defaultValue: item.label[1] }) }))} value={tab} onChange={setTab} />
       </div>
       {problem && (
         <div className="mb-3">

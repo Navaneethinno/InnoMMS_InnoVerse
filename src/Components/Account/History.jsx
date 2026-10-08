@@ -2,7 +2,8 @@ import { useWalletChanged } from "@/Services/api/liveUpdates";
 import { useTxnTypes } from "@/Hooks/Transactions/useTxnTypes";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowDownLeft, ArrowUpRight, Download, Printer } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowDownLeft, ArrowUpRight, Download, Printer, Undo2 } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import FilterSelect from "@/Components/Common/FilterSelect";
@@ -18,7 +19,7 @@ import ReceiptView from "./ReceiptView";
 // Newest first, every module (transfers, payments, refunds, cash, deposits,
 // loans, reversals). A line opens that transaction and its receipt.
 const LIMIT = 20;
-const TYPES = ["P2P_TRANSFER", "MERCHANT_PAYMENT", "MERCHANT_REFUND", "CASH_IN", "CASH_OUT", "CARD_LOAD", "CARD_UNLOAD", "CARD_PURCHASE_CP", "CARD_PURCHASE_CNP", "CARD_CASH_WITHDRAWAL", "NEW_CARD_FEE", "PHYSICAL_CARD_FEE", "REVERSAL"];
+const TYPES = ["P2P_TRANSFER", "P2P_TO_PHONE", "PHONE_TRANSFER_RETURN", "MERCHANT_PAYMENT", "MERCHANT_REFUND", "CASH_IN", "CASH_OUT", "CARD_LOAD", "CARD_UNLOAD", "CARD_PURCHASE_CP", "CARD_PURCHASE_CNP", "CARD_CASH_WITHDRAWAL", "NEW_CARD_FEE", "PHYSICAL_CARD_FEE", "REVERSAL"];
 
 // The line's words in the portal's language: the API's names for the kinds of
 // transaction (`types`, a transfer says which way the money went); while those
@@ -149,7 +150,11 @@ function HistoryTable({ items, onOpen }) {
   );
 }
 
-function TransactionDialog({ rrn, onClose }) {
+// A payment a customer made to this merchant can be refunded from its receipt.
+const refundable = (item) => item?.txn_type === "MERCHANT_PAYMENT" && item?.direction === "CR";
+
+function TransactionDialog({ item, onClose }) {
+  const rrn = item?.rrn;
   const { t } = useTranslation();
   const logo = useBrandingLogo();
   const [state, setState] = useState({ loading: true, receipt: null, error: "" });
@@ -191,6 +196,15 @@ function TransactionDialog({ rrn, onClose }) {
                 <Download size={15} />
                 {t("pos.download")}
               </Button>
+              {refundable(item) && (
+                <Link
+                  to={`/send?refund=${encodeURIComponent(rrn)}`}
+                  className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-forest px-5 py-3 text-sm font-bold text-white hover:bg-forest/90 dark:bg-lime dark:text-on-secondary dark:hover:bg-lime/90"
+                >
+                  <Undo2 size={15} />
+                  {t("refund.action", { defaultValue: "Refund" })}
+                </Link>
+              )}
             </div>
           )}
         </>
@@ -292,10 +306,10 @@ export default function History() {
         ) : (
           <>
             <p className="mb-3 text-sm text-slate-500">{t("history.showing", { from: first, to: first + state.items.length - 1, total: state.total })}</p>
-            <HistoryTable items={state.items} onOpen={(line) => setOpen(line.rrn)} />
+            <HistoryTable items={state.items} onOpen={setOpen} />
             <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-surface p-2 shadow-sm lg:hidden">
               {state.items.map((item, index) => (
-                <TransactionLine key={`${item.rrn}-${index}`} item={item} onOpen={(line) => setOpen(line.rrn)} />
+                <TransactionLine key={`${item.rrn}-${index}`} item={item} onOpen={setOpen} />
               ))}
             </ul>
           </>
@@ -312,7 +326,7 @@ export default function History() {
           </button>
         </div>
       )}
-      <TransactionDialog rrn={open} onClose={() => setOpen(null)} />
+      <TransactionDialog item={open} onClose={() => setOpen(null)} />
     </div>
   );
 }

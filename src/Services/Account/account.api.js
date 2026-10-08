@@ -2,7 +2,7 @@ import { API_ENDPOINTS } from "@/Utils/Constant";
 import { rememberCurrencies } from "@/Utils/Lib/format";
 import { portalPost } from "@/Services/api/portalRequest";
 
-const { ACCOUNT } = API_ENDPOINTS;
+const { ACCOUNT, CONTACTS } = API_ENDPOINTS;
 const data = async (call) => (await call).data;
 
 // The merchant's Active wallets: { acct_num, currency_code, avail_bal,
@@ -42,6 +42,12 @@ export const loadLimits = async (acctNum) => (await portalPost(ACCOUNT.LIMITS, a
 // yet": it can still be paid).
 export const checkPayee = (phoneNumber) => data(portalPost(ACCOUNT.PAYEE, { phone_number: phoneNumber }));
 
+// Which of these numbers are e-taku customers: [{ phone_number, acct_num, name,
+// party }]. Numbers with no account and the merchant's own number are left
+// out. At most 500 numbers, in any format.
+export const matchContacts = async (phoneNumbers) =>
+  phoneNumbers.length ? (await portalPost(CONTACTS.MATCH, { phone_numbers: phoneNumbers.slice(0, 500) })).rows : [];
+
 // The payee of a payment: the wallet when it is known, else the number.
 const payeeBody = ({ toAcctNum, toPhone }) => (toAcctNum ? { to_acct_num: toAcctNum } : { to_phone_number: toPhone });
 
@@ -56,7 +62,8 @@ export const loadPhoneTransfers = async ({ status, page = 1, limit = 20 } = {}) 
 export const cancelPhoneTransfer = (id) => data(portalPost(ACCOUNT.PHONE_TRANSFER_CANCEL, { id }));
 
 // What a payment would cost, without making it. `txn_type`: P2P_TRANSFER to
-// a customer's wallet, MERCHANT_PAYMENT to a merchant's.
+// a person (the quote comes back as P2P_TO_PHONE, `to` null, when the number
+// has no account yet: the money waits for them).
 // A merchant's refund (MERCHANT_REFUND) names the payment it returns (`orgRrn`)
 // instead of a payee.
 const targetBody = ({ toAcctNum, toPhone, orgRrn }) => (orgRrn ? { org_rrn: orgRrn } : payeeBody({ toAcctNum, toPhone }));
