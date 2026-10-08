@@ -168,12 +168,19 @@ export default function Send() {
 
   if (quote) {
     const fee = quote.fee ?? {};
+    // The wallet this pays from, and what is left in it after the payment.
+    const payingWallet = wallets?.find((w) => w.acct_num === quote.from?.acct_num) ?? wallets?.[0];
+    const available = Number(quote.from?.avail_bal ?? payingWallet?.avail_bal);
+    const balanceAfter = Number.isFinite(available) && quote.total_debit != null ? available - Number(quote.total_debit) : null;
     const limits = (quote.limits ?? []).flatMap((group) => (group.limits ?? []).map((limit) => ({ ...limit, side: group.side })));
     return (
-      <div className="max-w-xl">
+      <div>
         {heading}
-        {errorBox}
-        {pinNotice}
+        <div className="max-w-6xl">
+          {errorBox}
+          {pinNotice}
+        </div>
+        <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-2">
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -249,6 +256,25 @@ export default function Send() {
             </Button>
           </div>
         </form>
+        {/* What the payment does to the wallet, and what is left of the limits. */}
+        <WalletPanel
+          wallets={wallets}
+          selected={payingWallet}
+          className="order-first h-auto lg:order-none"
+          footer={
+            <>
+              {balanceAfter != null && (
+                <div className="mt-4 rounded-2xl bg-ink/5 p-4">
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.balanceAfter", { defaultValue: "Balance after this payment" })}</p>
+                  <FitText className="mt-1 font-black tracking-tight text-slate-800">{formatMoney(balanceAfter, quote.currency_code)}</FitText>
+                </div>
+              )}
+              <LimitsList wallet={payingWallet} txnType={quote.txn_type} />
+            </>
+          }
+          onSelect={() => {}}
+        />
+        </div>
       </div>
     );
   }
