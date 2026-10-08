@@ -34,6 +34,13 @@ export default function CameraCapture({ open, onOpenChange, onCapture }) {
   const maskId = useId();
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  // The <video> is replaced by the photo in the review step, so it is a new
+  // element after "Retake": the live stream is hooked up again every time one
+  // mounts (it was only hooked up once, leaving a black picture).
+  const setVideo = useCallback((node) => {
+    videoRef.current = node;
+    if (node && streamRef.current && node.srcObject !== streamRef.current) node.srcObject = streamRef.current;
+  }, []);
   const [cameraError, setCameraError] = useState("");
   const [cameraReady, setCameraReady] = useState(false);
   const [phase, setPhase] = useState("guiding"); // guiding | countdown | review
@@ -169,6 +176,8 @@ export default function CameraCapture({ open, onOpenChange, onCapture }) {
   const retake = () => {
     setShot(null);
     setVerdict({ checks: NO_CHECKS, hint: "position" });
+    // The new picture reports itself ready once its first frame is there.
+    setCameraReady(false);
     setPhase("guiding");
   };
   const use = () => {
@@ -220,7 +229,7 @@ export default function CameraCapture({ open, onOpenChange, onCapture }) {
               <p className="flex h-full items-center justify-center p-6 text-center text-sm text-red-300">{cameraError}</p>
             ) : (
               <video
-                ref={videoRef}
+                ref={setVideo}
                 autoPlay
                 playsInline
                 muted
