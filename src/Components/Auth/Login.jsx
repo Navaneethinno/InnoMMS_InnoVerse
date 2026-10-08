@@ -90,11 +90,11 @@ export default function Login() {
                 <Layers size={21} strokeWidth={1.8} />
               </span>
             )}
-            <span className="font-display text-2xl font-medium tracking-tight">{t("brand.name")}</span>
+            <div className="flex flex-col leading-none">
+              <span className="font-display text-2xl font-medium tracking-tight">{t("brand.name")}</span>
+              <span className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">{t("brand.portal")}</span>
+            </div>
           </div>
-          <p className="mt-2 pl-[52px] text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">
-            {t("brand.portal")}
-          </p>
         </div>
         <div className="my-auto max-w-[520px]">
           <div className="mb-6 flex items-center gap-3 text-[11px] font-semibold tracking-[0.2em] text-white/80">
