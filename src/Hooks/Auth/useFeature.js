@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 
-// Whether a feature is on for this customer (`features` from the menu call).
+// Whether a feature is on for this merchant (`features` from the menu call).
 // Until the menu is known, everything is shown; the API refuses what is not
 // allowed anyway.
 export function useFeature(key) {

@@ -4,7 +4,7 @@ import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { STORAGE_KEYS } from "@/Utils/Constant";
 
 // Guided tour for the individual onboarding form. Each step of the form has
-// its own short tour, shown automatically the first time the customer
+// its own short tour, shown automatically the first time the merchant
 // reaches that step. "Skip tour" turns the automatic tours off for good; the
 // header's "Take a tour" button replays the current step's tour any time.
 //

@@ -1,6 +1,6 @@
 export class ApiConfigurationError extends Error {
   constructor() {
-    super("Customer API contract is not configured");
+    super("Merchant API contract is not configured");
     this.code = "API_NOT_CONFIGURED";
   }
 }
@@ -17,7 +17,7 @@ export function normalizeApiError(error) {
   };
 }
 
-// A refusal from the customer-portal API. `message` is the API's own
+// A refusal from the merchant-portal API. `message` is the API's own
 // plain-language text (already in the caller's language) and is shown as
 // is; `problems` is the optional list of reasons under it
 // (`data[0].problems`, or `data.problems`); `status` is the HTTP status, which decides the kind

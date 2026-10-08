@@ -4,9 +4,9 @@ import { useCorporateOnboardingWizard } from "@/Hooks/Onboarding/useCorporateOnb
 import CategoryField from "./CategoryField";
 import OnboardingWizardView from "./OnboardingWizardView";
 
-// Runs a prospective CORPORATE customer through the institution's
+// Runs a prospective CORPORATE merchant through the institution's
 // published onboarding configuration. It works exactly like the individual
-// wizard (same calls, under /customer/corporate/web/*); only the heading
+// wizard (same calls, under /merchant/corporate/web/*); only the heading
 // differs, and the shared OnboardingWizardView does the rest.
 export default function CorporateOnboardingWizard({ onSubmitted, onActiveChange }) {
   const { t } = useTranslation();

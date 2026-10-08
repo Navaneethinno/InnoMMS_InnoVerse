@@ -64,7 +64,7 @@ function GuardianCard({ guardian, t }) {
 }
 
 // One checkpoint of the sign-up (or of the signed-in KYC upgrade): the screen
-// the bank asks the customer to see between two sections. `outcome` says what
+// the bank asks the merchant to see between two sections. `outcome` says what
 // can happen next: CONTINUE (show the next section), SUBMIT (ready to send),
 // STOP (cannot go on), WAIT (something outside the page has to happen first).
 export default function CheckpointScreen({ flow }) {

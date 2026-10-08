@@ -11,7 +11,7 @@ export function useTheme() {
       setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light"),
     );
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    // Follow the system setting until the customer picks one themselves.
+    // Follow the system setting until the merchant picks one themselves.
     const media = window.matchMedia?.("(prefers-color-scheme: dark)");
     const onSystemChange = () => {
       if (!readStoredTheme()) applyTheme(systemTheme());

@@ -64,11 +64,11 @@ export default function AppLayout() {
   useNotificationReceived(refreshUnread);
   useEffect(() => {
     const locked = () => dispatch(userUpdated({ pinLocked: true }));
-    window.addEventListener("customer:pin-locked", locked);
-    return () => window.removeEventListener("customer:pin-locked", locked);
+    window.addEventListener("merchant:pin-locked", locked);
+    return () => window.removeEventListener("merchant:pin-locked", locked);
   }, [dispatch]);
 
-  // Who the customer is (auth/me): the PIN rules and status, one PIN or two, the
+  // Who the merchant is (auth/me): the PIN rules and status, one PIN or two, the
   // time zone, the avatar. Asked when the area opens and again when the tab is
   // back in view (at most once a minute), so a change made on another device (a
   // new avatar, a PIN set) shows up.

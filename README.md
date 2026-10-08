@@ -1,6 +1,6 @@
-# InnoVerse_CustomerPortal
+# InnoVerse_MerchantPortal
 
-Standalone customer frontend. This directory is the application root; it neither imports nor depends on the admin application. The login screen and protected dashboard loading transition are implemented; dashboard content and APIs are pending.
+Standalone merchant frontend. This directory is the application root; it neither imports nor depends on the admin application. The login screen and protected dashboard loading transition are implemented; dashboard content and APIs are pending.
 
 ## Run
 
@@ -17,24 +17,24 @@ Development uses port 5174 to avoid the admin's port. Production hosts must rewr
 
 ## API integration is intentionally pending
 
-No customer backend collection/spec has been supplied. No endpoint paths, credentials, fake sessions, or successful mock authentication are included. Submitting valid login fields shows a localized not-connected message and sends no request. Username (including email or mobile number)/password are provisional UI fields to confirm against the real customer auth contract. Recovery, registration, and help actions explain that their flows are not available yet.
+No merchant backend collection/spec has been supplied. No endpoint paths, credentials, fake sessions, or successful mock authentication are included. Submitting valid login fields shows a localized not-connected message and sends no request. Username (including email or mobile number)/password are provisional UI fields to confirm against the real merchant auth contract. Recovery, registration, and help actions explain that their flows are not available yet.
 
 When the API contract arrives:
 
-1. Record the verified collection/spec in `src/Utils/Constant.jsx`, then fill confirmed customer endpoint values there only.
+1. Record the verified collection/spec in `src/Utils/Constant.jsx`, then fill confirmed merchant endpoint values there only.
 2. Set `VITE_API_BASE_URL` in a local `.env` from `.env.example`. Vite environment variables are public; never put secrets there.
 3. Implement the request and session mappings in `Services/api/authContract.js`, including validating the returned token shape. Confirm the backend's token transport, refresh rotation, and error schema.
 4. Connect `Services/Dashboard/dashboard.api.js` to the confirmed dashboard contract. Successful login already navigates to `/dashboard`; replace its ready-state placeholder with real dashboard content.
-5. Verify real login, failed credentials, refresh, logout, and expiry against the customer backend before deploying authentication.
+5. Verify real login, failed credentials, refresh, logout, and expiry against the merchant backend before deploying authentication.
 
-The shared axios client includes auth headers, single-flight refresh and one retry. Customer tokens use their own sessionStorage key, with in-memory fallback. JWT expiry checking is a client convenience, not server authorization. Redux stores user/session status, never passwords. Local input and loading state stay in the feature hook/component.
+The shared axios client includes auth headers, single-flight refresh and one retry. Merchant tokens use their own sessionStorage key, with in-memory fallback. JWT expiry checking is a client convenience, not server authorization. Redux stores user/session status, never passwords. Local input and loading state stay in the feature hook/component.
 
 ## Architecture
 
 - `Components/Common`: reusable UI primitives (Radix handles modal/dropdown/tooltip accessibility). Reuse these before writing feature markup.
-- `Components/Layout`: authenticated shell and customer-only route protection.
+- `Components/Layout`: authenticated shell and merchant-only route protection.
 - `Components/Auth`: independently designed login UI.
-- `Hooks/Master`: reserved for confirmed customer reference lookups; `Hooks/Auth` owns login state.
+- `Hooks/Master`: reserved for confirmed merchant reference lookups; `Hooks/Auth` owns login state.
 - `Services/api`: shared HTTP, storage, error/response normalization and pending contract mappings.
 - `Services/Auth`: thin API wrapper, importing centralized endpoints only.
 - `Redux`: cross-route session state.
@@ -43,7 +43,7 @@ The shared axios client includes auth headers, single-flight refresh and one ret
 - `Utils/Config`: route metadata; `Utils/Lib`: notifications, class and field-layout helpers.
 - `Pages` and `assets`: reserved for future page shells/assets.
 
-Add customer feature folders and lazy route arrays only as features are implemented. Re-export each route group from `Router/index.js` and spread protected feature groups in `authenticatedRoutes.jsx`. There are no admin roles, master CRUD, maker-checker actions, onboarding configuration editors, or shared admin imports. Tables and file uploads are deferred until list/KYC screens exist.
+Add merchant feature folders and lazy route arrays only as features are implemented. Re-export each route group from `Router/index.js` and spread protected feature groups in `authenticatedRoutes.jsx`. There are no admin roles, master CRUD, maker-checker actions, onboarding configuration editors, or shared admin imports. Tables and file uploads are deferred until list/KYC screens exist.
 
 ## Verification
 

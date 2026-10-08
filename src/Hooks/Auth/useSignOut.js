@@ -7,7 +7,7 @@ import { sessionCleared } from "@/Redux/slices/authSlice";
 
 // Ends the session on the server too (this device only, or every device with
 // `{ all: true }`); whatever the answer, the tokens are cleared and the
-// customer goes to the sign-in screen.
+// merchant goes to the sign-in screen.
 export function useSignOut() {
   const dispatch = useDispatch();
   const navigate = useNavigate();

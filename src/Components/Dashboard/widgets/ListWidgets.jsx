@@ -42,7 +42,7 @@ export function WalletsWidget() {
   );
 }
 
-// A card load or unload moves money between two of the customer's own accounts, so
+// A card load or unload moves money between two of the merchant's own accounts, so
 // it comes as two lines (the wallet's and the card's) with one reference. The
 // dashboard lists the move once: the line of the account it was made from.
 const OWN_MOVES = new Set(["CARD_LOAD", "CARD_UNLOAD"]);
@@ -81,7 +81,7 @@ export function RecentTransactionsWidget() {
   );
 }
 
-// `feature`: the menu's feature that has to be on for this customer.
+// `feature`: the menu's feature that has to be on for this merchant.
 const ACTIONS = [
   { key: "send", icon: ArrowRightLeft, to: "/send", feature: "send" },
   { key: "history", icon: History, to: "/history", feature: "history" },

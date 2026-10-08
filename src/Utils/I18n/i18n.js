@@ -5,7 +5,7 @@ import pt from "./locales/pt";
 import { setApiLanguage } from "@/Utils/Lib/apiLanguage";
 let language = "en";
 try {
-  language = localStorage.getItem("innoverse-customer:language") || "en";
+  language = localStorage.getItem("innoverse-merchant:language") || "en";
 } catch {
   /* Default locale. */
 }
@@ -30,7 +30,7 @@ i18n.on("languageChanged", (lng) => {
   document.documentElement.lang = lng;
   setApiLanguage(lng);
   try {
-    localStorage.setItem("innoverse-customer:language", lng);
+    localStorage.setItem("innoverse-merchant:language", lng);
   } catch {
     /* Locale still updates in memory. */
   }

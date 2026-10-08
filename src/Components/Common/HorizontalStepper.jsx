@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/Utils/Lib/utils";
 
 // Generic horizontal step indicator, reused by any multi-step flow (e.g. the
-// customer onboarding wizard). Purely presentational — steps, completion and
+// merchant onboarding wizard). Purely presentational — steps, completion and
 // navigation are all driven by the caller.
 export default function HorizontalStepper({
   steps,

@@ -3,14 +3,14 @@ import { loadSummary, loadWallets } from "@/Services/Account/account.api";
 import { readAuthUser } from "@/Services/api/authStorage";
 import { useWalletChanged } from "@/Services/api/liveUpdates";
 
-// What the dashboard shows, from the customer's own account calls: the Active
+// What the dashboard shows, from the merchant's own account calls: the Active
 // wallets, and the server's summary (this month's income and spending, the
 // monthly flow for the chart, and the latest transactions).
 export const AccountDataContext = createContext({ wallets: null, summary: null, loading: true, walletsError: "", summaryError: "" });
 
 const MONTHS = 6;
 
-// The last good answer for this customer, kept for a couple of minutes so
+// The last good answer for this merchant, kept for a couple of minutes so
 // coming back to the dashboard does not ask again. A live "money moved"
 // message always refetches.
 const FRESH_MS = 2 * 60 * 1000;

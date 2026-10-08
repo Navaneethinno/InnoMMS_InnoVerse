@@ -19,7 +19,7 @@ import { fitsPasswordRules, passwordRuleText } from "@/Utils/Lib/policy";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { fitsPinRules, pinRuleText, sanitizePin } from "@/Utils/Lib/pinRules";
 
-// The signed-in customer's password and transaction PIN: change the
+// The signed-in merchant's password and transaction PIN: change the
 // password, change the PIN, or reset the PIN with a code (which also unlocks
 // it). The PIN status comes from `auth/me`.
 
@@ -45,7 +45,7 @@ function useAction() {
   return { pending, problem, run };
 }
 
-// `passwordSet` false: the customer signs in with a PIN and has never set a
+// `passwordSet` false: the merchant signs in with a PIN and has never set a
 // password, so the "current" box takes their PIN.
 function PasswordCard({ onChanged }) {
   const { t } = useTranslation();
@@ -181,7 +181,7 @@ function ResetPinCard({ onChanged }) {
   );
 }
 
-// Where the customer is signed in: every open session, with a way to end the
+// Where the merchant is signed in: every open session, with a way to end the
 // others, and to sign out of every device at once.
 function SessionsCard() {
   const { t } = useTranslation();

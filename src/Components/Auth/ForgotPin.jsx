@@ -6,7 +6,7 @@ import AuthCard from "./AuthCard";
 import CodeFlow from "./CodeFlow";
 
 // A forgotten PIN where the portal signs in with a PIN: a code to the
-// customer's phone, then the new PIN typed twice. It also lifts a sign-in lock.
+// merchant's phone, then the new PIN typed twice. It also lifts a sign-in lock.
 export default function ForgotPin() {
   const { t } = useTranslation();
   const navigate = useNavigate();

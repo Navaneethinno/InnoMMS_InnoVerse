@@ -6,7 +6,7 @@ import { cn } from "@/Utils/Lib/utils";
 
 // The bell in the top bar: a round button like the theme toggle that opens the
 // notifications page, with the unread count on it. Hidden when the menu says
-// this customer has no notifications.
+// this merchant has no notifications.
 export default function NotificationBell() {
   const { t } = useTranslation();
   const enabled = useSelector((state) => state.auth.user?.features?.notifications) !== false;

@@ -3,7 +3,7 @@ import Button from "@/Components/Common/Button";
 import Modal from "@/Components/Common/Modal";
 
 // "Your session ends soon": shown a minute or two before the session's last
-// moment. Unlike the idle question, being active does not extend it; the customer
+// moment. Unlike the idle question, being active does not extend it; the merchant
 // finishes what they are doing and signs in again.
 export default function SessionEndWarning({ seconds, onClose, onLeave }) {
   const { t } = useTranslation();

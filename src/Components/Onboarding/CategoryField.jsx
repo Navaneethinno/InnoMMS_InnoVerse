@@ -3,7 +3,7 @@ import FilterSelect from "@/Components/Common/FilterSelect";
 
 const fieldBorder = "border-ink/25 focus:border-ink";
 
-// The one choice the customer makes before starting: the category from the
+// The one choice the merchant makes before starting: the category from the
 // `options` reply. Not drawn when there is nothing to choose between (the
 // only category is picked for them).
 export default function CategoryField({ flow, label, icon: Icon, heading }) {

@@ -1,7 +1,7 @@
 import { useAvatarUrl } from "@/Utils/Lib/avatarImage";
 import { cn } from "@/Utils/Lib/utils";
 
-// A round avatar: the customer's own picture (or the preset `code`), and their
+// A round avatar: the merchant's own picture (or the preset `code`), and their
 // initial on the brand colour until it has loaded or if it cannot be.
 export default function Avatar({ name = "", code, className, textClassName = "text-sm" }) {
   const url = useAvatarUrl(code);

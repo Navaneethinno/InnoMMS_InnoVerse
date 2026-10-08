@@ -14,7 +14,7 @@ import { userUpdated } from "@/Redux/slices/authSlice";
 import { notifications } from "@/Utils/Lib/notifications";
 import { fitsPinRules, pinRuleText, sanitizePin } from "@/Utils/Lib/pinRules";
 
-// A bank with two PINs: whether this customer still has to create the PIN that
+// A bank with two PINs: whether this merchant still has to create the PIN that
 // confirms payments (their sign-in PIN does not).
 export function useNeedsTransactionPin() {
   const user = useSelector((state) => state.auth.user);
@@ -76,7 +76,7 @@ export function TransactionPinForm({ onDone }) {
   );
 }
 
-// The same form in a dialog (shown when the customer signs in for the first time).
+// The same form in a dialog (shown when the merchant signs in for the first time).
 export function TransactionPinDialog({ open, onOpenChange }) {
   const { t } = useTranslation();
   return (

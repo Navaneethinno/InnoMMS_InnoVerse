@@ -84,9 +84,9 @@ export function createOnboardingApi(endpoints) {
     // phone: { otp_ref, expires_at, sent_to }) instead of the application.
     start: async (payload) => result(await rawApi.add(payload)),
     // The code from that message opens the application: the same reply the
-    // old resumed `add` gave (the section where the customer stopped).
+    // old resumed `add` gave (the section where the merchant stopped).
     resume: async ({ otpRef, otp }) => result(await rawApi.resume({ otp_ref: otpRef, otp })),
-    // `sectionKey` shows that section instead of where the customer stopped
+    // `sectionKey` shows that section instead of where the merchant stopped
     // (what a request from the institution reopens).
     loadWizard: async (referenceId, sectionKey) => result(await rawApi.get(referenceId, sectionKey)),
     // Saves the section's answers (`data`; leave it out to move on without

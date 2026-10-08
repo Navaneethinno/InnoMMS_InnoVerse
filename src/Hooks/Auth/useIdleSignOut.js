@@ -13,7 +13,7 @@ const WARN_SECONDS = 60;
 
 // The server ends a web session after `idle_timeout_seconds` without an API
 // call (the live socket does not count; 0 means no idle end), so:
-//  - while the customer is active, a light call now and then keeps the server
+//  - while the merchant is active, a light call now and then keeps the server
 //    session alive;
 //  - after that long without any input, they are signed out here;
 //  - a minute before, they are asked whether they are still there.
@@ -31,7 +31,7 @@ export function useIdleSignOut() {
     return configured == null ? IDLE_SIGN_OUT_SECONDS : Number(configured);
   };
 
-  // Any API call resets the server's clock; asking who the customer is also
+  // Any API call resets the server's clock; asking who the merchant is also
   // refreshes what the portal knows of them.
   const stay = useCallback(() => {
     lastInput.current = Date.now();

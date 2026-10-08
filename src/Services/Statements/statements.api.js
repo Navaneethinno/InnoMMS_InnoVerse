@@ -3,7 +3,7 @@ import { portalDownload, portalPost } from "@/Services/api/portalRequest";
 
 const { STATEMENT, ACCOUNT } = API_ENDPOINTS;
 
-// The customer's statements, newest first: [{ id, acct_num, period_from,
+// The merchant's statements, newest first: [{ id, acct_num, period_from,
 // period_to, opening_balance, closing_balance, total_credits, total_debits,
 // txn_count, email_delivery, created_at }].
 export const listStatements = async ({ acctNum, page = 1, limit = 20 } = {}) =>

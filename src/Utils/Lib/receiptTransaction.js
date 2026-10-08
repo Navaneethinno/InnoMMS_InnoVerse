@@ -1,7 +1,7 @@
 // What a printed receipt needs, from a receipt as the API returns it (rrn,
 // txn_short_desc, txn_time, currency_code, txn_amount, fee_amount, entry_amount,
 // acct_mask, status, receipt_payload { fee, total_debit, from, to, reason }...).
-// `extras` (the quote and the signed-in customer) fill what the receipt leaves
+// `extras` (the quote and the signed-in merchant) fill what the receipt leaves
 // out.
 //
 // Optional receipt fields an institution can send to make the slip its own
@@ -10,7 +10,7 @@
 //   receipt_footer                                           - closing lines
 //   status_name                                              - e.g. "Completed"
 // `toPhone` is the number paid, for when the receipt names no one. `note` is
-// what the customer wrote: the receipt's own `reason` is empty without one.
+// what the merchant wrote: the receipt's own `reason` is empty without one.
 export function receiptToTransaction(receipt = {}, { quote, user, rrn, toPhone, note } = {}) {
   const payload = receipt.receipt_payload ?? {};
   return {

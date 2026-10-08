@@ -6,14 +6,14 @@ import { compactPayload } from "./onboardingPayload";
 
 // Shared engine behind every self-service onboarding wizard (individual,
 // corporate, ...): the form once an onboarding exists. The server walks the
-// customer through ONE section per reply: `next` saves the answers and
+// merchant through ONE section per reply: `next` saves the answers and
 // answers with the following section, `back` with the previous one, and the
 // screen is redrawn from each reply instead of patching local state. Only
-// the API calls differ per flow (see useCustomerOnboardingWizard.js /
+// the API calls differ per flow (see useIndividualOnboardingWizard.js /
 // useCorporateOnboardingWizard.js), so this file is written once and never
 // needs to know individual vs corporate exists.
 //
-// Nothing the customer reads is written here: success and error text, the
+// Nothing the merchant reads is written here: success and error text, the
 // `notice` and the `problems` list all come from the API and are shown as
 // received. The client does not pre-validate the picker either — the API
 // refuses what is missing and says why.
@@ -44,7 +44,7 @@ function forgetReference(kind) {
 }
 
 // Every action's outcome (errors included) is shown at the top of the
-// page, so each one ends by bringing the customer back there.
+// page, so each one ends by bringing the merchant back there.
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 // An answer counts as empty when it is "", missing, an empty list, or a
@@ -145,7 +145,7 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
   const [navigating, setNavigating] = useState(false);
   // Local edits for the section on screen, seeded from `section.values` on
   // every load/save so a re-render from the server never loses what the
-  // customer just typed (this only ever holds THIS section's draft,
+  // merchant just typed (this only ever holds THIS section's draft,
   // replaced wholesale each time the section changes).
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -269,7 +269,7 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
   // counts.
   const [seededKey, setSeededKey] = useState(null);
   // Unsaved typing per step, so moving between steps (or a tour jumping to
-  // one) never throws away what the customer entered but hasn't saved yet.
+  // one) never throws away what the merchant entered but hasn't saved yet.
   const unsavedDrafts = useRef({});
   let effectiveDraft = draft;
   if (seededKey !== seedKey) {
@@ -294,7 +294,7 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
       unsavedDrafts.current[section.key] = draft;
   }, [draft, section?.key]);
 
-  // Only what the customer actually gave is sent (an `add` with just the
+  // Only what the merchant actually gave is sent (an `add` with just the
   // contact carries on with whatever that contact already has open).
   const categories = useMemo(() => buildCategories(options, t), [options, t]);
   const chosenCategory =
@@ -423,7 +423,7 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
       (Array.isArray(prev) ? prev : []).filter((_, i) => i !== rowIndex),
     );
 
-  // A field's problem goes away as soon as the customer edits it (the next
+  // A field's problem goes away as soon as the merchant edits it (the next
   // reply from the server brings back whatever is still wrong).
   const [edited, setEdited] = useState({ seed: null, keys: [] });
   const editedKeys = edited.seed === seedKey ? edited.keys : [];
@@ -483,7 +483,7 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
   const skipSection = () => persistSection({ skip: true });
 
   // Back: the section before this one, with its saved answers. Saves
-  // nothing; what was typed here is kept in case the customer returns.
+  // nothing; what was typed here is kept in case the merchant returns.
   const goBack = async () => {
     if (!section) return;
     setProblemInfo(null);
@@ -515,7 +515,7 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
       });
       applyWizard(form, message);
       // Approved: nothing left to resume. Under review (or waiting on the
-      // customer, or held for a parent) the reference stays, so a reload or a
+      // merchant, or held for a parent) the reference stays, so a reload or a
       // return visit shows that again.
       if ((!form?.review || form.review.status === "APPROVED") && !form?.checkpoint) forgetReference(kind);
       setCompletedMessage(message);

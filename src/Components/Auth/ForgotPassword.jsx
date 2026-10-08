@@ -5,7 +5,7 @@ import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import AuthCard from "./AuthCard";
 import CodeFlow from "./CodeFlow";
 
-// A forgotten password: code to the customer's contact, then a new one.
+// A forgotten password: code to the merchant's contact, then a new one.
 // Resetting ends every session and unlocks sign-in.
 export default function ForgotPassword() {
   const { t } = useTranslation();

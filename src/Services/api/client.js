@@ -112,12 +112,12 @@ api.interceptors.response.use(
     }
     // Three wrong PINs lock the transaction PIN: tell the screens, which then
     // point to the reset.
-    if (error.response?.data?.error_code === "portal.pin_locked") window.dispatchEvent(new Event("customer:pin-locked"));
-    // The institution disabled this customer's access: say so and sign out.
+    if (error.response?.data?.error_code === "portal.pin_locked") window.dispatchEvent(new Event("merchant:pin-locked"));
+    // The institution disabled this merchant's access: say so and sign out.
     if (error.response?.status === 403 && request && !request.skipAuth) {
       notifications.error(error.response.data?.message || "");
       clearAuthSession();
-      window.dispatchEvent(new Event("customer:session-expired"));
+      window.dispatchEvent(new Event("merchant:session-expired"));
       return Promise.reject(error);
     }
     if (
@@ -139,7 +139,7 @@ api.interceptors.response.use(
       return api(request);
     } catch {
       clearAuthSession();
-      window.dispatchEvent(new Event("customer:session-expired"));
+      window.dispatchEvent(new Event("merchant:session-expired"));
       return Promise.reject(error);
     }
   },

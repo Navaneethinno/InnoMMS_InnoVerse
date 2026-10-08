@@ -190,7 +190,7 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
   if (checkpoint) return <CheckpointScreen flow={flow} />;
 
   // Submitted: the outcome of the institution's review, and anything it asks
-  // of the customer. A submitted application is locked.
+  // of the merchant. A submitted application is locked.
   if (!editable) return <ReviewScreen flow={flow} onSubmitted={onSubmitted} />;
 
   if (!section) {

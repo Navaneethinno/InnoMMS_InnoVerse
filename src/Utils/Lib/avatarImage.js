@@ -2,9 +2,9 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useSelector } from "react-redux";
 import { loadAvatarImage } from "@/Services/Profile/profile.api";
 
-// Avatars arrive as images behind the customer's token, so each is fetched once
+// Avatars arrive as images behind the merchant's token, so each is fetched once
 // and shown through an object URL. A preset is cached by its code; the
-// customer's own by who they are, what it is and a version that is bumped
+// merchant's own by who they are, what it is and a version that is bumped
 // whenever they change it.
 const cache = new Map();
 const listeners = new Set();
@@ -16,7 +16,7 @@ const subscribe = (listener) => {
 };
 const getVersion = () => version;
 
-// The customer's avatar was changed: fetch it again, everywhere it is shown.
+// The merchant's avatar was changed: fetch it again, everywhere it is shown.
 export function refreshAvatar() {
   for (const [key, promise] of cache) {
     if (key.startsWith("me:")) {
@@ -38,7 +38,7 @@ function fetchUrl(key, code) {
 }
 
 // The address of an avatar image: the preset `code`, or the signed-in
-// customer's own. "" until it has loaded (or when it cannot be). The previous
+// merchant's own. "" until it has loaded (or when it cannot be). The previous
 // picture stays up while a new one loads, so nothing flickers.
 export function useAvatarUrl(code) {
   const user = useSelector((state) => state.auth.user);

@@ -27,10 +27,10 @@ import "./posReceipt.css";
 const ROOM = 32; // px under the paper: its bottom zigzag (8) and the lift after the tear
 const LIFT = 14; // how far the torn receipt hangs below the slot
 const FINAL = `translateY(${LIFT}px)`;
-const SOUND_KEY = "innoverse-customer:printer-sound";
+const SOUND_KEY = "innoverse-merchant:printer-sound";
 const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-// The printer sound is on unless the customer has switched it off.
+// The printer sound is on unless the merchant has switched it off.
 const readSound = () => {
   try {
     return window.localStorage.getItem(SOUND_KEY) !== "off";
@@ -95,7 +95,7 @@ const PosReceipt = forwardRef(function PosReceipt({ transaction, children, note,
   // Sound, modelled on a modern thermal printer rather than an old impact one:
   // a soft, high "tsss" for each line as the head fires, a quiet motor hum under
   // the whole print, a crisp tear, and a two-note confirmation beep like a
-  // payment terminal. The browser lets audio start once the customer has used
+  // payment terminal. The browser lets audio start once the merchant has used
   // the page (they just pressed Send); a suspended context is resumed. Every
   // call is wrapped so sound can never break the receipt.
   const audio = useCallback(() => {

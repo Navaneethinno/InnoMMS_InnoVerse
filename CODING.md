@@ -1,4 +1,4 @@
-# Coding Guide — InnoVerse Customer Portal
+# Coding Guide — InnoVerse Merchant Portal
 
 How this codebase is structured and the conventions to follow when changing it. Read this before adding a feature. `README.md` covers setup and API-integration status; this file covers *how to write code here*.
 
@@ -40,7 +40,7 @@ Empty feature folders (`Accounts`, `Profile`, `Support`, `Transactions`) hold `.
 
 ## API conventions
 
-- One axios instance: `Services/api/client.js` — attaches Bearer token, single-flight refresh on 401, one retry, dispatches `customer:session-expired` on refresh failure.
+- One axios instance: `Services/api/client.js` — attaches Bearer token, single-flight refresh on 401, one retry, dispatches `merchant:session-expired` on refresh failure.
 - Portal (pre-login) calls use `skipAuth: true` + `PORTAL_AUTHORIZATION` Basic header + `apiLanguageHeader()` (`x-api-lang`). See `Services/Onboarding/onboardingApiFactory.js`.
 - Backend envelope: `{ status, message, data: [...] }`. `status: "fail"` → throw `ApiRequestError` via `toApiRequestError(payload, status, fallback)`.
 - **Show the API's `message` as-is** (it's already localized by `x-api-lang`). Never show `remark`. Reasons live in `error.problems` (`data[0].problems`).
@@ -71,7 +71,7 @@ Empty feature folders (`Accounts`, `Profile`, `Support`, `Transactions`) hold `.
 
 ## Storage
 
-- All keys live in `STORAGE_KEYS` (`Constant.jsx`), prefixed `innoverse-customer:`.
+- All keys live in `STORAGE_KEYS` (`Constant.jsx`), prefixed `innoverse-merchant:`.
 - Wrap every `localStorage`/`sessionStorage` access in `try/catch` — the app must work when storage is blocked.
 - Session tokens: `Services/api/authStorage.js` only.
 

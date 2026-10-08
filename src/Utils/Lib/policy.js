@@ -5,8 +5,8 @@ import { DEFAULT_PIN_RULES, pinRulesFrom } from "./pinRules";
 // used until they arrive.
 export const DEFAULT_POLICY = {
   known: false,
-  // How this portal signs customers in: "PIN", "PASSWORD" or both (`method` is the one to show first).
-  // `separatePins`: the PIN that signs in is not the one that confirms payments (the customer sets a transaction PIN after the first sign-in).
+  // How this portal signs merchants in: "PIN", "PASSWORD" or both (`method` is the one to show first).
+  // `separatePins`: the PIN that signs in is not the one that confirms payments (the merchant sets a transaction PIN after the first sign-in).
   login: { methods: ["PASSWORD"], method: "PASSWORD", separatePins: false },
   // The institution's countries for phone numbers (empty: any country), the
   // primary first: [{ name, alpha2, dial, min, max, primary }].

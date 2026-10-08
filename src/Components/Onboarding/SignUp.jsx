@@ -13,26 +13,26 @@ import { useTranslation } from "react-i18next";
 import PageHeader from "@/Components/Common/PageHeader";
 import AppHeader from "@/Components/Common/AppHeader";
 import Footer from "@/Components/Layout/Footer";
-import CustomerOnboardingWizard from "./CustomerOnboardingWizard";
+import IndividualOnboardingWizard from "./IndividualOnboardingWizard";
 import CorporateOnboardingWizard from "./CorporateOnboardingWizard";
 import { corporateOnboardingFlow } from "@/Services/Onboarding/corporateOnboarding.api";
 
 // Which onboarding flow the picker below routes to — an individual pick
-// runs CustomerOnboardingWizard, a corporate pick runs
+// runs IndividualOnboardingWizard, a corporate pick runs
 // CorporateOnboardingWizard. They're separate components (each with its own
 // hook), so switching here simply unmounts one and mounts the other.
-const CUSTOMER_KINDS = [
+const MERCHANT_KINDS = [
   { value: "individual", labelKey: "signup.individual", icon: UserRound },
   { value: "corporate", labelKey: "signup.corporate", icon: Building2 },
 ];
 
-// Self-service registration entry point: a prospective customer lands here
+// Self-service registration entry point: a prospective merchant lands here
 // (from the sign-in page's "Get started" link) and runs themselves through
-// the institution's published onboarding form via CustomerOnboardingWizard.
+// the institution's published onboarding form via IndividualOnboardingWizard.
 export default function SignUp() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [customerKind, setCustomerKind] = useState("individual");
+  const [merchantKind, setMerchantKind] = useState("individual");
   // The whole flow is one full page. Before the form starts it shows the
   // intro and the Individual/Corporate choice; once the form is on screen
   // those give way to the steps. The wizard element keeps its place in the
@@ -41,7 +41,7 @@ export default function SignUp() {
   // Bumped by "Take a tour"; each new value starts the tour again.
   const [tourRequest, setTourRequest] = useState(0);
   // Corporate is offered only when the institution has set up a corporate
-  // customer type (its options list party types); until that is known, and
+  // merchant type (its options list party types); until that is known, and
   // when there is none, only Individual shows.
   const [corporateOffered, setCorporateOffered] = useState(false);
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function SignUp() {
           <AppHeader
             action={
               <>
-                {formActive && customerKind === "individual" && (
+                {formActive && merchantKind === "individual" && (
                   <button
                     type="button"
                     onClick={() => setTourRequest((n) => n + 1)}
@@ -117,15 +117,15 @@ export default function SignUp() {
           {!formActive && corporateOffered && (
             <div className="mt-8 flex justify-center">
               <div className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm">
-                {CUSTOMER_KINDS.map((kind) => {
+                {MERCHANT_KINDS.map((kind) => {
                   const Icon = kind.icon;
                   return (
                     <button
                       key={kind.value}
                       type="button"
-                      onClick={() => setCustomerKind(kind.value)}
+                      onClick={() => setMerchantKind(kind.value)}
                       className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-semibold transition ${
-                        customerKind === kind.value
+                        merchantKind === kind.value
                           ? "bg-forest text-white dark:bg-lime dark:text-on-secondary"
                           : "text-ink/70 hover:bg-ink/5"
                       }`}
@@ -144,13 +144,13 @@ export default function SignUp() {
                 : "mt-6 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm sm:p-10"
             }
           >
-            {customerKind === "corporate" ? (
+            {merchantKind === "corporate" ? (
               <CorporateOnboardingWizard
                 onSubmitted={() => navigate("/login")}
                 onActiveChange={setFormActive}
               />
             ) : (
-              <CustomerOnboardingWizard
+              <IndividualOnboardingWizard
                 onSubmitted={() => navigate("/login")}
                 onActiveChange={setFormActive}
                 tourRequest={tourRequest}

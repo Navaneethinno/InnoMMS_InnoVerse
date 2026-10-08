@@ -3,16 +3,16 @@ import { portalDownload, portalPost } from "@/Services/api/portalRequest";
 
 const { PROFILE } = API_ENDPOINTS;
 
-// The customer's own page: { header, avatar, sections, documents, contact }.
+// The merchant's own page: { header, avatar, sections, documents, contact }.
 export const loadProfile = async () => (await portalPost(PROFILE.GET)).data;
 
 // One of their documents from sign-up, as an image: resolves to { blob }.
 export const loadProfileFile = (path) => portalDownload(PROFILE.FILE, { path });
 
-// The pictures the customer can choose from: [{ code, label }].
+// The pictures the merchant can choose from: [{ code, label }].
 export const listAvatarPresets = async () => (await portalPost(PROFILE.AVATAR_PRESETS)).rows;
 
-// An avatar as an image: the customer's own, or the preset `code`.
+// An avatar as an image: the merchant's own, or the preset `code`.
 export const loadAvatarImage = (code) => portalDownload(PROFILE.AVATAR_IMAGE, code ? { code } : {});
 
 // Each of these resolves to { data: { kind, code }, message }.

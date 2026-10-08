@@ -253,7 +253,7 @@ export default function Send() {
     );
   }
 
-  // The wallet money leaves from: the customer's pick, else the one in the
+  // The wallet money leaves from: the merchant's pick, else the one in the
   // payee's currency (what the server would use), else the first.
   const selectedWallet = wallets?.find((w) => w.acct_num === form.from) ?? wallets?.find((w) => w.currency_code === picked?.currency_code) ?? wallets?.[0];
   return (

@@ -1,5 +1,5 @@
 import { INST_PROFILE_ID } from "@/Utils/Constant";
-// The customer auth contract: the request bodies and how a sign-in / refresh
+// The merchant auth contract: the request bodies and how a sign-in / refresh
 // reply becomes the stored session.
 const first = (payload) => (Array.isArray(payload?.data) ? payload.data[0] : payload?.data) ?? {};
 

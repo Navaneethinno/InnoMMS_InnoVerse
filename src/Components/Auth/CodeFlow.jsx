@@ -13,7 +13,7 @@ import { fitsPinRules, pinRuleText, sanitizePin } from "@/Utils/Lib/pinRules";
 
 // The two-step "code, then new secrets" flow shared by activating access and
 // resetting a password:
-//   1. the customer gives their email or mobile number and gets a 6-digit
+//   1. the merchant gives their email or mobile number and gets a 6-digit
 //      code (the API answers the same whether or not they are registered);
 //   2. they enter the code and choose the new password (and, when
 //      activating, the transaction PIN), each typed twice.

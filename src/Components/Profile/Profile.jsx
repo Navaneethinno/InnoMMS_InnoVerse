@@ -17,7 +17,7 @@ import ProfileDocuments from "./ProfileDocuments";
 const NONE = "—";
 const linkClass = "inline-flex items-center gap-2 rounded-xl border border-ink/25 px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-ink/5";
 
-// "My profile": the customer's own details as they gave them at sign-up,
+// "My profile": the merchant's own details as they gave them at sign-up,
 // read-only. The only thing they can change here is their avatar.
 export default function Profile() {
   const { t } = useTranslation();

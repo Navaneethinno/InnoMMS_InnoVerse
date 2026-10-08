@@ -179,7 +179,7 @@ export default {
   "dashboard.pendingLayout": "O conte\u00fado do painel ser\u00e1 adicionado quando a API e o layout estiverem dispon\u00edveis.",
 
   "brand.name": "{{brand}}",
-  "brand.portal": "Portal do cliente",
+  "brand.portal": "Portal do comerciante",
   "language.english": "English",
   "language.portuguese": "Portugu\u00eas",
   "common.language": "Idioma",
@@ -219,8 +219,8 @@ export default {
   "auth.personalSpace": "O seu portal pessoal {{brand}}",
   "auth.eyebrow": "BEM-VINDO \u00c0 {{brand, uppercase}}",
   "auth.title": "\u00c9 bom t\u00ea-lo de volta.",
-  "auth.description": "Entre para aceder ao seu portal de cliente.",
-  "auth.formLabel": "In\u00edcio de sess\u00e3o do cliente",
+  "auth.description": "Entre para aceder ao seu portal de comerciante.",
+  "auth.formLabel": "In\u00edcio de sess\u00e3o do comerciante",
   "auth.username": "E-mail ou telem\u00f3vel",
   "auth.password": "Palavra-passe",
   "auth.usernamePlaceholder": "ex.: voce@empresa.com",
@@ -236,7 +236,7 @@ export default {
   "auth.getStarted": "Registar",
   "auth.help": "Precisa de ajuda?",
   "auth.notConnected":
-    "O in\u00edcio de sess\u00e3o ainda n\u00e3o est\u00e1 ligado. Aguardamos os detalhes da API do cliente; n\u00e3o foram enviadas credenciais.",
+    "O in\u00edcio de sess\u00e3o ainda n\u00e3o est\u00e1 ligado. Aguardamos os detalhes da API do comerciante; n\u00e3o foram enviadas credenciais.",
   "auth.invalidCredentials":
     "Os dados de acesso n\u00e3o foram aceites. Tente novamente.",
   "auth.recoveryTitle": "Recuperar palavra-passe",
@@ -244,7 +244,7 @@ export default {
     "A recupera\u00e7\u00e3o estar\u00e1 dispon\u00edvel quando o servi\u00e7o de autentica\u00e7\u00e3o estiver ligado. N\u00e3o foi enviado nenhum pedido.",
   "auth.registrationTitle": "Bem-vindo \u00e0 {{brand}}",
   "auth.registrationDescription":
-    "O registo de clientes n\u00e3o est\u00e1 dispon\u00edvel nesta primeira vers\u00e3o. Ser\u00e1 adicionado numa atualiza\u00e7\u00e3o futura.",
+    "O registo de comerciantes n\u00e3o est\u00e1 dispon\u00edvel nesta primeira vers\u00e3o. Ser\u00e1 adicionado numa atualiza\u00e7\u00e3o futura.",
   "auth.helpTitle": "Estamos aqui para ajudar",
   "auth.helpDescription":
     "Os contactos de suporte ainda n\u00e3o foram configurados. Se j\u00e1 tem um contacto {{brand}}, solicite-lhe assist\u00eancia.",
@@ -365,7 +365,7 @@ export default {
   "pos.soundOff": "Desligar o som da impressora",
   "pos.ledReady": "Pronto",
   "pos.ledPrinting": "A imprimir",
-  "pos.subtitle": "Portal do cliente · Transfer\u00eancia",
+  "pos.subtitle": "Portal do comerciante · Transfer\u00eancia",
   "pos.moneySent": "*** DINHEIRO ENVIADO ***",
   "pos.acc": "Conta",
   "pos.date": "Data",

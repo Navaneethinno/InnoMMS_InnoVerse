@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import OnboardingWizardView from "@/Components/Onboarding/OnboardingWizardView";
 import { useKycUpgradeWizard } from "@/Hooks/Kyc/useKycUpgradeWizard";
 
-// "Complete your verification": a customer approved at a lower KYC level
+// "Complete your verification": a merchant approved at a lower KYC level
 // completes the next one. The screens are the sign-up's.
 export default function KycUpgrade() {
   const { t } = useTranslation();

@@ -11,7 +11,7 @@ import CardFace from "./CardFace";
 import { TransactionPinNotice } from "@/Components/Account/TransactionPinSetup";
 import { CardDetailsDialog, CardMoneyDialog, CardPinDialog, CardStatusDialog, GetCardDialog, PlasticDialog, ReissueDialog } from "./CardDialogs";
 
-// Cards: the customer's cards and requests, what they can get, and
+// Cards: the merchant's cards and requests, what they can get, and
 // everything they can do with a card. Live: a change to any of their cards
 // (by them, the institution or the system) refreshes the page.
 export default function Cards() {
@@ -317,7 +317,7 @@ function Requests({ requests, onDone }) {
   );
 }
 
-// What the customer can get now, with the fee; "Get" is off once they hold
+// What the merchant can get now, with the fee; "Get" is off once they hold
 // the most this product allows.
 function Offers({ offers, onGet }) {
   const { t } = useTranslation();

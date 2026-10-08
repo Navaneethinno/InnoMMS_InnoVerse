@@ -19,7 +19,7 @@ const ICONS = { money_in: ArrowDownLeft, money_out: ArrowUpRight, security: Shie
 const GROUP_NAMES = { today: "Today", yesterday: "Yesterday", earlier: "Earlier" };
 const FIELD_NAMES = { from: "From", account: "Account", reference: "Reference", balance: "Available balance" };
 
-// Everything the institution has sent the customer, newest first and grouped by
+// Everything the institution has sent the merchant, newest first and grouped by
 // day. Each notification is read by parseNotification into a kind (money in or
 // out, security, statement, interest), a short title, an amount and a summary;
 // opening it shows the details found in its message, or the message itself if

@@ -5,11 +5,11 @@ import WalletBadges from "@/Components/Common/WalletBadges";
 import { formatDate, formatMoney } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 
-// The customer's Active wallets beside the payment form: which one the money
+// The merchant's Active wallets beside the payment form: which one the money
 // leaves, with what is in it. It is one card, as tall as the form next to it,
 // holding a block per wallet (product, number, currency, available and ledger
 // balance, loyalty points, status, opened). With several wallets the blocks are
-// the choice; `selected` is the one in use (the customer's pick, or the one the
+// the choice; `selected` is the one in use (the merchant's pick, or the one the
 // server would use). Figures shrink to fit, so a very large balance stays whole.
 function Row({ label, children }) {
   if (children == null || children === "") return null;

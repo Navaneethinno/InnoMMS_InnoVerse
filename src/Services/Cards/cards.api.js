@@ -4,7 +4,7 @@ import { portalPost } from "@/Services/api/portalRequest";
 const { CARD, ACCOUNT } = API_ENDPOINTS;
 const data = async (call) => (await call).data;
 
-// The customer's cards. `pin` is always the transaction PIN; `card_pin` the
+// The merchant's cards. `pin` is always the transaction PIN; `card_pin` the
 // card's own. Calls that charge money take an `idempotency_key` (one per
 // tap, reused on a retry, so nothing is charged twice).
 
@@ -12,7 +12,7 @@ const data = async (call) => (await call).data;
 export const loadCards = async () => (await data(portalPost(CARD.list))) ?? { cards: [], requests: [] };
 // One card, with its `history`.
 export const loadCard = (id) => data(portalPost(CARD.get, { id }));
-// The card products the customer can get now, with their fees.
+// The card products the merchant can get now, with their fees.
 export const loadOffers = async () => {
   const { rows } = await portalPost(CARD.offers);
   const inner = rows.length === 1 ? (rows[0]?.offers ?? rows[0]?.items) : null;
@@ -36,7 +36,7 @@ export const reissueCard = (body) => data(portalPost(CARD.reissue, body));
 
 // Loading (CARD_LOAD, wallet -> card) and unloading (CARD_UNLOAD, card ->
 // wallet) use the payment quote and send. `fromAcctNum` names the wallet
-// (both ways) when the customer has more than one.
+// (both ways) when the merchant has more than one.
 const moveBody = ({ txnType, cardId, amount, fromAcctNum }) => ({ txn_type: txnType, card_id: cardId, amount, ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}) });
 export const quoteCardMove = (move) => data(portalPost(ACCOUNT.QUOTE, moveBody(move)));
 export const sendCardMove = ({ clientReference, pin, ...move }) => data(portalPost(ACCOUNT.SEND, { ...moveBody(move), client_reference: clientReference, ...(pin ? { pin } : {}) }));

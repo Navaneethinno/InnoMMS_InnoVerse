@@ -1,7 +1,7 @@
 import { pinRulesFrom } from "./pinRules";
 import { policyFrom } from "./policy";
 
-// What `auth/me` tells the portal about the signed-in customer, as the fields
+// What `auth/me` tells the portal about the signed-in merchant, as the fields
 // kept on the user: whether their transaction PIN is set or locked, whether the
 // bank has one PIN or two, the rules, the time zone and their avatar.
 export function mePatchFrom(me) {

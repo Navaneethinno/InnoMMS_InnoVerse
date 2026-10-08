@@ -3,7 +3,7 @@ import { cn } from "@/Utils/Lib/utils";
 
 // What is notable about a wallet, as small chips: a restriction (frozen,
 // blocked, dormant, waiting for its first deposit or for activation) and, for a
-// wallet the customer operates for someone else (a joint wallet, a minor's),
+// wallet the merchant operates for someone else (a joint wallet, a minor's),
 // whose it is. Nothing is drawn for an ordinary wallet of their own.
 const SEVERE = new Set(["FROZEN", "BLOCKED"]);
 

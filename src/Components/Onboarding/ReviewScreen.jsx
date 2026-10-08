@@ -8,7 +8,7 @@ import FileUploadField from "@/Components/Common/FileUploadField";
 import { cn } from "@/Utils/Lib/utils";
 import OnboardingField from "./OnboardingField";
 
-// What the customer sees once the application is submitted: the outcome
+// What the merchant sees once the application is submitted: the outcome
 // (`review.status`) and, when the institution asks for something, a form per
 // open request (`review.requests`). A submitted application is locked; the
 // only way to change anything is to answer a request.

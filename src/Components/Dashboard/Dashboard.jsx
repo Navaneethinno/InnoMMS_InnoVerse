@@ -10,7 +10,7 @@ import { WIDGET_REGISTRY } from "./layout/widgetRegistry";
 
 // A customizable widget dashboard (same model as the admin portal's Control
 // Space): drag cards to reorder, widen or narrow them, and the layout is
-// remembered per user. Widgets read the customer's wallets and history (layout/accountData).
+// remembered per user. Widgets read the merchant's wallets and history (layout/accountData).
 //
 //   Dashboard                 header + "Customize layout" / "Done"
 //   layout/widgetRegistry     id -> component, default / min / max span

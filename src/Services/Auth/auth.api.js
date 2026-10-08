@@ -13,16 +13,16 @@ export async function login(credentials) {
   return { ...session, user: { ...session.user, username: credentials.username } };
 }
 
-// A 6-digit code to the customer's email or mobile number. `purpose` is
+// A 6-digit code to the merchant's email or mobile number. `purpose` is
 // ACTIVATE or RESET_PASSWORD. Resolves to { otp_ref, expires_at, sent_to };
-// the reply is the same whether or not the contact belongs to a customer.
+// the reply is the same whether or not the contact belongs to a merchant.
 export const sendCode = async (loginId, purpose) => (await portalPost(AUTH.OTP, { ...bank(), login_id: loginId, purpose }, { signedIn: false })).data;
 
 // First-time access: the code plus the password and transaction PIN to set.
 export const activateAccess = (body) => portalPost(AUTH.ACTIVATE, body, { signedIn: false });
 export const resetPassword = (body) => portalPost(AUTH.PASSWORD_RESET, body, { signedIn: false });
 
-// The institution's rules before sign-in: how customers sign in (PIN, password
+// The institution's rules before sign-in: how merchants sign in (PIN, password
 // or both), the password and transaction PIN rules, the one-time codes, the
 // countries of phone numbers and its currencies; with an activation's
 // `otp_ref` they include that account's PIN rules.
@@ -41,10 +41,10 @@ export const setTransactionPin = (signinPin, pin) => portalPost(AUTH.PIN_SET, { 
 export const changeSigninPin = (current, next) => portalPost(AUTH.SIGNIN_PIN_CHANGE, { current, new: next });
 export const startPinReset = async () => (await portalPost(AUTH.PIN_RESET_START)).data;
 export const resetPin = (body) => portalPost(AUTH.PIN_RESET, body);
-// The customer's open sessions, most recently used first: [{ id, channel,
+// The merchant's open sessions, most recently used first: [{ id, channel,
 // device_type, signed_in_at, last_seen_at, expires_at, current }].
 export const listSessions = async () => (await portalPost(AUTH.SESSIONS)).rows;
 // Signs one device out (ending the current one works like sign-out).
 export const endSession = (id) => portalPost(AUTH.SESSION_END, { id });
-// Ends this session, or every session of the customer (all devices).
+// Ends this session, or every session of the merchant (all devices).
 export const logout = ({ all = false } = {}) => portalPost(AUTH.LOGOUT, all ? { all: true } : {});

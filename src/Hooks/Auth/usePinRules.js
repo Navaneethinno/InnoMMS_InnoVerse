@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { DEFAULT_PIN_RULES } from "@/Utils/Lib/pinRules";
 
-// The signed-in customer's transaction PIN rules (loaded with auth/me when the
+// The signed-in merchant's transaction PIN rules (loaded with auth/me when the
 // signed-in area opens); `known` is false until then.
 export function usePinRules() {
   const stored = useSelector((state) => state.auth.user?.pinRules);

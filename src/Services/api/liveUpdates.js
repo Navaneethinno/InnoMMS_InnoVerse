@@ -3,11 +3,11 @@ import { API_BASE_URL, API_ENDPOINTS } from "@/Utils/Constant";
 import { freshAccessToken } from "./client";
 
 // The live channel: the server says the moment money moves in or out of the
-// customer's wallets, so balances and history refresh without polling.
-//   wallet changed  -> "customer:wallet-changed" on window (pages refetch)
-//   card changed    -> "customer:card-changed" (the cards page refetches)
-//   notification    -> "customer:notification" (the inbox and its badge refetch)
-//   session ended   -> "customer:session-expired" (back to sign-in)
+// merchant's wallets, so balances and history refresh without polling.
+//   wallet changed  -> "merchant:wallet-changed" on window (pages refetch)
+//   card changed    -> "merchant:card-changed" (the cards page refetches)
+//   notification    -> "merchant:notification" (the inbox and its badge refetch)
+//   session ended   -> "merchant:session-expired" (back to sign-in)
 const PING_MS = 30000;
 const RETRY_MS = [2000, 5000, 15000, 30000];
 
@@ -47,14 +47,14 @@ export function connectLive() {
       } else if (message.type === "changed" && message.action === "wallet") {
         // Several moves close together refresh once.
         clearTimeout(burst);
-        burst = setTimeout(() => window.dispatchEvent(new CustomEvent("customer:wallet-changed", { detail: message.data ?? [] })), 400);
+        burst = setTimeout(() => window.dispatchEvent(new CustomEvent("merchant:wallet-changed", { detail: message.data ?? [] })), 400);
       } else if (message.type === "changed" && message.action === "card") {
-        window.dispatchEvent(new CustomEvent("customer:card-changed", { detail: message.data ?? [] }));
+        window.dispatchEvent(new CustomEvent("merchant:card-changed", { detail: message.data ?? [] }));
       } else if (message.type === "changed" && message.action === "notification") {
-        window.dispatchEvent(new CustomEvent("customer:notification", { detail: message.data ?? [] }));
+        window.dispatchEvent(new CustomEvent("merchant:notification", { detail: message.data ?? [] }));
       } else if (message.type === "session_ended") {
         stopped = true;
-        window.dispatchEvent(new Event("customer:session-expired"));
+        window.dispatchEvent(new Event("merchant:session-expired"));
       }
     };
     socket.onclose = () => {
@@ -78,36 +78,36 @@ export function connectLive() {
   };
 }
 
-// Runs `callback` whenever the customer's wallets change.
+// Runs `callback` whenever the merchant's wallets change.
 export function useWalletChanged(callback) {
   const latest = useRef(callback);
   latest.current = callback;
   useEffect(() => {
     const handler = (event) => latest.current(event.detail);
-    window.addEventListener("customer:wallet-changed", handler);
-    return () => window.removeEventListener("customer:wallet-changed", handler);
+    window.addEventListener("merchant:wallet-changed", handler);
+    return () => window.removeEventListener("merchant:wallet-changed", handler);
   }, []);
 }
 
-// Runs `callback` whenever one of the customer's cards changes, whoever
+// Runs `callback` whenever one of the merchant's cards changes, whoever
 // changed it (them, the institution or the system).
 export function useCardChanged(callback) {
   const latest = useRef(callback);
   latest.current = callback;
   useEffect(() => {
     const handler = (event) => latest.current(event.detail);
-    window.addEventListener("customer:card-changed", handler);
-    return () => window.removeEventListener("customer:card-changed", handler);
+    window.addEventListener("merchant:card-changed", handler);
+    return () => window.removeEventListener("merchant:card-changed", handler);
   }, []);
 }
 
-// Runs `callback` whenever a notification reaches the customer's inbox.
+// Runs `callback` whenever a notification reaches the merchant's inbox.
 export function useNotificationReceived(callback) {
   const latest = useRef(callback);
   latest.current = callback;
   useEffect(() => {
     const handler = (event) => latest.current(event.detail);
-    window.addEventListener("customer:notification", handler);
-    return () => window.removeEventListener("customer:notification", handler);
+    window.addEventListener("merchant:notification", handler);
+    return () => window.removeEventListener("merchant:notification", handler);
   }, []);
 }

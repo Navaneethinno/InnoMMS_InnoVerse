@@ -36,7 +36,7 @@ export default function Login() {
   const policy = usePortalPolicy();
   const canPin = policy.login.methods.includes("PIN");
   const canPassword = policy.login.methods.includes("PASSWORD");
-  // PIN or password: the portal's choice, or the customer's where both are allowed.
+  // PIN or password: the portal's choice, or the merchant's where both are allowed.
   const [chosen, setChosen] = useState(null);
   const signInWith = chosen ?? (canPin && policy.login.method === "PIN" ? "PIN" : "PASSWORD");
   const byPin = signInWith === "PIN" && canPin;

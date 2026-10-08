@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { loadKycStatus } from "@/Services/Kyc/kyc.api";
 
-// The customer's verification status, or null while unknown (or when the
-// bank has none: a company customer, no KYC levels).
+// The merchant's verification status, or null while unknown (or when the
+// bank has none: a company merchant, no KYC levels).
 export function useKycStatus() {
   const [status, setStatus] = useState(null);
   useEffect(() => {

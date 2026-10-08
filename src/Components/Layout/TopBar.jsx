@@ -8,7 +8,7 @@ import UserMenu from "./UserMenu";
 
 // The bar across the top of the signed-in pages: the portal's name on the
 // left (and the menu button on a phone), language, theme, the notifications
-// bell and the signed-in customer (with their menu) on the right.
+// bell and the signed-in merchant (with their menu) on the right.
 export default function TopBar({ onMenu }) {
   const { t } = useTranslation();
   const user = useSelector((state) => state.auth.user);

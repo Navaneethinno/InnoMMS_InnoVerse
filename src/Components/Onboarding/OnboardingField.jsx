@@ -179,7 +179,7 @@ export default function OnboardingField({ field, value, onChange, error, choices
         );
       }
       case "PIN": {
-        // A secret number the customer chooses: masked, digits only, typed
+        // A secret number the merchant chooses: masked, digits only, typed
         // twice unless the field says otherwise. The server never sends a
         // saved PIN back, only "********", which stays as it is unless a new
         // one is typed.

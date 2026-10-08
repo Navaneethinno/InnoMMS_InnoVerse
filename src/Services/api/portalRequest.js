@@ -3,14 +3,14 @@ import { api, requireEndpoint } from "./client";
 import { portalHeaders } from "./portalHeaders";
 import { readBlobPayload, toApiRequestError } from "./apiErrors";
 
-// One call to the customer API. Every reply is { status, code, message,
+// One call to the merchant API. Every reply is { status, code, message,
 // data: [ ... ] }; `message` is the API's own words for the user and is shown
 // as is. Resolves to { data: <first item>, message }; a refusal throws an
 // ApiRequestError carrying that message (and `status`, the HTTP status).
 //
 // `signedIn: false` is for the calls before sign-in (otp, activate, login,
 // refresh, password_reset): they carry the portal's Basic credential. Every
-// other call carries the customer's Bearer token (added by the client).
+// other call carries the merchant's Bearer token (added by the client).
 // A call that answers with a file (a CSV). A refusal is still JSON: it is read
 // back so its message can be shown. Resolves to { blob, filename }.
 export async function portalDownload(endpoint, body = {}) {

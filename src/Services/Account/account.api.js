@@ -5,7 +5,7 @@ import { portalPost } from "@/Services/api/portalRequest";
 const { ACCOUNT } = API_ENDPOINTS;
 const data = async (call) => (await call).data;
 
-// The customer's Active wallets: { acct_num, currency_code, avail_bal,
+// The merchant's Active wallets: { acct_num, currency_code, avail_bal,
 // ledger_bal, acct_product_name, digital_product_name, status_name,
 // opened_at }.
 export const loadWallets = async () => {
@@ -92,6 +92,6 @@ export const loadHistory = async ({ page = 1, limit = 20, acctId = null, txnType
 
 export const loadTransaction = (rrn) => data(portalPost(ACCOUNT.TRANSACTION, { rrn }));
 
-// `rrn` omitted = the customer's last receipt. `duplicate` counts a reprint.
+// `rrn` omitted = the merchant's last receipt. `duplicate` counts a reprint.
 export const loadReceipt = ({ rrn, duplicate = false } = {}) =>
   data(portalPost(ACCOUNT.RECEIPT, { ...(rrn ? { rrn } : {}), ...(duplicate ? { duplicate: true } : {}) }));

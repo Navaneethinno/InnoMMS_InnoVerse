@@ -8,7 +8,7 @@ const OTHER = "__other__";
 // A phone number as the institution takes it: a prefix picked from its
 // countries and the digits after it. The value is the whole number
 // ("+258840000000"), or "" while no digits are typed. With no countries (any
-// country is accepted) it is one plain box where the customer types the number.
+// country is accepted) it is one plain box where the merchant types the number.
 // `allowOther` adds an "Other" prefix for signing in with a number exactly as
 // it is stored (older records have no prefix): what is typed is sent as typed.
 export default function PhoneField({ label, value, onChange, countries = [], allowOther = false, error, disabled, name = "phone", placeholder }) {

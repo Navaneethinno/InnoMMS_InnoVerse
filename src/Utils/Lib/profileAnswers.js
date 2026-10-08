@@ -1,4 +1,4 @@
-// Turns the profile's sections (the sign-up questions with the customer's
+// Turns the profile's sections (the sign-up questions with the merchant's
 // answers) into rows to show. Pure.
 
 const FILE_TYPES = /FILE|PHOTO|IMAGE|CAMERA|SELFIE|SIGNATURE/i;

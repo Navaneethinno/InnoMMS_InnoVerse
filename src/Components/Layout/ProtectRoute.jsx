@@ -25,11 +25,11 @@ export default function ProtectRoute({ children }) {
     };
     check();
     const timer = window.setInterval(check, 10000);
-    window.addEventListener("customer:session-expired", expire);
+    window.addEventListener("merchant:session-expired", expire);
     window.addEventListener("focus", check);
     return () => {
       clearInterval(timer);
-      window.removeEventListener("customer:session-expired", expire);
+      window.removeEventListener("merchant:session-expired", expire);
       window.removeEventListener("focus", check);
     };
   }, [dispatch, authenticated]);

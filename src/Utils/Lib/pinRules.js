@@ -1,4 +1,4 @@
-// The transaction PIN's rules come from the customer's product (an exact
+// The transaction PIN's rules come from the merchant's product (an exact
 // length, or a range; digits only or letters too; whether it may equal the
 // password). The API sends them as `pin_rules` (auth/me, and auth/pin_rules
 // before sign-in); until they are known the box is the loosest sensible one and

@@ -47,7 +47,7 @@ function Document({ item }) {
   );
 }
 
-// The ID photos and selfie the customer gave at sign-up (read-only).
+// The ID photos and selfie the merchant gave at sign-up (read-only).
 export default function ProfileDocuments({ documents }) {
   return (
     <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

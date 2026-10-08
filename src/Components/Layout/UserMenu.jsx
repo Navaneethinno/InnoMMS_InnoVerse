@@ -7,7 +7,7 @@ import { usePolicy } from "@/Hooks/Auth/usePolicy";
 import { useSignOut } from "@/Hooks/Auth/useSignOut";
 import { cn } from "@/Utils/Lib/utils";
 
-// The signed-in customer in the top bar: their name and initial, and on click
+// The signed-in merchant in the top bar: their name and initial, and on click
 // a small menu with who they are (name, the bank, their login) and what they
 // can do: change their password (on the Security page) and sign out. Closes on
 // an outside click, Escape, and when the page changes.

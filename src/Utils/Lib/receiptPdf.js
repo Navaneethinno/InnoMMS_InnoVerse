@@ -4,7 +4,7 @@ import { receiptTexts } from "./receiptTransaction";
 
 // The receipt as a PDF, laid out like the thermal slip on screen: 80 mm wide,
 // as tall as it needs to be, monospaced text, dashed rules, the barcode. jsPDF
-// is loaded only when the customer asks for the download.
+// is loaded only when the merchant asks for the download.
 const WIDTH = 80;
 const MARGIN = 6;
 const INNER = WIDTH - MARGIN * 2;

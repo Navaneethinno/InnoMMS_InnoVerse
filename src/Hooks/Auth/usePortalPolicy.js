@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { loadPolicy } from "@/Services/Auth/auth.api";
 import { DEFAULT_POLICY, policyFrom } from "@/Utils/Lib/policy";
 
-// The institution's rules before sign-in (auth/policy): how customers sign in,
+// The institution's rules before sign-in (auth/policy): how merchants sign in,
 // the PIN and password rules, the codes, phone countries and currencies. With
 // an activation's `otpRef` they include the PIN rules of that account. The
 // general ones are fetched once. `status` is "loading", "ready" or "failed"

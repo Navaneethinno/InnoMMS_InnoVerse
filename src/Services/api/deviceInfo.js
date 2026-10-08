@@ -1,6 +1,6 @@
 // The `Deviceinfo` header sent with every call: the device is recorded on
 // every transaction. `device_id` is made once per browser and kept.
-const KEY = "innoverse-customer:device-id";
+const KEY = "innoverse-merchant:device-id";
 
 function deviceId() {
   try {

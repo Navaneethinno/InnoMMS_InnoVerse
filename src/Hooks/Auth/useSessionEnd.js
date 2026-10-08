@@ -9,7 +9,7 @@ const CHECK_MS = 1000;
 
 // A session has a last moment (`refresh_expires_at` of the sign-in reply, the
 // start plus `session.max_seconds`) after which only a new sign-in works, however
-// active the customer is. A minute or two before it they are told; at it they are
+// active the merchant is. A minute or two before it they are told; at it they are
 // signed out with a note. Timestamps, not timers, so a sleeping laptop is handled
 // on return. Returns { secondsLeft, dismiss }: `secondsLeft` is null until the
 // warning is due (and after it was dismissed).

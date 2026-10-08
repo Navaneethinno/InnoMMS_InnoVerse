@@ -3,14 +3,14 @@ import { portalDownload, portalPost } from "@/Services/api/portalRequest";
 
 const { KYC } = API_ENDPOINTS;
 
-// Where the customer stands: { reference_id, kyc_level_no, target_level_no,
+// Where the merchant stands: { reference_id, kyc_level_no, target_level_no,
 // top_level_no, state, can_upgrade, kyc_scheme_name, no_kyc_levels }.
 // `state` is NONE, IN_PROGRESS, WAITING, REJECTED (`narration` is the
 // checker's reason), AT_TOP or LOCKED.
 export const loadKycStatus = async () => (await portalPost(KYC.STATUS)).data;
 
 // The upgrade's screens are the sign-up's (section, checkpoint, progress), for
-// the signed-in customer's own details, so the sign-up wizard draws them. This
+// the signed-in merchant's own details, so the sign-up wizard draws them. This
 // is the same shape as an onboarding flow's api; the server works from the
 // session, so there is no reference to send back.
 const screen = (reply, referenceId) => ({

@@ -23,7 +23,7 @@ export const ROW_HEIGHT = 36;
  * Every dashboard widget, by id. The ids are the ones the server's layout uses
  * (letters, digits, _ and -); the grid and the saved layout work from ids, so a
  * new widget is one component plus one entry here. Key order is the default
- * layout (flowed left to right) for a customer with none saved.
+ * layout (flowed left to right) for a merchant with none saved.
  * @type {Record<string, WidgetDefinition>}
  */
 export const WIDGET_REGISTRY = {

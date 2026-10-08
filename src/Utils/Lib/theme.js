@@ -1,7 +1,7 @@
 import { STORAGE_KEYS } from "@/Utils/Constant";
 
 // Light/dark theme: a `dark` class on <html> switches the colour variables
-// in styles.css. The customer's choice is remembered; until they choose,
+// in styles.css. The merchant's choice is remembered; until they choose,
 // the system setting is followed.
 export function readStoredTheme() {
   try {

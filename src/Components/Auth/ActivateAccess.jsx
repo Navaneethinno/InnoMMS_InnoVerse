@@ -5,7 +5,7 @@ import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import AuthCard from "./AuthCard";
 import CodeFlow from "./CodeFlow";
 
-// First-time access for an approved customer: code to their contact, then the
+// First-time access for an approved merchant: code to their contact, then the
 // password and transaction PIN they choose.
 export default function ActivateAccess() {
   const { t } = useTranslation();
