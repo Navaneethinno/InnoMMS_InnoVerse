@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Camera, FileText, IdCard, KeyRound, Phone, ShieldCheck, Store, UserRound } from "lucide-react";
-import Avatar from "@/Components/Common/Avatar";
 import DetailRow from "@/Components/Common/DetailRow";
 import ErrorState from "@/Components/Common/ErrorState";
 import IconCard from "@/Components/Common/IconCard";
@@ -12,6 +11,7 @@ import { sectionBlocks } from "@/Utils/Lib/profileAnswers";
 import { formatDate, formatDateTime } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 import AvatarDialog from "./AvatarDialog";
+import AvatarPreview from "./AvatarPreview";
 
 // Each sign-up section's card icon, by what it is about.
 const sectionIcon = (key = "") => {
@@ -44,7 +44,7 @@ export default function Profile() {
       {error && <ErrorState message={error} />}
       <section className="flex flex-col items-center gap-5 rounded-3xl border border-slate-200 bg-surface p-6 text-center shadow-sm sm:flex-row sm:text-left">
         <div className="relative shrink-0">
-          <Avatar name={header.name} className="h-24 w-24" textClassName="text-4xl" />
+          <AvatarPreview name={header.name} onChange={() => setPhotoOpen(true)} />
           <button
             type="button"
             onClick={() => setPhotoOpen(true)}
