@@ -57,17 +57,20 @@ export const cancelPhoneTransfer = (id) => data(portalPost(ACCOUNT.PHONE_TRANSFE
 
 // What a payment would cost, without making it. `txn_type`: P2P_TRANSFER to
 // a customer's wallet, MERCHANT_PAYMENT to a merchant's.
-export const quotePayment = ({ txnType, toAcctNum, toPhone, amount, fromAcctNum }) =>
-  data(portalPost(ACCOUNT.QUOTE, { txn_type: txnType, ...payeeBody({ toAcctNum, toPhone }), amount, ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}) }));
+// A merchant's refund (MERCHANT_REFUND) names the payment it returns (`orgRrn`)
+// instead of a payee.
+const targetBody = ({ toAcctNum, toPhone, orgRrn }) => (orgRrn ? { org_rrn: orgRrn } : payeeBody({ toAcctNum, toPhone }));
+export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, amount, fromAcctNum }) =>
+  data(portalPost(ACCOUNT.QUOTE, { txn_type: txnType, ...targetBody({ toAcctNum, toPhone, orgRrn }), amount, ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}) }));
 
 // Makes the payment. `clientReference` is one per attempt and is reused when
 // retrying: the same reference never pays twice (the second call returns the
 // first payment with `replayed: true`).
-export const sendPayment = ({ txnType, toAcctNum, toPhone, amount, fromAcctNum, clientReference, pin, note }) =>
+export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, amount, fromAcctNum, clientReference, pin, note }) =>
   data(
     portalPost(ACCOUNT.SEND, {
       txn_type: txnType,
-      ...payeeBody({ toAcctNum, toPhone }),
+      ...targetBody({ toAcctNum, toPhone, orgRrn }),
       amount,
       ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}),
       client_reference: clientReference,

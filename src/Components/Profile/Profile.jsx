@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Camera, FileText, KeyRound, Phone, ShieldCheck, UserRound } from "lucide-react";
 import Avatar from "@/Components/Common/Avatar";
 import DetailRow from "@/Components/Common/DetailRow";
-import KycStatusCard from "@/Components/Kyc/KycStatusCard";
 import ErrorState from "@/Components/Common/ErrorState";
 import IconCard from "@/Components/Common/IconCard";
 import LoadingState from "@/Components/Common/LoadingState";
@@ -36,7 +35,6 @@ export default function Profile() {
   return (
     <div className="space-y-5">
       {error && <ErrorState message={error} />}
-      <KycStatusCard />
       <section className="flex flex-col items-center gap-5 rounded-3xl border border-slate-200 bg-surface p-6 text-center shadow-sm sm:flex-row sm:text-left">
         <div className="relative shrink-0">
           <Avatar name={header.name} className="h-24 w-24" textClassName="text-4xl" />

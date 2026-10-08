@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Check, LayoutGrid, RotateCcw } from "lucide-react";
-import KycStatusCard from "@/Components/Kyc/KycStatusCard";
 import { DashboardGrid } from "./layout/DashboardGrid";
 import { useDashboardLayout } from "./layout/useDashboardLayout";
 import { isHidden, useDashboardServer } from "./layout/dashboardData";
@@ -75,9 +74,6 @@ export default function Dashboard() {
             {editing ? t("dash.done") : t("dash.customizeLayout")}
           </button>
         </div>
-      </div>
-      <div className="mb-6 empty:hidden">
-        <KycStatusCard />
       </div>
       {layout ? (
         <AccountDataContext.Provider value={accountData}>

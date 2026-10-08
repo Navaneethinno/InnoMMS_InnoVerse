@@ -510,6 +510,8 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
       const { data: form, message } = await flowApi.submit({
         reference_id: wizard.onboarding.reference_id,
         expected_updated_time: wizard.onboarding.updated_time,
+        // The KYC level this channel submits at (`progress.submit_level_no`).
+        ...(progress?.submit_level_no != null ? { level_no: progress.submit_level_no } : {}),
       });
       applyWizard(form, message);
       // Approved: nothing left to resume. Under review (or waiting on the
