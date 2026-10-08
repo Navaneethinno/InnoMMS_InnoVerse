@@ -1,0 +1,55 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { dashboardApi } from "@/Services/Dashboard/dashboard.api";
+import { notifications } from "@/Utils/Lib/notifications";
+import { reconcileLayout } from "./gridLayout";
+import { GRID_COLS, MAX_SPAN, WIDGET_REGISTRY, defaultLayout } from "./widgetRegistry";
+
+// Per-user widget layout. The server is the only copy: it comes back with
+// layout_get and is saved with layout_save a moment after the last move or
+// resize. Nothing is kept in the browser.
+// Saved widgets this page does not know (another portal's, sharing the same
+// dashboard key) are carried through every save untouched.
+const SAVE_DELAY = 800;
+const options = { cols: GRID_COLS, maxSpan: MAX_SPAN };
+
+// `serverLayout`: the layout the server returned (undefined until it has
+// answered, null when the user never customised). `layout` stays null until
+// then, so the page never flashes a layout it is about to replace.
+export function useDashboardLayout(_user, serverLayout) {
+  const [layout, setLayoutState] = useState(null);
+  const timer = useRef(null);
+  const foreign = useRef([]);
+
+  useEffect(() => {
+    if (serverLayout === undefined) return;
+    foreign.current = (Array.isArray(serverLayout?.layout) ? serverLayout.layout : []).filter((it) => it && !WIDGET_REGISTRY[it.id]);
+    setLayoutState(serverLayout?.layout ? reconcileLayout(WIDGET_REGISTRY, serverLayout.layout, options) : defaultLayout());
+  }, [serverLayout]);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const save = useCallback(
+    (value) => {
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => {
+        dashboardApi.saveLayout(value && [...value, ...foreign.current]).catch((error) => notifications.error(error.message));
+      }, SAVE_DELAY);
+    },
+    [],
+  );
+
+  const setLayout = useCallback(
+    (value) => {
+      setLayoutState(value);
+      save(value);
+    },
+    [save],
+  );
+
+  const resetLayout = useCallback(() => {
+    setLayoutState(defaultLayout());
+    save(foreign.current.length ? defaultLayout() : null);
+  }, [save]);
+
+  return { layout, setLayout, resetLayout };
+}

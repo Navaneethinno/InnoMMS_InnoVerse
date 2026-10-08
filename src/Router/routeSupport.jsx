@@ -1,8 +1,8 @@
 import { Component, Suspense } from "react";
 import { LoadingAnimation } from "@/Components/Common/LoadingAnimation";
 export const pageFallback = (
-  <div className="flex justify-center px-4 py-24">
-    <LoadingAnimation className="h-24 w-96 max-w-full" />
+  <div className="flex min-h-screen items-center justify-center bg-paper px-6">
+    <LoadingAnimation />
   </div>
 );
 

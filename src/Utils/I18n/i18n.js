@@ -1,56 +1,38 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
 import en from "./locales/en";
 import pt from "./locales/pt";
-
-// Resources are assembled from one file PER LANGUAGE (locales/en.js,
-// locales/pt.js, ...) rather than a single inline object holding every
-// language — adding a language means adding one file here, not editing a
-// shared blob. Matches payse's own per-language-file convention
-// (Services/Translation/EnglishTranslation.json etc.), just as plain JS
-// objects instead of JSON so each file can share sub-objects between
-// namespaces if useful later.
-const resources = {
-  en,
-  pt,
-};
-
-void i18n
-  .use(LanguageDetector)
+import { setApiLanguage } from "@/Utils/Lib/apiLanguage";
+let language = "en";
+try {
+  language = localStorage.getItem("innoverse-customer:language") || "en";
+} catch {
+  /* Default locale. */
+}
+i18n
   .use(initReactI18next)
   .init({
-    resources,
+    resources: { en: { translation: en }, pt: { translation: pt } },
+    lng: language,
     fallbackLng: "en",
-    defaultNS: "common",
-    ns: [
-      "common",
-      "auth",
-      "login",
-      "signup",
-      "layout",
-      "dashboard",
-      "forgotPassword",
-      "setup",
-      "changePassword",
-      "sidebar",
-      "routes",
-      "statusLabels",
-      "myProfile",
-      "category",
-    ],
-    interpolation: { escapeValue: false },
-    detection: {
-      // Same localStorage key the language dropdown's own apiLanguage.js
-      // helper uses (see LanguageDropdown.jsx) — one key, one source of
-      // truth for "which language is selected" driving both this (UI
-      // string translation) and the x-api-lang request header (backend
-      // message translation), instead of two separate persisted values
-      // that could drift out of sync.
-      order: ["localStorage", "navigator", "htmlTag"],
-      lookupLocalStorage: "apiLang",
-      caches: ["localStorage"],
-    },
+    keySeparator: false,
+    // `brand` is the bank's display name from the branding API (see
+    // Utils/Lib/branding.js); this is the name until that arrives.
+    interpolation: { escapeValue: false, defaultVariables: { brand: "InnoVerse" } },
   });
-
-export { i18n };
+// {{brand, uppercase}} for the eyebrows that are written in capitals.
+i18n.services.formatter?.add("uppercase", (value) => String(value).toUpperCase());
+document.documentElement.lang = i18n.language || "en";
+// The API translates its messages by the x-api-lang header, so it always
+// follows the app language.
+setApiLanguage(i18n.language || "en");
+i18n.on("languageChanged", (lng) => {
+  document.documentElement.lang = lng;
+  setApiLanguage(lng);
+  try {
+    localStorage.setItem("innoverse-customer:language", lng);
+  } catch {
+    /* Locale still updates in memory. */
+  }
+});
+export default i18n;

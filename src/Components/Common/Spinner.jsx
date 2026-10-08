@@ -1,6 +1,10 @@
 import { Loader2 } from "lucide-react";
-
-// Small inline spinner for buttons awaiting an API response.
-export function Spinner({ size = 14, className = "" }) {
-  return <Loader2 size={size} className={`animate-spin ${className}`} />;
+import { cn } from "@/Utils/Lib/utils";
+export default function Spinner({ className }) {
+  return (
+    <Loader2
+      aria-hidden="true"
+      className={cn("h-5 w-5 animate-spin", className)}
+    />
+  );
 }

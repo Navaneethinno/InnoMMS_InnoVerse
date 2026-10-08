@@ -1,57 +1,83 @@
-import { STORAGE_KEYS } from "@/Services/api/storageKeys";
-
-// A JWT's payload (the middle base64url segment) carries `exp` as a Unix
-// timestamp in seconds. Decoded locally, without a library, purely to check
-// expiry client-side — the backend remains the real authority and still
-// rejects an invalid token on any actual request; this only stops
-// ProtectRoute from waving a visibly-expired leftover token straight into
-// the app shell before that first request ever fires.
-function isTokenExpired(token) {
+import { STORAGE_KEYS } from "@/Utils/Constant";
+// The signed-in session: a short-lived access token (JWT, 15 minutes) and a
+// refresh token (30 days) that changes on every refresh. Kept in
+// sessionStorage (gone when the tab closes), with an in-memory copy for
+// browsers that block it.
+let memorySession = null;
+export function isTokenExpired(token, marginSeconds = 0) {
   try {
-    const payload = token.split(".")[1];
-    if (!payload) return true;
-    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-    if (!decoded?.exp) return false;
-    return decoded.exp * 1000 <= Date.now();
+    const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(
+      atob(payload.padEnd(Math.ceil(payload.length / 4) * 4, "=")),
+    );
+    return !Number.isFinite(decoded.exp) || decoded.exp * 1000 - marginSeconds * 1000 <= Date.now();
   } catch {
     return true;
   }
 }
-
-export function getAccessToken() {
-  const token = window.localStorage.getItem(STORAGE_KEYS.accessToken);
-  if (token && isTokenExpired(token)) {
-    clearAuthSession();
-    return null;
+function readSession() {
+  try {
+    return (
+      JSON.parse(window.sessionStorage.getItem(STORAGE_KEYS.session)) ||
+      memorySession
+    );
+  } catch {
+    return memorySession;
   }
-  return token;
+}
+// The raw access token, even when about to expire (the client refreshes it).
+export function getStoredAccessToken() {
+  return readSession()?.accessToken || null;
+}
+export function getAccessToken() {
+  const token = getStoredAccessToken();
+  return token && !isTokenExpired(token) ? token : null;
 }
 export function getRefreshToken() {
-  return window.localStorage.getItem(STORAGE_KEYS.refreshToken);
+  const session = readSession();
+  if (!session?.refreshToken) return null;
+  if (session.refreshExpiresAt && new Date(session.refreshExpiresAt).getTime() <= Date.now()) return null;
+  return session.refreshToken;
+}
+// Signed in = a refresh token that still works; the access token is renewed
+// from it whenever needed.
+export function hasSession() {
+  return Boolean(getRefreshToken());
+}
+// The session's timing from sign-in / refresh: { idle_timeout_seconds,
+// access_ttl_seconds, max_seconds }, or null.
+export function readSessionPolicy() {
+  return hasSession() ? readSession()?.sessionPolicy || null : null;
+}
+// The session's last moment (ms): `refresh_expires_at` of the sign-in reply, the
+// start plus the maximum. After it only a new sign-in works. Null when unknown.
+export function readSessionEnd() {
+  const at = hasSession() ? new Date(readSession()?.refreshExpiresAt).getTime() : NaN;
+  return Number.isFinite(at) ? at : null;
 }
 export function readAuthUser() {
+  return hasSession() ? readSession()?.user || null : null;
+}
+export function persistAuthSession(user, accessToken, refreshToken, refreshExpiresAt, sessionPolicy = null) {
+  memorySession = { user, accessToken, refreshToken, refreshExpiresAt, sessionPolicy };
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEYS.user);
-    return raw ? JSON.parse(raw) : null;
+    window.sessionStorage.setItem(
+      STORAGE_KEYS.session,
+      JSON.stringify(memorySession),
+    );
   } catch {
-    return null;
+    /* In-memory fallback for restricted storage. */
   }
 }
-export function persistAuthSession(user, token, refreshToken) {
-  try {
-    window.localStorage.setItem(STORAGE_KEYS.accessToken, token);
-    if (refreshToken) window.localStorage.setItem(STORAGE_KEYS.refreshToken, refreshToken);
-    window.localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
-  } catch {
-    // Storage failures should not prevent the in-memory session from updating.
-  }
+export function updateAuthUser(user) {
+  const session = readSession();
+  if (session) persistAuthSession(user, session.accessToken, session.refreshToken, session.refreshExpiresAt, session.sessionPolicy);
 }
 export function clearAuthSession() {
+  memorySession = null;
   try {
-    window.localStorage.removeItem(STORAGE_KEYS.accessToken);
-    window.localStorage.removeItem(STORAGE_KEYS.refreshToken);
-    window.localStorage.removeItem(STORAGE_KEYS.user);
+    window.sessionStorage.removeItem(STORAGE_KEYS.session);
   } catch {
-    // Storage failures should not prevent logout.
+    /* Storage may be unavailable. */
   }
 }

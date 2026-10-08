@@ -1,12 +1,10 @@
-export function unwrapApiResponse(response, fallback) {
+export function unwrapApiResponse(response, fallback = null) {
   if (
-    response !== null &&
+    response &&
     typeof response === "object" &&
     "success" in response &&
     "data" in response
-  ) {
-    const data = response.data;
-    return data ?? fallback;
-  }
+  )
+    return response.data ?? fallback;
   return response ?? fallback;
 }

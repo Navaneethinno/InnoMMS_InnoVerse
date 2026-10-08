@@ -1,17 +1,22 @@
 import { lazy } from "react";
 import { pageElement } from "./routeSupport";
-
-// App-level pages that are not sidebar menus: dashboard, and the header's
-// notifications / my profile / change password.
-const DashboardPage = lazy(() => import("@/Pages/Dashboard/DashboardPage").then((m) => ({ default: m.DashboardPage })));
-const NotificationsPage = lazy(() => import("@/Pages/Notifications/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
-const MyProfilePage = lazy(() => import("@/Pages/Header/MyProfilePage").then((m) => ({ default: m.MyProfilePage })));
-const ChangePasswordPage = lazy(() => import("@/Pages/Header/ChangePasswordPage").then((m) => ({ default: m.ChangePasswordPage })));
-
+const Dashboard = lazy(() => import("@/Components/Dashboard/Dashboard"));
+const Send = lazy(() => import("@/Components/Account/Send"));
+const History = lazy(() => import("@/Components/Account/History"));
+const Security = lazy(() => import("@/Components/Account/Security"));
+const Cards = lazy(() => import("@/Components/Cards/Cards"));
+const Inbox = lazy(() => import("@/Components/Inbox/Inbox"));
+const Profile = lazy(() => import("@/Components/Profile/Profile"));
+const KycUpgrade = lazy(() => import("@/Components/Kyc/KycUpgrade"));
+const Statements = lazy(() => import("@/Components/Statements/Statements"));
 export const dashboardRoutes = [
-  { path: "/", element: pageElement(DashboardPage) },
-  { path: "/dashboard", element: pageElement(DashboardPage) },
-  { path: "/notifications", element: pageElement(NotificationsPage) },
-  { path: "/my-profile", element: pageElement(MyProfilePage) },
-  { path: "/change-password", element: pageElement(ChangePasswordPage) },
+  { path: "dashboard", element: pageElement(Dashboard) },
+  { path: "send", element: pageElement(Send) },
+  { path: "history", element: pageElement(History) },
+  { path: "cards", element: pageElement(Cards) },
+  { path: "statements", element: pageElement(Statements) },
+  { path: "notifications", element: pageElement(Inbox) },
+  { path: "profile", element: pageElement(Profile) },
+  { path: "verification", element: pageElement(KycUpgrade) },
+  { path: "security", element: pageElement(Security) },
 ];

@@ -1,0 +1,66 @@
+/* The notifications page. The brand's own colours (dark, accent, surface) come
+   from the portal's tokens, so they follow the institution's branding and dark
+   mode; what is set here is the warm secondary text, the colour of each kind
+   of notification and the loading shimmer. */
+.notif {
+  --n-muted: #6b6350;
+  --n-detail: #fbf4e0;
+  --n-dot: #9a6e00;
+  --n-in: #17744a;
+  --n-in-bg: #ddf0e4;
+  --n-out: #4a4332;
+  --n-out-bg: #efe7d2;
+  --n-security: #a8401a;
+  --n-security-bg: #fbe3d6;
+  --n-statement: #2a5599;
+  --n-statement-bg: #e1e9f6;
+  --n-interest: #0f6b63;
+  --n-interest-bg: #dcefec;
+  --n-generic: #4a4332;
+  --n-generic-bg: #f6edd2;
+  --n-skeleton-a: #efe6cb;
+  --n-skeleton-b: #f8f1de;
+}
+.dark .notif {
+  --n-muted: #b9ae92;
+  --n-detail: rgb(255 255 255 / 0.06);
+  --n-dot: #f5c400;
+  --n-in: #5fd39c;
+  --n-in-bg: rgb(23 116 74 / 0.3);
+  --n-out: #d9d0b8;
+  --n-out-bg: rgb(255 255 255 / 0.1);
+  --n-security: #ff9b6e;
+  --n-security-bg: rgb(168 64 26 / 0.3);
+  --n-statement: #8fb4f0;
+  --n-statement-bg: rgb(42 85 153 / 0.35);
+  --n-interest: #6fd6cb;
+  --n-interest-bg: rgb(15 107 99 / 0.35);
+  --n-generic: #d9d0b8;
+  --n-generic-bg: rgb(255 255 255 / 0.1);
+  --n-skeleton-a: rgb(255 255 255 / 0.06);
+  --n-skeleton-b: rgb(255 255 255 / 0.12);
+}
+.notif-muted { color: var(--n-muted); }
+.notif-dot { background: var(--n-dot); }
+.notif-detail { background: var(--n-detail); }
+.notif-in { color: var(--n-in); }
+.notif-tile-money_in { background: var(--n-in-bg); color: var(--n-in); }
+.notif-tile-money_out { background: var(--n-out-bg); color: var(--n-out); }
+.notif-tile-security { background: var(--n-security-bg); color: var(--n-security); }
+.notif-tile-statement { background: var(--n-statement-bg); color: var(--n-statement); }
+.notif-tile-interest { background: var(--n-interest-bg); color: var(--n-interest); }
+.notif-tile-generic { background: var(--n-generic-bg); color: var(--n-generic); }
+.notif-focus:focus-visible { outline: 2px solid var(--n-dot); outline-offset: 2px; }
+
+@keyframes notif-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.notif-shimmer {
+  background: linear-gradient(90deg, var(--n-skeleton-a) 25%, var(--n-skeleton-b) 50%, var(--n-skeleton-a) 75%);
+  background-size: 200% 100%;
+  animation: notif-shimmer 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .notif-shimmer { animation: none; }
+}

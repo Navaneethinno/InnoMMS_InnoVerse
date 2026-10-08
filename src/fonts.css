@@ -1,16 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap");
 
 :root {
-  /* Single application-wide font source. Plus Jakarta Sans reads noticeably
-     more compact/tighter than Inter (the previous choice) at the same size —
-     less "expanded" feeling, especially in dense data tables — while staying
-     just as clean and legible. */
+  /* Change the font here for the whole portal. When choosing a different
+     web font, update the import above in this same file as well. */
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-sans);
+  /* Display serif for the wordmark and big headings. */
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
 }
 
-body {
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Toastify has its own font token; use the application font there too. */
+.Toastify {
+  --toastify-font-family: var(--font-sans);
 }

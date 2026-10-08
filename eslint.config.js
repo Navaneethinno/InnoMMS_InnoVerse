@@ -1,33 +1,22 @@
-import eslint from "@eslint/js";
-import reactHooks from "eslint-plugin-react-hooks";
+import js from "@eslint/js";
 import globals from "globals";
-
+import hooks from "eslint-plugin-react-hooks";
 export default [
-  {
-    ignores: ["dist/**", "node_modules/**", ".codex-js/**"],
-  },
-  eslint.configs.recommended,
+  { ignores: ["dist/**", "node_modules/**"] },
+  js.configs.recommended,
   {
     files: ["**/*.{js,jsx}"],
     languageOptions: {
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        ecmaFeatures: { jsx: true },
-      },
+      globals: { ...globals.browser, ...globals.node },
+      parserOptions: { ecmaFeatures: { jsx: true } },
     },
-    plugins: {
-      "react-hooks": reactHooks,
-    },
+    plugins: { "react-hooks": hooks },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      "react-hooks/preserve-manual-memoization": "off",
-      "react-hooks/preserve-caught-error": "off",
-      "react-hooks/set-state-in-effect": "off",
-      "react-hooks/purity": "off",
-      "preserve-caught-error": "off",
-      "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      ...hooks.configs.recommended.rules,
+      "no-unused-vars": [
+        "error",
+        { varsIgnorePattern: "^[A-Z_]", argsIgnorePattern: "^_" },
+      ],
     },
   },
 ];

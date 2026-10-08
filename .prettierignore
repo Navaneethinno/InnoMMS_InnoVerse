@@ -1,3 +1,6 @@
-node_modules
-dist
+node_modules/
+dist/
+test-results/
+playwright-report/
+src/Router/routeSupport.jsx
 package-lock.json
