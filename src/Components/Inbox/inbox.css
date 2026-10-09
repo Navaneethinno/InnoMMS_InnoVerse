@@ -50,7 +50,7 @@
 .notif-tile-statement { background: var(--n-statement-bg); color: var(--n-statement); }
 .notif-tile-interest { background: var(--n-interest-bg); color: var(--n-interest); }
 .notif-tile-generic { background: var(--n-generic-bg); color: var(--n-generic); }
-.notif-focus:focus-visible { outline: 2px solid var(--n-dot); outline-offset: 2px; }
+.notif-focus:focus-visible { outline: 2px solid var(--n-dot); outline-offset: -2px; }
 
 @keyframes notif-shimmer {
   0% { background-position: 200% 0; }

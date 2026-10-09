@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { Move } from "lucide-react";
+import { PHONE_QUERY, useMediaQuery } from "@/Hooks/Layout/useMediaQuery";
 import { cn } from "@/Utils/Lib/utils";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -10,21 +11,9 @@ import { mergeVisible, stackItems, toGridItems } from "./gridLayout";
 import { GRID_COLS, MAX_SPAN, ROW_HEIGHT, WIDGET_REGISTRY } from "./widgetRegistry";
 
 const ResponsiveGrid = WidthProvider(Responsive);
-const PHONE = "(max-width: 767.98px)";
-
 // Below 768px the grid is not used: fixed row heights leave big gaps under
 // short widgets on a narrow screen. Each card is as tall as its content there,
 // never shorter than its smallest grid size (a chart needs the room).
-function usePhone() {
-  const [phone, setPhone] = useState(() => typeof window !== "undefined" && window.matchMedia(PHONE).matches);
-  useEffect(() => {
-    const query = window.matchMedia(PHONE);
-    const update = () => setPhone(query.matches);
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-  return phone;
-}
 const minHeight = (rows) => rows * ROW_HEIGHT + (rows - 1) * 16;
 
 // The widget grid (react-grid-layout). Each card has a cell position and a
@@ -43,7 +32,7 @@ export function DashboardGrid({ layout, visibleIds, setLayout, editing }) {
   const shown = useMemo(() => layout.filter((it) => visibleIds.has(it.id)), [layout, visibleIds]);
   const items = useMemo(() => toGridItems(WIDGET_REGISTRY, shown, { maxSpan: MAX_SPAN, editing: canEdit }), [shown, canEdit]);
   const stacked = useMemo(() => stackItems(items), [items]);
-  const phone = usePhone();
+  const phone = useMediaQuery(PHONE_QUERY);
 
   // Saved only when the user finishes a move or resize; changes the grid
   // makes on its own (mount, width changes) are never written back.
