@@ -28,31 +28,6 @@ import { isSuperAgent } from "@/Utils/Lib/roles";
 // sign-up from the list ("Continue").
 const kindKey = (who, kind) => `assisted-${who}-${kind}`;
 
-// A super agent may only sign up AGENTS (not super agents): offer those only.
-function agentsOnly(flowApi) {
-  return {
-    ...flowApi,
-    loadOptions: async (payload) => {
-      const options = await flowApi.loadOptions(payload);
-      const parties = (options?.party_types ?? [])
-        .filter((party) => party.name === "AGENT")
-        .map((party) => ({
-          ...party,
-          ownerships: (party.ownerships ?? []).map((o) => ({
-            ...o,
-            sub_types: (o.sub_types ?? []).filter(
-              (sub) => !/super/i.test(sub.name ?? ""),
-            ),
-          })),
-        }));
-      return {
-        ...options,
-        party_types: parties.length ? parties : (options?.party_types ?? []),
-      };
-    },
-  };
-}
-
 // `continuing`: open that sign-up (the wizard resumes the reference stored for
 // its flow); otherwise start clean. Written before the wizard reads it.
 function Wizard({ flowApi, storageKind, continuing, onSubmitted, heading }) {
@@ -93,12 +68,11 @@ export default function AssistedSignup() {
   const continuing = params.get("ref");
 
   const flowApi = useMemo(() => {
+    // The server offers a super agent only the types it may sign up (Agent tier).
     if (who === "agent")
-      return agentsOnly(
-        kind === "corporate"
-          ? assistedFlows.agentCorporate
-          : assistedFlows.agentIndividual,
-      );
+      return kind === "corporate"
+        ? assistedFlows.agentCorporate
+        : assistedFlows.agentIndividual;
     return kind === "corporate"
       ? assistedFlows.customerCorporate
       : assistedFlows.customerIndividual;

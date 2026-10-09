@@ -21,6 +21,9 @@ export function mePatchFrom(me) {
     // manager or cashier the `staff` block (role, stores, refund limit).
     ...(me?.party_type ? { partyType: me.party_type } : {}),
     ...(Array.isArray(me?.roles) ? { roles: me.roles } : {}),
+    // The rule the server checks when the owner sets a store user's PIN (it can
+    // differ from the owner's own `pin_rules`).
+    ...(me?.staff_pin_rules ? { staffPinRules: pinRulesFrom(me.staff_pin_rules) } : {}),
     ...(me ? { superAgent: me.super_agent ?? null, staff: me.staff ?? null } : {}),
     ...(me?.name ? { name: me.name } : {}),
   };

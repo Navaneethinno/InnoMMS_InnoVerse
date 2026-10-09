@@ -36,6 +36,7 @@ import { sendableWallets } from "@/Utils/Lib/roles";
 // Both go form -> quote (the confirmation screen) -> send. The PIN is asked
 // only when `pin_required`. One `client_reference` is made per attempt and
 // reused when retrying, so a timeout and a retry can never pay twice.
+const refundableOf = (payment) => payment?.refundable ?? payment?.amount;
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 export default function Send() {
@@ -122,7 +123,7 @@ export default function Send() {
   // null goes back to the list.
   const pick = useCallback((payment) => {
     setPicked(payment);
-    setForm((previous) => ({ ...previous, amount: payment ? String(payment.amount ?? "") : "" }));
+    setForm((previous) => ({ ...previous, amount: payment ? String(refundableOf(payment) ?? "") : "" }));
   }, []);
 
   const switchMode = (next) => {
@@ -163,6 +164,7 @@ export default function Send() {
         amount: form.amount,
         fromAcctNum: form.from,
         clientReference: reference.current,
+        expectedCharge: quote.fee?.total_charge,
         pin: quote.pin_required ? pin : "",
         note: form.note.trim(),
       });
@@ -174,6 +176,17 @@ export default function Send() {
       scrollToTop();
     } catch (error) {
       fail(error);
+      // The fee changed since the quote (nothing was posted): show the new
+      // figures, with the API's message naming the new charge, as a new attempt.
+      if (error.errorCode === "txn.quote_changed") {
+        try {
+          setQuote(await quotePayment({ ...target(), amount: form.amount, fromAcctNum: form.from }));
+          setPin("");
+          reference.current = newReference();
+        } catch {
+          setQuote(null);
+        }
+      }
     } finally {
       setPending(false);
     }
@@ -370,7 +383,10 @@ export default function Send() {
   const currency = refunding ? picked?.currency_code : payee?.currency_code;
   const selectedWallet = wallets?.find((w) => w.acct_num === form.from) ?? wallets?.find((w) => w.currency_code === currency) ?? wallets?.[0];
   // A refund returns at most what was paid.
-  const overRefund = refunding && picked && Number(form.amount) > Number(picked.amount);
+  // A refund returns at most what is still refundable (the payment less its
+  // earlier refunds: `refundable`), else the whole payment.
+  const refundMax = picked ? refundableOf(picked) : null;
+  const overRefund = refunding && picked && Number(form.amount) > Number(refundMax);
   const ready = refunding ? Boolean(picked) && !overRefund : (payee || unknown) && !checking && !payeeIsMerchant;
   return (
     <div>
@@ -421,12 +437,12 @@ export default function Send() {
             inputMode="decimal"
             autoComplete="off"
             value={form.amount}
-            error={overRefund ? t("refund.tooMuch", { amount: formatMoney(picked.amount, picked.currency_code) }) : undefined}
+            error={overRefund ? t("refund.tooMuch", { amount: formatMoney(refundMax, picked.currency_code) }) : undefined}
             onChange={(event) => setForm((previous) => ({ ...previous, amount: event.target.value.replace(/[^\d.]/g, "") }))}
           />
-          {refunding && picked && Number(form.amount) !== Number(picked.amount) && !overRefund && (
-            <button type="button" onClick={() => setForm((previous) => ({ ...previous, amount: String(picked.amount) }))} className="mt-2 text-xs font-bold text-ink underline-offset-2 hover:underline">
-              {t("refund.full", { amount: formatMoney(picked.amount, picked.currency_code) })}
+          {refunding && picked && Number(form.amount) !== Number(refundMax) && !overRefund && (
+            <button type="button" onClick={() => setForm((previous) => ({ ...previous, amount: String(refundMax) }))} className="mt-2 text-xs font-bold text-ink underline-offset-2 hover:underline">
+              {t("refund.full", { amount: formatMoney(refundMax, picked.currency_code) })}
             </button>
           )}
         </div>

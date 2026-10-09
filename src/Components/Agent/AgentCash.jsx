@@ -46,15 +46,12 @@ const ACTIONS = {
 };
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-// What the agent earns on this transaction: their AGENT share, plus the
-// SUPER_AGENT share when nobody is above them (handoff, phase 3).
-function earnedOf(quote, user) {
-  const shares = quote?.fee?.shares ?? [];
-  const amountOf = (purpose) =>
-    Number(shares.find((s) => s.purpose === purpose)?.amount ?? 0);
-  const noneAbove = isSuperAgent(user) || !user?.superAgent;
-  const total = amountOf("AGENT") + (noneAbove ? amountOf("SUPER_AGENT") : 0);
-  return total > 0 ? total : null;
+// What the agent earns on this transaction: the server's `agent_earns` (the
+// shares paid to the serving agent, a super agent's share included when nobody
+// is above them).
+function earnedOf(quote) {
+  const earned = Number(quote?.agent_earns);
+  return Number.isFinite(earned) && earned > 0 ? quote.agent_earns : null;
 }
 
 export default function AgentCash() {
@@ -114,12 +111,13 @@ export default function AgentCash() {
     if (searchParams.toString()) setSearchParams({}, { replace: true });
   };
 
-  // Who the money is about: the customer (cash in / out) or the other agent.
+  // Who the money is about: the customer (cash in and cash out both name them
+  // with customer_phone_number) or, for float, the other agent.
   const target = () => {
     const phone = form.phone.trim();
-    return cashOut
-      ? { txnType: action.txnType, customerPhone: phone }
-      : { txnType: action.txnType, toPhone: phone };
+    return mode === "float"
+      ? { txnType: action.txnType, toPhone: phone }
+      : { txnType: action.txnType, customerPhone: phone };
   };
 
   const review = async (event) => {
@@ -148,6 +146,8 @@ export default function AgentCash() {
         ...target(),
         amount: form.amount,
         clientReference: reference.current,
+        // The price guard: nothing is posted if the fee changed since the quote.
+        expectedCharge: quote.fee?.total_charge,
         // Cash-out: the customer's PIN. Otherwise the agent's, when asked.
         ...(cashOut
           ? { customerPin: pin }
@@ -159,8 +159,20 @@ export default function AgentCash() {
       scrollToTop();
     } catch (error) {
       fail(error);
-      // A wrong PIN can be typed again; anything else goes back to the agent.
-      if (error.errorCode !== "portal.pin_wrong") setStep("confirm");
+      if (error.errorCode === "txn.quote_changed") {
+        // The fee changed (nothing was posted): the agent checks the new
+        // figures, as a new attempt.
+        try {
+          setQuote(await quotePayment({ ...target(), amount: form.amount }));
+          reference.current = newReference();
+        } catch {
+          setQuote(null);
+        }
+        setStep("confirm");
+      } else if (error.errorCode !== "portal.pin_wrong") {
+        // A wrong PIN can be typed again; anything else goes back to the agent.
+        setStep("confirm");
+      }
     } finally {
       // The PIN is never kept after the call, right or wrong.
       setPin("");
@@ -298,7 +310,7 @@ export default function AgentCash() {
     const money = (value) => formatMoney(value, quote.currency_code);
     const amount = money(quote.amount);
     const customer = cashOut ? quote.from?.name : quote.to?.name;
-    const earned = earnedOf(quote, user);
+    const earned = earnedOf(quote);
     const charged = fee.total_charge != null && Number(fee.total_charge) !== 0;
     // What the agent does, in one sentence.
     const instruction =

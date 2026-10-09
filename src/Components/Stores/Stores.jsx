@@ -25,6 +25,7 @@ import PhoneField from "@/Components/Common/PhoneField";
 import SegmentedTabs from "@/Components/Common/SegmentedTabs";
 import TextField from "@/Components/Common/TextField";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
+import { DEFAULT_PIN_RULES } from "@/Utils/Lib/pinRules";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import {
   loadWallets,
@@ -94,6 +95,13 @@ const EMPTY_USER = {
   refund_limit: "",
   status: "ACTIVE",
 };
+
+// The rule for store users' PINs (auth/me staff_pin_rules), not the owner's own.
+function useStaffPinRules() {
+  const ownerRules = usePinRules();
+  const staff = useSelector((state) => state.auth.user?.staffPinRules);
+  return staff ? { ...DEFAULT_PIN_RULES, ...staff } : ownerRules;
+}
 
 const Badge = ({ tone, children }) => (
   <span
@@ -272,7 +280,7 @@ function StoreDialog({ store, onClose, onSaved }) {
 function UserDialog({ user, stores, onClose, onSaved }) {
   const { t } = useTranslation();
   const portalPolicy = usePortalPolicy();
-  const pinRules = usePinRules();
+  const pinRules = useStaffPinRules();
   const editing = Boolean(user?.id);
   const [form, setForm] = useState(() =>
     user
@@ -476,7 +484,7 @@ function UserDialog({ user, stores, onClose, onSaved }) {
 
 function PinDialog({ user, onClose }) {
   const { t } = useTranslation();
-  const pinRules = usePinRules();
+  const pinRules = useStaffPinRules();
   const [pin, setPin] = useState("");
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
@@ -577,6 +585,7 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
         reference.current = newReference();
       } else {
         await sendPayment({
+          expectedCharge: quote.fee?.total_charge,
           txnType: "STORE_SWEEP",
           ...ends,
           amount,
@@ -590,6 +599,8 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
       }
     } catch (error) {
       setProblem(error.message);
+      // The fee changed since the quote (nothing moved): review again.
+      if (error.errorCode === "txn.quote_changed") setQuote(null);
     } finally {
       setPin("");
       setPending(false);

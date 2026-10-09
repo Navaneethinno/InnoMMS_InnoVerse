@@ -901,4 +901,12 @@ export default {
   "history.txnType.AGENT_FLOAT_LOAD": "Float carregado",
   "history.txnType.AGENT_FLOAT_UNLOAD": "Float retirado",
   "history.txnType.STORE_SWEEP": "Movido entre carteiras",
+  "terminals.status.PENDING": "A aguardar o banco",
+  "terminals.status.ACTIVE": "Ativo",
+  "terminals.status.REJECTED": "Rejeitado",
+  "terminals.status.BLOCKED": "Bloqueado pelo banco",
+  "terminals.status.RETIRED": "Retirado",
+  "terminals.whoShort": "Quem pode entrar",
+  "terminals.someUsers": "{{count}} utilizadores escolhidos",
+  "terminals.allUsers": "Todos os utilizadores da loja",
 };

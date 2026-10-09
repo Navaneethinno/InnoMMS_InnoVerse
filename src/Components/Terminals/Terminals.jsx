@@ -24,19 +24,44 @@ import { cn } from "@/Utils/Lib/utils";
 // assigns them to the merchant; the owner places each in an Active store, names
 // it and may limit who signs in on it, and can ask the bank to block one (lost,
 // stolen, broken). A store manager sees its stores' terminals, read-only.
-// Terminal fields are read defensively: the list is "the same shape as admin's".
-const tidOf = (x) => x.tid ?? x.terminal_id ?? x.id;
-const storeIdOf = (x) => x.store_id ?? x.store?.id ?? null;
-const storeNameOf = (x, stores) =>
-  x.store_name ??
-  x.store?.name ??
-  stores?.find((s) => s.id === storeIdOf(x))?.name ??
-  null;
-const userIdsOf = (x) =>
-  (x.user_ids ?? (x.users ?? []).map((u) => u.id ?? u.portal_user_id)).filter(
-    (id) => id != null,
-  );
-const statusOf = (x) => String(x.status_name ?? x.status ?? "").toUpperCase();
+// terminal/list items: id, tid, serial_number, terminal_type(_name), make,
+// model, name, status (PENDING | ACTIVE | REJECTED | BLOCKED | RETIRED, no label:
+// ours below), merchant, store ({ id, code, name, status } or null), user_ids
+// ([] = every user of its store), block_requested_at, block_request_note,
+// last_seen_at, app_version, decision_note.
+const tidOf = (x) => x.tid ?? x.id;
+const storeIdOf = (x) => x.store?.id ?? null;
+const storeNameOf = (x) => x.store?.name ?? null;
+const userIdsOf = (x) => (x.user_ids ?? []).filter((id) => id != null);
+const STATUS = {
+  PENDING: [
+    "terminals.status.PENDING",
+    "Waiting for the bank",
+    "bg-amber-500/15 text-amber-700",
+  ],
+  ACTIVE: [
+    "terminals.status.ACTIVE",
+    "Active",
+    "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  ],
+  REJECTED: [
+    "terminals.status.REJECTED",
+    "Rejected",
+    "bg-red-500/15 text-red-700 dark:text-red-300",
+  ],
+  BLOCKED: [
+    "terminals.status.BLOCKED",
+    "Blocked by the bank",
+    "bg-red-500/15 text-red-700 dark:text-red-300",
+  ],
+  RETIRED: [
+    "terminals.status.RETIRED",
+    "Retired",
+    "bg-slate-500/15 text-slate-600",
+  ],
+};
+// Only an active terminal can be set up or reported.
+const usable = (x) => x.status === "ACTIVE";
 
 function SetupDialog({ terminal, stores, users, onClose, onSaved }) {
   const { t } = useTranslation();
@@ -301,14 +326,15 @@ export default function Terminals() {
       ) : (
         <ul className="grid gap-4 md:grid-cols-2">
           {terminals.map((terminal) => {
-            const status = statusOf(terminal);
-            const good = status === "ACTIVE" || status === "1";
-            const storeName = storeNameOf(terminal, stores);
+            const [statusKey, statusFallback, statusTone] = STATUS[
+              terminal.status
+            ] ?? [null, terminal.status, "bg-ink/5 text-ink"];
+            const storeName = storeNameOf(terminal);
             const rows = [
               [
                 t("terminals.type", { defaultValue: "Type" }),
                 [
-                  terminal.terminal_type ?? terminal.type,
+                  terminal.terminal_type_name ?? terminal.terminal_type,
                   terminal.make,
                   terminal.model,
                 ]
@@ -327,7 +353,25 @@ export default function Terminals() {
               [
                 t("terminals.lastSeen", { defaultValue: "Last seen" }),
                 terminal.last_seen_at
-                  ? formatDateTime(terminal.last_seen_at)
+                  ? [
+                      formatDateTime(terminal.last_seen_at),
+                      terminal.app_version && `v${terminal.app_version}`,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")
+                  : null,
+              ],
+              [
+                t("terminals.whoShort", { defaultValue: "Who may sign in" }),
+                storeName
+                  ? userIdsOf(terminal).length
+                    ? t("terminals.someUsers", {
+                        count: userIdsOf(terminal).length,
+                        defaultValue: "{{count}} chosen users",
+                      })
+                    : t("terminals.allUsers", {
+                        defaultValue: "Every user of the store",
+                      })
                   : null,
               ],
             ];
@@ -353,12 +397,12 @@ export default function Terminals() {
                   <span
                     className={cn(
                       "rounded-full px-2.5 py-0.5 text-[11px] font-bold",
-                      good
-                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                        : "bg-amber-500/15 text-amber-700",
+                      statusTone,
                     )}
                   >
-                    {terminal.status_name ?? terminal.status}
+                    {statusKey
+                      ? t(statusKey, { defaultValue: statusFallback })
+                      : statusFallback}
                   </span>
                 </div>
                 <dl className="mt-4 divide-y divide-slate-100 text-xs">
@@ -383,9 +427,16 @@ export default function Terminals() {
                       at: formatDateTime(terminal.block_requested_at),
                       defaultValue: "Block asked for on {{at}}",
                     })}
+                    {terminal.block_request_note &&
+                      ` · ${terminal.block_request_note}`}
                   </p>
                 )}
-                {owner && (
+                {terminal.decision_note && terminal.status !== "ACTIVE" && (
+                  <p className="mt-3 rounded-xl bg-ink/5 px-3 py-2 text-xs text-slate-600">
+                    {terminal.decision_note}
+                  </p>
+                )}
+                {owner && usable(terminal) && (
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Button
                       variant="secondary"

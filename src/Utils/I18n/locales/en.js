@@ -896,4 +896,12 @@ export default {
   "history.txnType.AGENT_FLOAT_LOAD": "Float loaded",
   "history.txnType.AGENT_FLOAT_UNLOAD": "Float withdrawn",
   "history.txnType.STORE_SWEEP": "Moved between wallets",
+  "terminals.status.PENDING": "Waiting for the bank",
+  "terminals.status.ACTIVE": "Active",
+  "terminals.status.REJECTED": "Rejected",
+  "terminals.status.BLOCKED": "Blocked by the bank",
+  "terminals.status.RETIRED": "Retired",
+  "terminals.whoShort": "Who may sign in",
+  "terminals.someUsers": "{{count}} chosen users",
+  "terminals.allUsers": "Every user of the store",
 };

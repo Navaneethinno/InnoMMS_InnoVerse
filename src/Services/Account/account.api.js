@@ -66,8 +66,9 @@ export const cancelPhoneTransfer = (id) => data(portalPost(ACCOUNT.PHONE_TRANSFE
 // has no account yet: the money waits for them).
 // A merchant's refund (MERCHANT_REFUND) names the payment it returns (`orgRrn`)
 // instead of a payee.
-// An agent's cash-out names the customer who pays (`customer_phone_number`)
-// instead of a payee; a store sweep names both of the owner's wallets.
+// Agent cash-in and cash-out name the customer (`customer_phone_number`, or
+// `customer_acct_num`) instead of a payee; a store sweep names both of the
+// owner's wallets.
 const targetBody = ({ toAcctNum, toPhone, orgRrn, customerPhone }) =>
   orgRrn ? { org_rrn: orgRrn } : customerPhone ? { customer_phone_number: customerPhone } : payeeBody({ toAcctNum, toPhone });
 export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, amount, fromAcctNum }) =>
@@ -78,12 +79,16 @@ export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhon
 // first payment with `replayed: true`).
 // `customerPin`: on an agent's cash-out the customer approves with their own PIN
 // (the agent's is not asked).
-export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, customerPin, amount, fromAcctNum, clientReference, pin, note }) =>
+// `expectedCharge` (the quote's fee.total_charge) guards the price: if the fee
+// at send time differs, nothing is posted and the reply is 409
+// txn.quote_changed (re-quote and show the new figures).
+export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, customerPin, amount, fromAcctNum, clientReference, pin, note, expectedCharge }) =>
   data(
     portalPost(ACCOUNT.SEND, {
       txn_type: txnType,
       ...targetBody({ toAcctNum, toPhone, orgRrn, customerPhone }),
       ...(customerPin ? { customer_pin: customerPin } : {}),
+      ...(expectedCharge != null && expectedCharge !== "" ? { expected_total_charge: expectedCharge } : {}),
       amount,
       ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}),
       client_reference: clientReference,
