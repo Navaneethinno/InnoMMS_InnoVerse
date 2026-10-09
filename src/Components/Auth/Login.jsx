@@ -132,6 +132,19 @@ export default function Login() {
             {t("auth.title")}
           </h1>
           <p className="mt-2 text-[14.5px] text-slate-500">{t("auth.description")}</p>
+          {/* One sign-in for everyone in this portal: merchants, agents and
+              super agents, and store managers and cashiers. */}
+          <p className="mt-3 inline-flex flex-wrap gap-1.5">
+            {[
+              ["auth.whoMerchant", "Merchants"],
+              ["auth.whoAgent", "Agents"],
+              ["auth.whoStaff", "Store staff"],
+            ].map(([key, fallback]) => (
+              <span key={key} className="rounded-full bg-ink/5 px-2.5 py-1 text-[11px] font-semibold text-ink/70">
+                {t(key, { defaultValue: fallback })}
+              </span>
+            ))}
+          </p>
           {error && (
             <div className="mt-4">
               <ErrorState message={error.message} />
@@ -238,6 +251,11 @@ export default function Login() {
                 {byPin ? t("auth.forgotPin", { defaultValue: "Forgot PIN?" }) : t("auth.forgot")}
               </button>
             </div>
+            {byPin && (
+              <p className="-mt-1 text-[11px] leading-4 text-slate-500">
+                {t("auth.staffPinHint", { defaultValue: "Store manager or cashier? Your store's owner resets your PIN." })}
+              </p>
+            )}
             <Button
               type="submit"
               animated

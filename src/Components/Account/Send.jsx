@@ -24,7 +24,7 @@ import RecentPayees from "./RecentPayees";
 import RefundPicker from "./RefundPicker";
 import WalletPanel from "./WalletPanel";
 import { TransactionPinNotice, useNeedsTransactionPin } from "./TransactionPinSetup";
-import { sendableWallets } from "@/Utils/Lib/roles";
+import { isStaff, sendableWallets } from "@/Utils/Lib/roles";
 
 // Money out of the merchant's wallet, two ways:
 //  - "send": to a person by their number (P2P_TRANSFER). A number with no
@@ -47,7 +47,9 @@ export default function Send() {
   const needsTxnPin = useNeedsTransactionPin();
   const [searchParams, setSearchParams] = useSearchParams();
   const refundRrn = searchParams.get("refund");
-  const [mode, setMode] = useState(refundRrn ? "refund" : "send");
+  // A store manager may only refund payments made at its stores (handoff, phase 5).
+  const refundOnly = isStaff(user);
+  const [mode, setMode] = useState(refundRrn || refundOnly ? "refund" : "send");
   const [allWallets, setAllWallets] = useState(null);
   // Sending and refunds use the merchant's own money only: the agent wallet and
   // an owner's store wallets are refused here (portal.wallet_unknown).
@@ -223,7 +225,7 @@ export default function Send() {
         <h1 className="text-2xl font-black tracking-tight text-slate-800">{refunding ? t("refund.title", { defaultValue: "Refund a payment" }) : t("send.title")}</h1>
         <p className="mt-1 text-sm text-slate-500">{refunding ? t("refund.subtitle", { defaultValue: "Return money to a customer who paid you." }) : t("send.subtitle")}</p>
       </div>
-      {!quote && !paid && (
+      {!quote && !paid && !refundOnly && (
         <SegmentedTabs
           items={[
             { key: "send", label: t("send.modeSend", { defaultValue: "Send money" }) },
@@ -387,7 +389,10 @@ export default function Send() {
   // earlier refunds: `refundable`), else the whole payment.
   const refundMax = picked ? refundableOf(picked) : null;
   const overRefund = refunding && picked && Number(form.amount) > Number(refundMax);
-  const ready = refunding ? Boolean(picked) && !overRefund : (payee || unknown) && !checking && !payeeIsMerchant;
+  // A store manager's own limit: above it the merchant must refund.
+  const staffLimit = refundOnly && user?.staff?.refund_limit != null ? Number(user.staff.refund_limit) : null;
+  const overLimit = staffLimit != null && Number(form.amount) > staffLimit;
+  const ready = refunding ? Boolean(picked) && !overRefund && !overLimit : (payee || unknown) && !checking && !payeeIsMerchant;
   return (
     <div>
       {heading}
@@ -437,7 +442,13 @@ export default function Send() {
             inputMode="decimal"
             autoComplete="off"
             value={form.amount}
-            error={overRefund ? t("refund.tooMuch", { amount: formatMoney(refundMax, picked.currency_code) }) : undefined}
+            error={
+              overRefund
+                ? t("refund.tooMuch", { amount: formatMoney(refundMax, picked.currency_code) })
+                : overLimit
+                  ? t("refund.overLimit", { amount: formatMoney(staffLimit, picked?.currency_code), defaultValue: "Your refund limit is {{amount}}. Larger refunds need the merchant." })
+                  : undefined
+            }
             onChange={(event) => setForm((previous) => ({ ...previous, amount: event.target.value.replace(/[^\d.]/g, "") }))}
           />
           {refunding && picked && Number(form.amount) !== Number(refundMax) && !overRefund && (

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ArrowRightLeft,
@@ -760,7 +761,15 @@ export default function Stores() {
   const owner = isOwner(user);
   // A cashier may list stores only; a manager also sees users and wallets.
   const canSeeUsers = owner || staffRole(user) === "STORE_MANAGER";
-  const [tab, setTab] = useState("stores");
+  // ?tab=wallets&move=<acct_num>: the dashboard's "Move money" on a store wallet.
+  const [params, setParams] = useSearchParams();
+  const [tab, setTab] = useState(
+    params.get("tab") === "wallets"
+      ? "wallets"
+      : params.get("tab") === "users"
+        ? "users"
+        : "stores",
+  );
   const [stores, setStores] = useState(null);
   const [users, setUsers] = useState(null);
   const [wallets, setWallets] = useState(null);
@@ -819,6 +828,18 @@ export default function Stores() {
     (w) => w.wallet_purpose === "STORE",
   );
   const mainWallets = (wallets ?? []).filter(isOwnMoney);
+  // Open the Move money dialog the dashboard asked for, once the wallets are in.
+  const moveAcct = params.get("move");
+  const moveWallet = moveAcct
+    ? storeWallets.find((w) => w.acct_num === moveAcct)
+    : null;
+  const canMove = Boolean(moveWallet && owner && mainWallets.length);
+  useEffect(() => {
+    if (!canMove) return;
+    setParams({ tab: "wallets" }, { replace: true });
+    setDialog({ kind: "sweep", wallet: moveWallet });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canMove]);
   const storeName = (id) => stores?.find((s) => s.id === id)?.name;
   const tabs = [
     { key: "stores", label: t("stores.tab", { defaultValue: "Stores" }) },

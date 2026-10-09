@@ -7,6 +7,8 @@ import {
   Sparkles,
   UserRound,
   Building2,
+  Banknote,
+  Store,
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -16,6 +18,15 @@ import Footer from "@/Components/Layout/Footer";
 import IndividualOnboardingWizard from "./IndividualOnboardingWizard";
 import CorporateOnboardingWizard from "./CorporateOnboardingWizard";
 import { corporateOnboardingFlow } from "@/Services/Onboarding/corporateOnboarding.api";
+import { individualOnboardingFlow } from "@/Services/Onboarding/individualOnboarding.api";
+
+// Who is signing up (Agents, stores and POS, phase 1): agents sign up and sign
+// in through this same portal. Offered when the bank's options list the AGENT
+// party type; the form then shows only that party's categories.
+const PARTIES = [
+  { value: "MERCHANT", labelKey: "signup.asMerchant", fallback: "As a merchant", icon: Store },
+  { value: "AGENT", labelKey: "signup.asAgent", fallback: "As an agent", icon: Banknote },
+];
 
 // Which onboarding flow the picker below routes to — an individual pick
 // runs IndividualOnboardingWizard, a corporate pick runs
@@ -44,6 +55,24 @@ export default function SignUp() {
   // merchant type (its options list party types); until that is known, and
   // when there is none, only Individual shows.
   const [corporateOffered, setCorporateOffered] = useState(false);
+  // MERCHANT or AGENT, once the bank is known to offer agents.
+  const [agentOffered, setAgentOffered] = useState(false);
+  const [partyType, setPartyType] = useState("MERCHANT");
+  // The party types the bank has a company form for.
+  const [corporateParties, setCorporateParties] = useState([]);
+  useEffect(() => {
+    let live = true;
+    Promise.allSettled([individualOnboardingFlow.loadOptions(), corporateOnboardingFlow.loadOptions()]).then((results) => {
+      if (!live) return;
+      const namesOf = (r) => (r.status === "fulfilled" ? (r.value?.party_types ?? []).map((p) => p.name) : []);
+      const names = [...namesOf(results[0]), ...namesOf(results[1])];
+      setCorporateParties(namesOf(results[1]));
+      setAgentOffered(names.includes("AGENT") && names.includes("MERCHANT"));
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
   useEffect(() => {
     let cancelled = false;
     corporateOnboardingFlow
@@ -114,7 +143,41 @@ export default function SignUp() {
         <div
           className={`mx-auto w-full ${formActive ? "max-w-6xl pt-8" : "max-w-3xl pt-0"}`}
         >
-          {!formActive && corporateOffered && (
+          {!formActive && agentOffered && (
+            <div className="mt-8 text-center">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-ink/60">
+                {t("signup.whoAreYou", { defaultValue: "Sign up" })}
+              </p>
+              <div className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm">
+                {PARTIES.map((party) => {
+                  const PartyIcon = party.icon;
+                  return (
+                    <button
+                      key={party.value}
+                      type="button"
+                      onClick={() => {
+                        setPartyType(party.value);
+                        if (!corporateParties.includes(party.value)) setMerchantKind("individual");
+                      }}
+                      className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-semibold transition ${
+                        partyType === party.value ? "bg-forest text-white dark:bg-lime dark:text-on-secondary" : "text-ink/70 hover:bg-ink/5"
+                      }`}
+                    >
+                      <PartyIcon size={15} /> {t(party.labelKey, { defaultValue: party.fallback })}
+                    </button>
+                  );
+                })}
+              </div>
+              {partyType === "AGENT" && (
+                <p className="mx-auto mt-3 max-w-md text-xs text-slate-500">
+                  {t("signup.agentNote", {
+                    defaultValue: "Agents serve customers with cash in and cash out. After the bank approves you, sign in here with your phone and PIN.",
+                  })}
+                </p>
+              )}
+            </div>
+          )}
+          {!formActive && corporateOffered && (!agentOffered || corporateParties.includes(partyType)) && (
             <div className="mt-8 flex justify-center">
               <div className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm">
                 {MERCHANT_KINDS.map((kind) => {
@@ -146,11 +209,15 @@ export default function SignUp() {
           >
             {merchantKind === "corporate" ? (
               <CorporateOnboardingWizard
+                key={`corporate-${partyType}`}
+                partyType={agentOffered ? partyType : undefined}
                 onSubmitted={() => navigate("/login")}
                 onActiveChange={setFormActive}
               />
             ) : (
               <IndividualOnboardingWizard
+                key={`individual-${partyType}`}
+                partyType={agentOffered ? partyType : undefined}
                 onSubmitted={() => navigate("/login")}
                 onActiveChange={setFormActive}
                 tourRequest={tourRequest}

@@ -10,9 +10,9 @@ import OnboardingWizardView from "./OnboardingWizardView";
 // their own information, one section at a time. Everything except the
 // heading is the shared OnboardingWizardView, driven by
 // useIndividualOnboardingWizard.
-export default function IndividualOnboardingWizard({ onSubmitted, onActiveChange, tourRequest }) {
+export default function IndividualOnboardingWizard({ onSubmitted, onActiveChange, tourRequest, partyType }) {
   const { t } = useTranslation();
-  const flow = useIndividualOnboardingWizard();
+  const flow = useIndividualOnboardingWizard({ partyType });
   const identityFields = <CategoryField flow={flow} icon={Users} heading={t("onb.aboutYou")} />;
   return <OnboardingWizardView flow={flow} identityFields={identityFields} onSubmitted={onSubmitted} onActiveChange={onActiveChange} tourRequest={tourRequest} tourEnabled />;
 }

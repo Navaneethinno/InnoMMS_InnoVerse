@@ -135,7 +135,9 @@ const INITIAL_PICK = { category: "", email: "", phone_number: "" };
 // `flowApi.autoStart` is for a flow with no picker (the signed-in KYC upgrade):
 // the screen is asked for as soon as the page opens, and `onLeave` is called
 // when it is submitted or dropped instead of going back to the picker.
-export function useOnboardingWizard({ flowApi, kind, onLeave }) {
+// `partyType` (MERCHANT | AGENT): only that party's categories are offered, when
+// the options have it (the sign-up page's "as a merchant / as an agent").
+export function useOnboardingWizard({ flowApi, kind, onLeave, partyType }) {
   const { t } = useTranslation();
   const initialPick = INITIAL_PICK;
   const [options, setOptions] = useState(null);
@@ -308,7 +310,11 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
 
   // Only what the merchant actually gave is sent (an `add` with just the
   // contact carries on with whatever that contact already has open).
-  const categories = useMemo(() => buildCategories(options, t), [options, t]);
+  const categories = useMemo(() => {
+    const parties = options?.party_types ?? [];
+    const only = partyType && parties.some((p) => p.name === partyType) ? { ...options, party_types: parties.filter((p) => p.name === partyType) } : options;
+    return buildCategories(only, t);
+  }, [options, t, partyType]);
   const chosenCategory =
     categories.find((c) => c.value === pick.category) ?? (categories.length === 1 ? categories[0] : null);
   const buildStartPayload = () =>

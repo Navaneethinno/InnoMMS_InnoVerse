@@ -17,9 +17,20 @@ const Status = ({ loading, error, empty, children }) => {
   return children;
 };
 
+// A wallet's title on the dashboard: an agent's money is split into "My money"
+// and "Agent wallet" (handoff, phase 2); a store wallet carries its store.
+function walletTitle(wallet, t, hasSpecial) {
+  if (wallet.wallet_purpose === "AGENT_FLOAT") return t("wallet.purpose.AGENT_FLOAT", { defaultValue: "Agent wallet" });
+  if (wallet.wallet_purpose === "STORE") return wallet.store_name ?? t("wallet.purpose.STORE", { defaultValue: "Store wallet" });
+  if (hasSpecial) return t("wallet.myMoney", { defaultValue: "My money" });
+  return wallet.acct_product_name ?? wallet.digital_product_name ?? wallet.acct_num;
+}
+
 export function WalletsWidget() {
   const { t } = useTranslation();
   const { wallets, loading, walletsError: error } = useAccountData();
+  const owner = !useSelector((state) => state.auth.user?.staff);
+  const hasSpecial = (wallets ?? []).some((w) => w.wallet_purpose === "AGENT_FLOAT" || w.wallet_purpose === "STORE");
   return (
     <WidgetCard title={t("dash.accounts")} icon={Landmark}>
       <Status loading={loading && !wallets} error={!wallets && error} empty={wallets?.length === 0 && t("dash.noWallets")}>
@@ -28,12 +39,22 @@ export function WalletsWidget() {
             <li key={wallet.acct_num} className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl bg-slate-100/70 px-3 py-2.5">
               <div className="min-w-[7rem] flex-1">
                 <p title={wallet.acct_product_name ?? wallet.digital_product_name} className="line-clamp-2 break-words text-xs font-bold text-slate-800">
-                  {wallet.acct_product_name ?? wallet.digital_product_name ?? wallet.acct_num}
+                  {walletTitle(wallet, t, hasSpecial)}
                 </p>
                 <p className="break-all text-[11px] text-slate-500">{wallet.acct_num}</p>
                 <WalletBadges wallet={wallet} className="mt-1" />
               </div>
               <FitText max={13} min={9} className="w-full text-right font-bold text-slate-800">{formatMoney(wallet.avail_bal, wallet.currency_code)}</FitText>
+              {wallet.wallet_purpose === "AGENT_FLOAT" && (
+                <Link to="/agent" className="text-[11px] font-bold text-ink hover:underline">
+                  {t("agent.title", { defaultValue: "Cash in / out" })} →
+                </Link>
+              )}
+              {wallet.wallet_purpose === "STORE" && owner && (
+                <Link to={`/stores?tab=wallets&move=${encodeURIComponent(wallet.acct_num)}`} className="text-[11px] font-bold text-ink hover:underline">
+                  {t("storeWallets.move", { defaultValue: "Move money" })} →
+                </Link>
+              )}
             </li>
           ))}
         </ul>
