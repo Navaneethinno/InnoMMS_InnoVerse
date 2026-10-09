@@ -66,18 +66,24 @@ export const cancelPhoneTransfer = (id) => data(portalPost(ACCOUNT.PHONE_TRANSFE
 // has no account yet: the money waits for them).
 // A merchant's refund (MERCHANT_REFUND) names the payment it returns (`orgRrn`)
 // instead of a payee.
-const targetBody = ({ toAcctNum, toPhone, orgRrn }) => (orgRrn ? { org_rrn: orgRrn } : payeeBody({ toAcctNum, toPhone }));
-export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, amount, fromAcctNum }) =>
-  data(portalPost(ACCOUNT.QUOTE, { txn_type: txnType, ...targetBody({ toAcctNum, toPhone, orgRrn }), amount, ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}) }));
+// An agent's cash-out names the customer who pays (`customer_phone_number`)
+// instead of a payee; a store sweep names both of the owner's wallets.
+const targetBody = ({ toAcctNum, toPhone, orgRrn, customerPhone }) =>
+  orgRrn ? { org_rrn: orgRrn } : customerPhone ? { customer_phone_number: customerPhone } : payeeBody({ toAcctNum, toPhone });
+export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, amount, fromAcctNum }) =>
+  data(portalPost(ACCOUNT.QUOTE, { txn_type: txnType, ...targetBody({ toAcctNum, toPhone, orgRrn, customerPhone }), amount, ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}) }));
 
 // Makes the payment. `clientReference` is one per attempt and is reused when
 // retrying: the same reference never pays twice (the second call returns the
 // first payment with `replayed: true`).
-export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, amount, fromAcctNum, clientReference, pin, note }) =>
+// `customerPin`: on an agent's cash-out the customer approves with their own PIN
+// (the agent's is not asked).
+export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, customerPin, amount, fromAcctNum, clientReference, pin, note }) =>
   data(
     portalPost(ACCOUNT.SEND, {
       txn_type: txnType,
-      ...targetBody({ toAcctNum, toPhone, orgRrn }),
+      ...targetBody({ toAcctNum, toPhone, orgRrn, customerPhone }),
+      ...(customerPin ? { customer_pin: customerPin } : {}),
       amount,
       ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}),
       client_reference: clientReference,

@@ -9,6 +9,12 @@ const Inbox = lazy(() => import("@/Components/Inbox/Inbox"));
 const Profile = lazy(() => import("@/Components/Profile/Profile"));
 const KycUpgrade = lazy(() => import("@/Components/Kyc/KycUpgrade"));
 const Statements = lazy(() => import("@/Components/Statements/Statements"));
+const AgentCash = lazy(() => import("@/Components/Agent/AgentCash"));
+const Signups = lazy(() => import("@/Components/Agent/Signups"));
+const AssistedSignup = lazy(() => import("@/Components/Agent/AssistedSignup"));
+const MyAgents = lazy(() => import("@/Components/Agent/MyAgents"));
+const Stores = lazy(() => import("@/Components/Stores/Stores"));
+const Terminals = lazy(() => import("@/Components/Terminals/Terminals"));
 export const dashboardRoutes = [
   { path: "dashboard", element: pageElement(Dashboard) },
   { path: "send", element: pageElement(Send) },
@@ -19,4 +25,10 @@ export const dashboardRoutes = [
   { path: "profile", element: pageElement(Profile) },
   { path: "verification", element: pageElement(KycUpgrade) },
   { path: "security", element: pageElement(Security) },
+  { path: "agent", element: pageElement(AgentCash) },
+  { path: "signups", element: pageElement(Signups) },
+  { path: "signups/new", element: pageElement(AssistedSignup) },
+  { path: "my-agents", element: pageElement(MyAgents) },
+  { path: "stores", element: pageElement(Stores) },
+  { path: "terminals", element: pageElement(Terminals) },
 ];

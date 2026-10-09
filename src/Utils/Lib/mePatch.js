@@ -16,5 +16,12 @@ export function mePatchFrom(me) {
     ...(typeof me?.password_set === "boolean" ? { passwordSet: me.password_set } : {}),
     ...(me?.timezone ? { timezone: me.timezone } : {}),
     ...(me?.avatar ? { avatar: me.avatar } : {}),
+    // Agents, stores and POS: what they signed up as, their roles (MERCHANT,
+    // AGENT, SUPER_AGENT, any mix), an agent's super agent, and for a store
+    // manager or cashier the `staff` block (role, stores, refund limit).
+    ...(me?.party_type ? { partyType: me.party_type } : {}),
+    ...(Array.isArray(me?.roles) ? { roles: me.roles } : {}),
+    ...(me ? { superAgent: me.super_agent ?? null, staff: me.staff ?? null } : {}),
+    ...(me?.name ? { name: me.name } : {}),
   };
 }

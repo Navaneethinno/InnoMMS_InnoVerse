@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Bell, CreditCard, FileText, History, LayoutDashboard, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowRightLeft, Banknote, Bell, CreditCard, FileText, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Store, UserPlus, UserRound, Users } from "lucide-react";
 
 // Ordered by merchant navigation. Extend only when actual screens are added.
 export const routeConfig = { login: { titleKey: "auth.title" } };
@@ -15,6 +15,12 @@ export const navScreens = {
   notifications: { to: "/notifications", labelKey: "nav.notifications", icon: Bell },
   profile: { to: "/profile", labelKey: "nav.profile", icon: UserRound },
   security: { to: "/security", labelKey: "nav.security", icon: ShieldCheck },
+  // Agents, stores and POS (shown only when the API's menu lists them).
+  agent: { to: "/agent", labelKey: "nav.agent", icon: Banknote },
+  signups: { to: "/signups", labelKey: "nav.signups", icon: UserPlus },
+  my_agents: { to: "/my-agents", labelKey: "nav.myAgents", icon: Users },
+  stores: { to: "/stores", labelKey: "nav.stores", icon: Store },
+  terminals: { to: "/terminals", labelKey: "nav.terminals", icon: MonitorSmartphone },
 };
 
 // What the sidebar shows until the menu has been fetched (or when it cannot be).

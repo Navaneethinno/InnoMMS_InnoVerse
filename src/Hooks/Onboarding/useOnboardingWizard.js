@@ -92,12 +92,24 @@ function toFormats(value) {
 // The category choice from the `options` reply: every sub type is a
 // category, and an ownership that has a `definition_id` also allows
 // registering with no category ("Standard": no sub_type_id is sent).
+// With more than one party type (a merchant portal that also signs up agents),
+// each choice says which it is: "Merchant · National", "Agent · Super Agent".
+const PARTY_LABEL = { MERCHANT: ["roles.merchant", "Merchant"], AGENT: ["roles.agent", "Agent"], CUSTOMER: ["roles.customer", "Customer"] };
 function buildCategories(options, t) {
   const list = [];
-  for (const party of options?.party_types ?? []) {
+  const parties = options?.party_types ?? [];
+  const partyName = (party) => {
+    const known = PARTY_LABEL[party.name];
+    return known ? t(known[0], { defaultValue: known[1] }) : party.name;
+  };
+  // A sub type listed under two party types needs the party type named on `add`.
+  const subSeen = {};
+  for (const party of parties) for (const o of party.ownerships ?? []) for (const sub of o.sub_types ?? []) subSeen[sub.id] = (subSeen[sub.id] ?? 0) + 1;
+  for (const party of parties) {
+    const prefix = parties.length > 1 ? `${partyName(party)} · ` : "";
     for (const ownership of party.ownerships ?? []) {
       for (const sub of ownership.sub_types ?? [])
-        list.push({ value: `sub:${sub.id}`, param: "sub_type_id", id: sub.id, label: sub.name, group: ownership.name });
+        list.push({ value: `sub:${sub.id}`, param: "sub_type_id", id: sub.id, label: `${prefix}${sub.name}`, group: ownership.name, partyTypeId: subSeen[sub.id] > 1 ? party.id : null });
       if (ownership.definition_id != null)
         list.push({ value: `standard:${ownership.id}`, param: null, id: null, label: t("onb.standard"), group: ownership.name });
     }
@@ -302,6 +314,8 @@ export function useOnboardingWizard({ flowApi, kind, onLeave }) {
   const buildStartPayload = () =>
     compactPayload({
       ...(chosenCategory?.param ? { [chosenCategory.param]: chosenCategory.id } : {}),
+      // Only when the same sub type is both a merchant and an agent type.
+      ...(chosenCategory?.partyTypeId ? { party_type_id: chosenCategory.partyTypeId } : {}),
       email: pick.email.trim(),
       phone_number: pick.phone_number.trim(),
     });

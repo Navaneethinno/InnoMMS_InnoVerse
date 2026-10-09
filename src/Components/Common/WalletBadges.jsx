@@ -12,9 +12,18 @@ export default function WalletBadges({ wallet, className }) {
   const restriction = wallet?.restriction;
   // `owner` is there only on a shared wallet (a joint holder's, a guardian's).
   const owner = wallet?.owner?.name;
-  if (!restriction && !owner) return null;
+  // An agent's float and a store's own wallet are not "my money": say so.
+  const purpose = wallet?.wallet_purpose === "AGENT_FLOAT" || wallet?.wallet_purpose === "STORE" ? wallet.wallet_purpose : null;
+  if (!restriction && !owner && !purpose) return null;
   return (
     <div className={cn("flex flex-wrap gap-1.5", className)}>
+      {purpose && (
+        <span className="rounded-full bg-lime/25 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink">
+          {purpose === "AGENT_FLOAT"
+            ? t("wallet.purpose.AGENT_FLOAT", { defaultValue: "Agent wallet" })
+            : t("wallet.purpose.STORE", { defaultValue: "Store wallet" }) + (wallet.store_name ? ` · ${wallet.store_name}` : "")}
+        </span>
+      )}
       {restriction && (
         <span
           className={cn(

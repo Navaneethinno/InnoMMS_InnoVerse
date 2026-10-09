@@ -36,8 +36,11 @@ export const DIGITAL_PRODUCT_ID = import.meta.env.VITE_DIGITAL_PRODUCT_ID || "";
 export const INST_PROFILE_ID = Number(import.meta.env.VITE_INST_PROFILE_ID) || null;
 // One onboarding flow's calls: /merchant/{kind}/web/{call}, kind being
 // `individual` (a person) or `corporate` (a company).
-const onboardingEndpoints = (kind) => {
-  const path = (call) => `/merchant/${kind}/web/${call}`;
+// `base` overrides the path root: an agent's assisted sign-up runs the same
+// calls under /customer/{kind}/agent/ (customers) or /merchant/{kind}/agent/
+// (a super agent signing up agents).
+const onboardingEndpoints = (kind, base = `/merchant/${kind}/web`) => {
+  const path = (call) => `${base}/${call}`;
   return {
     OPTIONS: path("options"),
     ADD: path("add"),
@@ -67,6 +70,9 @@ const dashboardPath = channelPath("dashboard");
 const profilePath = channelPath("profile");
 const kycPath = channelPath("kyc");
 const contactsPath = channelPath("contacts");
+const agentPath = channelPath("agent");
+const storePath = channelPath("store");
+const terminalPath = channelPath("terminal");
 export const API_ENDPOINTS = {
   // WebSocket path (the host is API_BASE_URL with ws/wss).
   LIVE: "/merchant/web/live",
@@ -140,6 +146,17 @@ export const API_ENDPOINTS = {
   BRANDING: { GET: "/merchant/web/branding", FILE: "/merchant/web/branding/file" },
   INDIVIDUAL_ONBOARDING: onboardingEndpoints("individual"),
   CORPORATE_ONBOARDING: onboardingEndpoints("corporate"),
+  // Agents and super agents (Agents, stores and POS handoff, phases 1-4): the
+  // agent wallet (float), the sign-ups an agent started, a super agent's agents.
+  AGENT: { FLOAT: agentPath("float"), SIGNUPS: agentPath("signups"), AGENTS: agentPath("agents") },
+  // Assisted sign-up: the self sign-up calls, signed in as the agent.
+  ASSISTED_CUSTOMER_INDIVIDUAL: onboardingEndpoints("individual", "/customer/individual/agent"),
+  ASSISTED_CUSTOMER_CORPORATE: onboardingEndpoints("corporate", "/customer/corporate/agent"),
+  ASSISTED_AGENT_INDIVIDUAL: onboardingEndpoints("individual", "/merchant/individual/agent"),
+  ASSISTED_AGENT_CORPORATE: onboardingEndpoints("corporate", "/merchant/corporate/agent"),
+  // Stores and their users (phase 5); terminals placed in stores (phase 6).
+  STORE: Object.fromEntries(["list", "add", "edit", "close", "reopen", "users", "user_add", "user_edit", "user_pin"].map((call) => [call, storePath(call)])),
+  TERMINAL: { LIST: terminalPath("list"), SETUP: terminalPath("setup"), BLOCK_REQUEST: terminalPath("block_request") },
 };
 // Until the API says otherwise (the `session` block of sign-in and refresh): a
 // web session unused for this long ends on the server, and the portal signs the

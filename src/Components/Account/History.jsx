@@ -19,7 +19,7 @@ import ReceiptView from "./ReceiptView";
 // Newest first, every module (transfers, payments, refunds, cash, deposits,
 // loans, reversals). A line opens that transaction and its receipt.
 const LIMIT = 20;
-const TYPES = ["P2P_TRANSFER", "P2P_TO_PHONE", "PHONE_TRANSFER_RETURN", "MERCHANT_PAYMENT", "MERCHANT_REFUND", "CASH_IN", "CASH_OUT", "CARD_LOAD", "CARD_UNLOAD", "CARD_PURCHASE_CP", "CARD_PURCHASE_CNP", "CARD_CASH_WITHDRAWAL", "NEW_CARD_FEE", "PHYSICAL_CARD_FEE", "REVERSAL"];
+const TYPES = ["P2P_TRANSFER", "P2P_TO_PHONE", "PHONE_TRANSFER_RETURN", "MERCHANT_PAYMENT", "MERCHANT_REFUND", "CASH_IN", "CASH_OUT", "CARD_LOAD", "CARD_UNLOAD", "CARD_PURCHASE_CP", "CARD_PURCHASE_CNP", "CARD_CASH_WITHDRAWAL", "NEW_CARD_FEE", "PHYSICAL_CARD_FEE", "REVERSAL", "AGENT_CASH_IN", "AGENT_CASH_OUT", "AGENT_FLOAT_TRANSFER", "AGENT_FLOAT_LOAD", "AGENT_FLOAT_UNLOAD", "STORE_SWEEP"];
 
 // The line's words in the portal's language: the API's names for the kinds of
 // transaction (`types`, a transfer says which way the money went); while those
@@ -31,6 +31,14 @@ export const describe = (item, t, types) => {
   const label = item.txn_type ? t(`history.txnType.${item.txn_type}`, { defaultValue: "" }) : "";
   return label || (item.description ?? item.txn_short_desc ?? item.txn_type_name ?? item.txn_type);
 };
+
+// An agent's commission is its own line on the personal wallet; its
+// description starts "Commission:" (handoff, phase 3).
+export const isCommission = (item) => /^\s*commission\s*:/i.test(item?.description ?? "");
+function CommissionTag() {
+  const { t } = useTranslation();
+  return <span className="ml-2 rounded-full bg-lime/30 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-ink">{t("history.commission", { defaultValue: "Commission" })}</span>;
+}
 
 export function TransactionLine({ item, onOpen }) {
   const { t } = useTranslation();
@@ -45,7 +53,10 @@ export function TransactionLine({ item, onOpen }) {
           <Icon size={16} />
         </span>
         <span className="min-w-[10rem] flex-1">
-          <span className="block truncate text-sm font-semibold text-slate-800">{describe(item, t, types)}</span>
+          <span className="block truncate text-sm font-semibold text-slate-800">
+            {describe(item, t, types)}
+            {isCommission(item) && <CommissionTag />}
+          </span>
           <span className="block break-words text-xs text-slate-500">
             {[who, formatDateTime(item.tran_date_time)].filter(Boolean).join(" · ")}
             {item.status === "REVERSED" && <span className="ml-2 font-semibold text-amber-600">{t("history.reversed")}</span>}
@@ -119,7 +130,10 @@ function HistoryTable({ items, onOpen }) {
                         <Icon size={15} />
                       </span>
                       <span className="min-w-0">
-                        <span className="block font-semibold text-slate-800">{describe(item, t, types)}</span>
+                        <span className="block font-semibold text-slate-800">
+                          {describe(item, t, types)}
+                          {isCommission(item) && <CommissionTag />}
+                        </span>
                         {who && (
                           <span className="block text-xs text-slate-500">
                             {who}

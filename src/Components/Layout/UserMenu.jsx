@@ -6,6 +6,7 @@ import Avatar from "@/Components/Common/Avatar";
 import { usePolicy } from "@/Hooks/Auth/usePolicy";
 import { useSignOut } from "@/Hooks/Auth/useSignOut";
 import { cn } from "@/Utils/Lib/utils";
+import { roleLine, superAgentLine } from "@/Utils/Lib/roles";
 
 // The signed-in merchant in the top bar: their name and initial, and on click
 // a small menu with who they are (name, the bank, their login) and what they
@@ -19,6 +20,9 @@ export default function UserMenu({ user }) {
   const [open, setOpen] = useState(false);
   const root = useRef(null);
   const name = user?.name ?? user?.username ?? "";
+  // "Merchant · Agent", "Super agent", a store user's role; and an agent's super agent.
+  const role = roleLine(user, t);
+  const parent = superAgentLine(user, t);
 
   useEffect(() => setOpen(false), [location.pathname]);
   useEffect(() => {
@@ -47,15 +51,21 @@ export default function UserMenu({ user }) {
         <Avatar name={name} className="h-9 w-9" />
         <span className="hidden min-w-0 leading-tight sm:block">
           <span className="block max-w-[180px] truncate text-sm font-bold text-slate-800">{name}</span>
-          {user?.username && user.username !== name && <span className="block max-w-[180px] truncate text-[11px] text-slate-500">{user.username}</span>}
+          {role ? (
+            <span className="block max-w-[180px] truncate text-[11px] font-semibold text-slate-500">{role}</span>
+          ) : (
+            user?.username && user.username !== name && <span className="block max-w-[180px] truncate text-[11px] text-slate-500">{user.username}</span>
+          )}
         </span>
         <ChevronDown size={15} className={cn("hidden shrink-0 text-slate-500 transition sm:block", open && "rotate-180")} />
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 top-full z-40 mt-2 w-52 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-surface p-1.5 shadow-xl">
+        <div role="menu" className="absolute right-0 top-full z-40 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-surface p-1.5 shadow-xl">
           <div className="px-2.5 pb-2 pt-1.5">
             <p className="truncate text-[13px] font-bold text-slate-800">{name}</p>
+            {role && <p className="truncate text-[11px] font-semibold text-ink">{role}</p>}
+            {parent && <p className="truncate text-[11px] text-slate-500">{parent}</p>}
             <p className="truncate text-[11px] text-slate-500">{[t("brand.name"), user?.username !== name ? user?.username : null].filter(Boolean).join(" · ")}</p>
           </div>
           <div className="border-t border-slate-100 pt-1.5">

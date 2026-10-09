@@ -13,6 +13,7 @@ const SEALED = new Set([
   "signin_pin", // auth/pin_set: the sign-in PIN, to create the transaction PIN
   "pin", "current_pin", "new_pin", "confirm_pin", "txn_pin", "confirm", // transaction PIN, and the onboarding PIN pair
   "card_pin", "current_card_pin",
+  "customer_pin", // agent cash-out: the customer types their own PIN on the agent's device
   "otp",
 ]);
 const PREFIX = "enc:v1:";

@@ -52,7 +52,7 @@ export default function AppLayout() {
   // The menu and the features come from the API (labels in the portal's language).
   useEffect(() => {
     loadMenu()
-      .then(({ menu, features }) => dispatch(userUpdated({ menu, features })))
+      .then((loaded) => dispatch(userUpdated(loaded)))
       .catch(() => {});
   }, [dispatch, i18n.language]);
   // The inbox's unread count, for the badge; live while the portal is open.

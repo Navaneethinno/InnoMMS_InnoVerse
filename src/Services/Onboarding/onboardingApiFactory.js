@@ -13,7 +13,10 @@ import { apiLanguageHeader } from "@/Utils/Lib/apiLanguage";
 // login, no token). Every reply is { status, message, data: [ ... ] }:
 // `message` is the API's own text and is what gets shown, and a refusal
 // carries its reasons in `data[0].problems` — none of it is re-worded here.
-function createRequest(endpoints) {
+//
+// `signedIn`: an agent's assisted sign-up uses the same calls with the agent's
+// Bearer token (added by the client) instead of the Basic credential.
+function createRequest(endpoints, { signedIn = false } = {}) {
   // `responseType: "blob"` is for calls that answer with a file; their
   // refusals are still JSON, read back from the blob.
   return async function request(endpointKey, body = {}, { responseType } = {}) {
@@ -22,10 +25,10 @@ function createRequest(endpoints) {
       // A FormData body goes out as multipart; axios lets the browser set
       // Content-Type with its boundary.
       const response = await api.post(endpoint, body, {
-        skipAuth: true,
+        skipAuth: !signedIn,
         responseType,
         headers: {
-          ...(PORTAL_AUTHORIZATION ? { Authorization: PORTAL_AUTHORIZATION } : {}),
+          ...(!signedIn && PORTAL_AUTHORIZATION ? { Authorization: PORTAL_AUTHORIZATION } : {}),
           ...apiLanguageHeader(),
         },
       });
@@ -56,8 +59,8 @@ const result = (payload) => ({ data: firstOf(payload), message: payload?.message
 // but `loadOptions` resolves to { data: <the screen>, message } (one section
 // per reply) so callers can show the API's own message; `loadOptions`
 // resolves to the options object itself.
-export function createOnboardingApi(endpoints) {
-  const request = createRequest(endpoints);
+export function createOnboardingApi(endpoints, { signedIn = false } = {}) {
+  const request = createRequest(endpoints, { signedIn });
   // `options` and `add` name the bank; the other calls work from the
   // onboarding's reference_id.
   const withBank = (payload = {}) => (INST_PROFILE_ID ? { inst_profile_id: INST_PROFILE_ID, ...payload } : payload);

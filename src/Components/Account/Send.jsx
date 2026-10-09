@@ -24,6 +24,7 @@ import RecentPayees from "./RecentPayees";
 import RefundPicker from "./RefundPicker";
 import WalletPanel from "./WalletPanel";
 import { TransactionPinNotice, useNeedsTransactionPin } from "./TransactionPinSetup";
+import { sendableWallets } from "@/Utils/Lib/roles";
 
 // Money out of the merchant's wallet, two ways:
 //  - "send": to a person by their number (P2P_TRANSFER). A number with no
@@ -46,7 +47,10 @@ export default function Send() {
   const [searchParams, setSearchParams] = useSearchParams();
   const refundRrn = searchParams.get("refund");
   const [mode, setMode] = useState(refundRrn ? "refund" : "send");
-  const [wallets, setWallets] = useState(null);
+  const [allWallets, setAllWallets] = useState(null);
+  // Sending and refunds use the merchant's own money only: the agent wallet and
+  // an owner's store wallets are refused here (portal.wallet_unknown).
+  const wallets = allWallets && sendableWallets(allWallets, user);
   const [form, setForm] = useState({ from: "", to: "", amount: "", note: "" });
   const [payee, setPayee] = useState(null);
   const [checking, setChecking] = useState(false);
@@ -65,14 +69,14 @@ export default function Send() {
 
   useEffect(() => {
     loadWallets()
-      .then(setWallets)
+      .then((list) => setAllWallets(list))
       .catch((error) => {
-        setWallets([]);
+        setAllWallets([]);
         setProblem(error.message);
       });
   }, [t]);
 
-  useWalletChanged(() => loadWallets().then(setWallets).catch(() => {}));
+  useWalletChanged(() => loadWallets().then((list) => setAllWallets(list)).catch(() => {}));
 
   const set = (key) => (event) => {
     setForm((previous) => ({ ...previous, [key]: event.target.value }));
@@ -437,7 +441,7 @@ export default function Send() {
           payment), on a wide screen it sits beside the form. */}
       <WalletPanel wallets={wallets} selected={selectedWallet} footer={<LimitsList wallet={selectedWallet} txnType={refunding ? "MERCHANT_REFUND" : "P2P_TRANSFER"} />} onSelect={(acctNum) => setForm((previous) => ({ ...previous, from: acctNum }))} className={refunding ? undefined : "order-first lg:order-none"} />
       </div>
-      {!refunding && <PhoneTransfers version={transfersVersion} onCancelled={() => loadWallets().then(setWallets).catch(() => {})} className="max-w-6xl" />}
+      {!refunding && <PhoneTransfers version={transfersVersion} onCancelled={() => loadWallets().then((list) => setAllWallets(list)).catch(() => {})} className="max-w-6xl" />}
     </div>
   );
 }
