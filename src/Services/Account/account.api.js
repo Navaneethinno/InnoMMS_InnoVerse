@@ -98,9 +98,10 @@ export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone
   );
 
 // Newest first, every module. Resolves to { items, total, page }.
-export const loadHistory = async ({ page = 1, limit = 20, acctId = null, txnType = "", from = "", to = "" } = {}) => {
+// `refundable`: only payments received with something left to refund.
+export const loadHistory = async ({ page = 1, limit = 20, acctId = null, txnType = "", from = "", to = "", refundable = false } = {}) => {
   // Only the filters that are set go out (no empty strings or nulls).
-  const { rows } = await portalPost(ACCOUNT.HISTORY, { page, limit, ...(acctId ? { acct_id: acctId } : {}), ...(txnType ? { txn_type: txnType } : {}), ...(from ? { from } : {}), ...(to ? { to } : {}) });
+  const { rows } = await portalPost(ACCOUNT.HISTORY, { page, limit, ...(acctId ? { acct_id: acctId } : {}), ...(txnType ? { txn_type: txnType } : {}), ...(from ? { from } : {}), ...(to ? { to } : {}), ...(refundable ? { refundable: true } : {}) });
   // One item { items, total, page }, or the lines themselves one per item.
   const [first] = rows;
   if (first && Array.isArray(first.items)) return { items: first.items, total: first.total ?? first.items.length, page: first.page ?? page };

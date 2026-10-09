@@ -32,12 +32,24 @@ export const describe = (item, t, types) => {
   return label || (item.description ?? item.txn_short_desc ?? item.txn_type_name ?? item.txn_type);
 };
 
-// An agent's commission is its own line on the personal wallet; its
-// description starts "Commission:" (handoff, phase 3).
-export const isCommission = (item) => /^\s*commission\s*:/i.test(item?.description ?? "");
+// An agent's commission is its own line on the personal wallet: `entry_kind`
+// COMMISSION (the description prefix only for a server without it).
+export const isCommission = (item) =>
+  item?.entry_kind ? item.entry_kind === "COMMISSION" : /^\s*commission\s*:/i.test(item?.description ?? "");
 function CommissionTag() {
   const { t } = useTranslation();
   return <span className="ml-2 rounded-full bg-lime/30 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-ink">{t("history.commission", { defaultValue: "Commission" })}</span>;
+}
+// Which wallet a line moved: the agent float or a store's wallet is tagged
+// (`wallet_purpose`); the merchant's own money is not.
+function WalletTag({ item }) {
+  const { t } = useTranslation();
+  if (item?.wallet_purpose !== "AGENT_FLOAT" && item?.wallet_purpose !== "STORE") return null;
+  return (
+    <span className="ml-2 rounded-full bg-ink/10 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-ink">
+      {t(`wallet.purpose.${item.wallet_purpose}`, { defaultValue: item.wallet_purpose === "STORE" ? "Store wallet" : "Agent wallet" })}
+    </span>
+  );
 }
 
 export function TransactionLine({ item, onOpen }) {
@@ -56,6 +68,7 @@ export function TransactionLine({ item, onOpen }) {
           <span className="block truncate text-sm font-semibold text-slate-800">
             {describe(item, t, types)}
             {isCommission(item) && <CommissionTag />}
+            <WalletTag item={item} />
           </span>
           <span className="block break-words text-xs text-slate-500">
             {[who, formatDateTime(item.tran_date_time)].filter(Boolean).join(" · ")}
@@ -133,6 +146,8 @@ function HistoryTable({ items, onOpen }) {
                         <span className="block font-semibold text-slate-800">
                           {describe(item, t, types)}
                           {isCommission(item) && <CommissionTag />}
+                          <WalletTag item={item} />
+            <WalletTag item={item} />
                         </span>
                         {who && (
                           <span className="block text-xs text-slate-500">
@@ -165,7 +180,10 @@ function HistoryTable({ items, onOpen }) {
 }
 
 // A payment a customer made to this merchant can be refunded from its receipt.
-const refundable = (item) => item?.txn_type === "MERCHANT_PAYMENT" && item?.direction === "CR";
+// A payment received with something left to refund (`refundable` is what is
+// left: "0.00" once it is fully refunded).
+const refundable = (item) =>
+  item?.txn_type === "MERCHANT_PAYMENT" && item?.direction === "CR" && (item.refundable == null || Number(item.refundable) > 0);
 
 function TransactionDialog({ item, onClose }) {
   const rrn = item?.rrn;

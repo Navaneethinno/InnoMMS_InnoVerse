@@ -909,4 +909,5 @@ export default {
   "terminals.whoShort": "Quem pode entrar",
   "terminals.someUsers": "{{count}} utilizadores escolhidos",
   "terminals.allUsers": "Todos os utilizadores da loja",
+  "signups.rejectedHint": "Não aprovado: contacte o banco antes de voltar a registar este número.",
 };

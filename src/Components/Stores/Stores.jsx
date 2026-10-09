@@ -32,6 +32,7 @@ import {
   quotePayment,
   sendPayment,
 } from "@/Services/Account/account.api";
+import { useStoreChanged, useWalletChanged } from "@/Services/api/liveUpdates";
 import {
   closeStore,
   loadStores,
@@ -763,6 +764,10 @@ export default function Stores() {
         .catch(() => setWallets([]));
   }, [canSeeUsers]);
   useEffect(loadAll, [loadAll]);
+  // The bank's decision on a store (or a close / reopen elsewhere) and money
+  // moving in a store wallet refresh the page.
+  useStoreChanged(() => loadAll());
+  useWalletChanged(() => loadAll());
 
   const toggleStore = async () => {
     const { store } = dialog;
@@ -1159,7 +1164,7 @@ export default function Stores() {
             dialog.store.status === "ACTIVE"
               ? t("stores.closeHint", {
                   defaultValue:
-                    "Its terminals stop taking payments until you reopen it.",
+                    "Closing this store stops its terminals and signs out users who have no other open store. Its wallet keeps its balance; you can move the money to your main wallet.",
                 })
               : undefined
           }

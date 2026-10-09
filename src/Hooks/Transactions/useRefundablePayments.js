@@ -26,8 +26,9 @@ export function useRefundablePayments({ initialPeriod = DEFAULT_PERIOD } = {}) {
     async (page) => {
       setState((previous) => ({ ...previous, loading: true, error: "", ...(page === 1 ? { items: null } : {}) }));
       try {
-        const { items, total } = await loadHistory({ page, limit: PAGE, txnType: "MERCHANT_PAYMENT", from: range?.from ?? "", to: range?.to ?? "" });
-        const received = items.filter((item) => item.direction === "CR");
+        const { items, total } = await loadHistory({ page, limit: PAGE, txnType: "MERCHANT_PAYMENT", from: range?.from ?? "", to: range?.to ?? "", refundable: true });
+        // The server leaves out fully refunded payments; an older one may not.
+        const received = items.filter((item) => item.direction === "CR" && (item.refundable == null || Number(item.refundable) > 0));
         setState((previous) => ({
           items: page === 1 ? received : [...(previous.items ?? []), ...received],
           total,

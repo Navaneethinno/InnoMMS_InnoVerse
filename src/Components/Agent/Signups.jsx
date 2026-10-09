@@ -194,6 +194,14 @@ export default function Signups() {
                 >
                   {statusText(item.status)}
                 </span>
+                {item.status === "REJECTED" && (
+                  <span className="w-full text-xs text-slate-500 sm:w-auto">
+                    {t("signups.rejectedHint", {
+                      defaultValue:
+                        "Not approved: contact the bank before signing this number up again.",
+                    })}
+                  </span>
+                )}
                 {item.status === "ACTIVE" && (
                   <Link
                     to={`/signups/new?who=${who}&kind=${item.kind === "CORPORATE" ? "corporate" : "individual"}&ref=${encodeURIComponent(item.reference_id)}`}

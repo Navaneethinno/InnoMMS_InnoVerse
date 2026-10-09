@@ -904,4 +904,5 @@ export default {
   "terminals.whoShort": "Who may sign in",
   "terminals.someUsers": "{{count}} chosen users",
   "terminals.allUsers": "Every user of the store",
+  "signups.rejectedHint": "Not approved: contact the bank before signing this number up again.",
 };

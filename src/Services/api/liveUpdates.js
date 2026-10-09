@@ -7,6 +7,8 @@ import { freshAccessToken } from "./client";
 //   wallet changed  -> "merchant:wallet-changed" on window (pages refetch)
 //   card changed    -> "merchant:card-changed" (the cards page refetches)
 //   notification    -> "merchant:notification" (the inbox and its badge refetch)
+//   store / terminal -> "merchant:store-changed" / "merchant:terminal-changed"
+//                      (the bank's decision, a close or reopen: the lists refetch)
 //   session ended   -> "merchant:session-expired" (back to sign-in)
 const PING_MS = 30000;
 const RETRY_MS = [2000, 5000, 15000, 30000];
@@ -50,6 +52,8 @@ export function connectLive() {
         burst = setTimeout(() => window.dispatchEvent(new CustomEvent("merchant:wallet-changed", { detail: message.data ?? [] })), 400);
       } else if (message.type === "changed" && message.action === "card") {
         window.dispatchEvent(new CustomEvent("merchant:card-changed", { detail: message.data ?? [] }));
+      } else if (message.type === "changed" && (message.action === "store" || message.action === "terminal")) {
+        window.dispatchEvent(new CustomEvent(`merchant:${message.action}-changed`, { detail: message.data ?? {} }));
       } else if (message.type === "changed" && message.action === "notification") {
         window.dispatchEvent(new CustomEvent("merchant:notification", { detail: message.data ?? [] }));
       } else if (message.type === "session_ended") {
@@ -111,3 +115,19 @@ export function useNotificationReceived(callback) {
     return () => window.removeEventListener("merchant:notification", handler);
   }, []);
 }
+
+// Runs `callback` when one of the merchant's stores, or terminals, changes
+// status: { id, status } (and `tid` for a terminal).
+function useLiveEvent(name, callback) {
+  const latest = useRef(callback);
+  useEffect(() => {
+    latest.current = callback;
+  });
+  useEffect(() => {
+    const handler = (event) => latest.current(event.detail);
+    window.addEventListener(name, handler);
+    return () => window.removeEventListener(name, handler);
+  }, [name]);
+}
+export const useStoreChanged = (callback) => useLiveEvent("merchant:store-changed", callback);
+export const useTerminalChanged = (callback) => useLiveEvent("merchant:terminal-changed", callback);

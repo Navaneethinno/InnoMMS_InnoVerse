@@ -16,6 +16,10 @@ import {
   setupTerminal,
 } from "@/Services/Terminal/terminal.api";
 import { formatDateTime } from "@/Utils/Lib/format";
+import {
+  useStoreChanged,
+  useTerminalChanged,
+} from "@/Services/api/liveUpdates";
 import { notifications } from "@/Utils/Lib/notifications";
 import { isOwner, roleName } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
@@ -287,6 +291,10 @@ export default function Terminals() {
         .catch(() => {});
   }, [owner]);
   useEffect(load, [load]);
+  // The bank blocking, approving or retiring a terminal, or a store closing,
+  // shows at once.
+  useTerminalChanged(() => load());
+  useStoreChanged(() => load());
   const saved = () => {
     setDialog(null);
     load();
