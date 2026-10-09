@@ -972,4 +972,9 @@ export default {
   "ext.letYouKnow": "Vamos avisá-lo",
   "ext.letYouKnowHint": "O operador ainda não respondeu. Receberá uma notificação quando responder, e aparece no seu histórico.",
   "ext.waiting": "A aguardar o operador…",
+  "ext.error.ACCOUNT_NOT_FOUND": "{{provider}} não tem conta para este número.",
+  "ext.error.DECLINED": "{{provider}} recusou a transferência.",
+  "ext.error.REJECTED": "O titular rejeitou o pedido no telefone.",
+  "ext.error.LIMIT_EXCEEDED": "O valor está acima do limite de {{provider}} para uma transferência.",
+  "ext.error.other": "{{provider}} não concluiu a transferência.",
 };

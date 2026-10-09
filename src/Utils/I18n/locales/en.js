@@ -967,4 +967,9 @@ export default {
   "ext.letYouKnow": "We'll let you know",
   "ext.letYouKnowHint": "The provider hasn't answered yet. You'll get a notification when it does, and it shows in your history.",
   "ext.waiting": "Waiting for the provider…",
+  "ext.error.ACCOUNT_NOT_FOUND": "{{provider}} has no account for this number.",
+  "ext.error.DECLINED": "{{provider}} declined the transfer.",
+  "ext.error.REJECTED": "The holder rejected the request on their phone.",
+  "ext.error.LIMIT_EXCEEDED": "The amount is above {{provider}}'s limit for one transfer.",
+  "ext.error.other": "{{provider}} did not complete the transfer.",
 };

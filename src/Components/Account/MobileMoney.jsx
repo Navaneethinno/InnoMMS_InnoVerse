@@ -81,6 +81,12 @@ export default function MobileMoney() {
   const settle = (next) => {
     if (!next || next.status === "PENDING") return;
     setOrder(next);
+    // The live event carries only error_code: account/ext_order has the
+    // reason in the portal's language.
+    if (next.status === "FAILED" && !next.message && next.order_ref)
+      loadExtOrder(next.order_ref)
+        .then((full) => full?.message && setOrder((o) => ({ ...o, message: full.message })))
+        .catch(() => {});
     // A credited top-up has a receipt of its own.
     if (next.status === "SUCCESS" && next.txn_type === TXN.topUp && next.rrn) loadReceipt({ rrn: next.rrn }).then(setTopUpReceipt).catch(() => {});
   };
@@ -280,10 +286,18 @@ export default function MobileMoney() {
         : sending
           ? t("ext.inProgress", { defaultValue: "Transfer in progress" })
           : t("ext.approveOnPhone", { provider: external.provider_name, defaultValue: "Approve the request on your {{provider}} phone" });
+    // Why it failed: the server's text, else ours for the code.
+    const reason = failed
+      ? order?.message ||
+        t(`ext.error.${order?.error_code}`, {
+          provider: external.provider_name,
+          defaultValue: t("ext.error.other", { provider: external.provider_name, defaultValue: "{{provider}} did not complete the transfer" }),
+        })
+      : "";
     const hint = failed
-      ? sending
+      ? reason + " " + (sending
         ? t("ext.sendFailedHint", { defaultValue: "Your money was returned to your wallet." })
-        : t("ext.topUpFailedHint", { defaultValue: "Nothing was taken and your wallet is unchanged." })
+        : t("ext.topUpFailedHint", { defaultValue: "Nothing was taken and your wallet is unchanged." }))
       : gaveUp
         ? t("ext.letYouKnowHint", { defaultValue: "The provider hasn't answered yet. You'll get a notification when it does, and it shows in your history." })
         : sending
