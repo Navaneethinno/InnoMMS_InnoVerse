@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Banknote, Bell, CreditCard, FileText, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Store, UserPlus, UserRound, Users } from "lucide-react";
+import { ArrowRightLeft, Banknote, Smartphone, Bell, CreditCard, FileText, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Store, UserPlus, UserRound, Users } from "lucide-react";
 
 // Ordered by merchant navigation. Extend only when actual screens are added.
 export const routeConfig = { login: { titleKey: "auth.title" } };
@@ -20,6 +20,8 @@ export const navScreens = {
   signups: { to: "/signups", labelKey: "nav.signups", icon: UserPlus },
   my_agents: { to: "/my-agents", labelKey: "nav.myAgents", icon: Users },
   stores: { to: "/stores", labelKey: "nav.stores", icon: Store },
+  // M-Pesa / e-Mola / mKesh: placed under Send for the owner (the API menu has no key for it).
+  mobile_money: { to: "/mobile-money", labelKey: "nav.mobileMoney", icon: Smartphone },
   terminals: { to: "/terminals", labelKey: "nav.terminals", icon: MonitorSmartphone },
 };
 

@@ -14,6 +14,7 @@ const Signups = lazy(() => import("@/Components/Agent/Signups"));
 const AssistedSignup = lazy(() => import("@/Components/Agent/AssistedSignup"));
 const MyAgents = lazy(() => import("@/Components/Agent/MyAgents"));
 const Stores = lazy(() => import("@/Components/Stores/Stores"));
+const MobileMoney = lazy(() => import("@/Components/Account/MobileMoney"));
 const Terminals = lazy(() => import("@/Components/Terminals/Terminals"));
 export const dashboardRoutes = [
   { path: "dashboard", element: pageElement(Dashboard) },
@@ -30,5 +31,6 @@ export const dashboardRoutes = [
   { path: "signups/new", element: pageElement(AssistedSignup) },
   { path: "my-agents", element: pageElement(MyAgents) },
   { path: "stores", element: pageElement(Stores) },
+  { path: "mobile-money", element: pageElement(MobileMoney) },
   { path: "terminals", element: pageElement(Terminals) },
 ];

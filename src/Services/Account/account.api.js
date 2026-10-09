@@ -69,10 +69,18 @@ export const cancelPhoneTransfer = (id) => data(portalPost(ACCOUNT.PHONE_TRANSFE
 // Agent cash-in and cash-out name the customer (`customer_phone_number`, or
 // `customer_acct_num`) instead of a payee; a store sweep names both of the
 // owner's wallets.
-const targetBody = ({ toAcctNum, toPhone, orgRrn, customerPhone }) =>
-  orgRrn ? { org_rrn: orgRrn } : customerPhone ? { customer_phone_number: customerPhone } : payeeBody({ toAcctNum, toPhone });
-export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, amount, fromAcctNum }) =>
-  data(portalPost(ACCOUNT.QUOTE, { txn_type: txnType, ...targetBody({ toAcctNum, toPhone, orgRrn, customerPhone }), amount, ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}) }));
+// A top-up from a mobile wallet (EXT_WALLET_IN) names no payee: only, when it
+// isn't the merchant's own number, the number it is pulled from (`fromPhone`).
+const targetBody = ({ toAcctNum, toPhone, orgRrn, customerPhone, fromPhone, txnType }) =>
+  orgRrn
+    ? { org_rrn: orgRrn }
+    : customerPhone
+      ? { customer_phone_number: customerPhone }
+      : txnType === "EXT_WALLET_IN"
+        ? fromPhone ? { from_phone_number: fromPhone } : {}
+        : payeeBody({ toAcctNum, toPhone });
+export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, fromPhone, amount, fromAcctNum }) =>
+  data(portalPost(ACCOUNT.QUOTE, { txn_type: txnType, ...targetBody({ toAcctNum, toPhone, orgRrn, customerPhone, fromPhone, txnType }), amount, ...(fromAcctNum ? { from_acct_num: fromAcctNum } : {}) }));
 
 // Makes the payment. `clientReference` is one per attempt and is reused when
 // retrying: the same reference never pays twice (the second call returns the
@@ -82,11 +90,11 @@ export const quotePayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhon
 // `expectedCharge` (the quote's fee.total_charge) guards the price: if the fee
 // at send time differs, nothing is posted and the reply is 409
 // txn.quote_changed (re-quote and show the new figures).
-export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, customerPin, amount, fromAcctNum, clientReference, pin, note, expectedCharge }) =>
+export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone, fromPhone, customerPin, amount, fromAcctNum, clientReference, pin, note, expectedCharge }) =>
   data(
     portalPost(ACCOUNT.SEND, {
       txn_type: txnType,
-      ...targetBody({ toAcctNum, toPhone, orgRrn, customerPhone }),
+      ...targetBody({ toAcctNum, toPhone, orgRrn, customerPhone, fromPhone, txnType }),
       ...(customerPin ? { customer_pin: customerPin } : {}),
       ...(expectedCharge != null && expectedCharge !== "" ? { expected_total_charge: expectedCharge } : {}),
       amount,
@@ -96,6 +104,9 @@ export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone
       ...(note ? { note } : {}),
     }),
   );
+
+// The mobile wallets: [{ code, name, prefixes: ["84", ...], send, top_up }].
+export const loadExtProviders = async () => (await portalPost(ACCOUNT.EXT_PROVIDERS)).rows;
 
 // Newest first, every module. Resolves to { items, total, page }.
 // `refundable`: only payments received with something left to refund.

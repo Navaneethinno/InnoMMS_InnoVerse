@@ -19,7 +19,7 @@ import ReceiptView from "./ReceiptView";
 // Newest first, every module (transfers, payments, refunds, cash, deposits,
 // loans, reversals). A line opens that transaction and its receipt.
 const LIMIT = 20;
-const TYPES = ["P2P_TRANSFER", "P2P_TO_PHONE", "PHONE_TRANSFER_RETURN", "MERCHANT_PAYMENT", "MERCHANT_REFUND", "CASH_IN", "CASH_OUT", "CARD_LOAD", "CARD_UNLOAD", "CARD_PURCHASE_CP", "CARD_PURCHASE_CNP", "CARD_CASH_WITHDRAWAL", "NEW_CARD_FEE", "PHYSICAL_CARD_FEE", "REVERSAL", "AGENT_CASH_IN", "AGENT_CASH_OUT", "AGENT_FLOAT_TRANSFER", "AGENT_FLOAT_LOAD", "AGENT_FLOAT_UNLOAD", "STORE_SWEEP"];
+const TYPES = ["P2P_TRANSFER", "P2P_TO_PHONE", "PHONE_TRANSFER_RETURN", "MERCHANT_PAYMENT", "MERCHANT_REFUND", "CASH_IN", "CASH_OUT", "CARD_LOAD", "CARD_UNLOAD", "CARD_PURCHASE_CP", "CARD_PURCHASE_CNP", "CARD_CASH_WITHDRAWAL", "NEW_CARD_FEE", "PHYSICAL_CARD_FEE", "REVERSAL", "AGENT_CASH_IN", "AGENT_CASH_OUT", "AGENT_FLOAT_TRANSFER", "AGENT_FLOAT_LOAD", "AGENT_FLOAT_UNLOAD", "STORE_SWEEP", "EXT_WALLET_OUT", "EXT_WALLET_IN"];
 
 // The line's words in the portal's language: the API's names for the kinds of
 // transaction (`types`, a transfer says which way the money went); while those

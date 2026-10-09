@@ -115,6 +115,8 @@ export const API_ENDPOINTS = {
     LIMITS: accountPath("limits"),
     SUMMARY: accountPath("summary"),
     TXN_TYPES: accountPath("txn_types"),
+    // M-Pesa / e-Mola / mKesh: who the portal can send to and top up from.
+    EXT_PROVIDERS: accountPath("ext_providers"),
     HISTORY_EXPORT: accountPath("history_export"),
     // Money sent to a number that is not a customer yet, waiting for them.
     PHONE_TRANSFERS: accountPath("phone_transfers"),
