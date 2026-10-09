@@ -905,4 +905,12 @@ export default {
   "terminals.someUsers": "{{count}} chosen users",
   "terminals.allUsers": "Every user of the store",
   "signups.rejectedHint": "Not approved: contact the bank before signing this number up again.",
+  "stores.location": "Store location",
+  "stores.openMap": "Open map",
+  "stores.noGeolocation": "This browser can't share your location.",
+  "stores.locationDenied": "Location access was refused. Allow it in the browser, or type the coordinates.",
+  "stores.locationFailed": "Couldn't get your location. Try again, or type the coordinates.",
+  "stores.locating": "Finding your location…",
+  "stores.useLocation": "Use my current location",
+  "stores.pointBad": "Latitude is -90 to 90 and longitude -180 to 180; give both or neither.",
 };

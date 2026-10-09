@@ -47,6 +47,7 @@ import { notifications } from "@/Utils/Lib/notifications";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { isOwner, isOwnMoney, roleName, staffRole } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
+import StoreMap, { UseMyLocation, validPoint } from "./StoreMap";
 
 // Stores and store users (Agents, stores and POS, phase 5), and store wallets
 // (phase 6). The owner (the merchant) adds stores, which wait for the bank; adds
@@ -131,6 +132,9 @@ function StoreDialog({ store, onClose, onSaved }) {
   const set = (key) => (event) =>
     setForm((previous) => ({ ...previous, [key]: event.target.value }));
   const codeBad = !editing && form.code && !CODE.test(form.code);
+  // Both coordinates or neither, and inside the world's range.
+  const anyPoint = form.latitude !== "" || form.longitude !== "";
+  const pointBad = anyPoint && !validPoint(form.latitude, form.longitude);
   const submit = async (event) => {
     event.preventDefault();
     setPending(true);
@@ -258,6 +262,24 @@ function StoreDialog({ store, onClose, onSaved }) {
             value={form.longitude}
             onChange={set("longitude")}
           />
+          {/* Where the store is: from the device, or typed; the map shows the
+              point the bank will see when it reviews the store. */}
+          <div className="space-y-3 sm:col-span-2">
+            <UseMyLocation
+              onLocated={(point) =>
+                setForm((previous) => ({ ...previous, ...point }))
+              }
+            />
+            {pointBad && (
+              <p className="text-xs text-red-600">
+                {t("stores.pointBad", {
+                  defaultValue:
+                    "Latitude is -90 to 90 and longitude -180 to 180; give both or neither.",
+                })}
+              </p>
+            )}
+            <StoreMap latitude={form.latitude} longitude={form.longitude} />
+          </div>
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="secondary" disabled={pending} onClick={onClose}>
@@ -267,7 +289,9 @@ function StoreDialog({ store, onClose, onSaved }) {
             type="submit"
             pending={pending}
             disabled={
-              !form.name.trim() || (!editing && (!form.code || codeBad))
+              !form.name.trim() ||
+              pointBad ||
+              (!editing && (!form.code || codeBad))
             }
           >
             {t("common.save", { defaultValue: "Save" })}
@@ -920,6 +944,12 @@ export default function Stores() {
                       .filter(Boolean)
                       .join(" · ") || "—"}
                   </p>
+                  <StoreMap
+                    latitude={store.latitude}
+                    longitude={store.longitude}
+                    height="h-40"
+                    className="mt-3"
+                  />
                   {owner && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {store.status !== "INACTIVE" && (

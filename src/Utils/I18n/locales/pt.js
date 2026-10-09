@@ -910,4 +910,12 @@ export default {
   "terminals.someUsers": "{{count}} utilizadores escolhidos",
   "terminals.allUsers": "Todos os utilizadores da loja",
   "signups.rejectedHint": "Não aprovado: contacte o banco antes de voltar a registar este número.",
+  "stores.location": "Localização da loja",
+  "stores.openMap": "Abrir mapa",
+  "stores.noGeolocation": "Este navegador não consegue partilhar a sua localização.",
+  "stores.locationDenied": "O acesso à localização foi recusado. Permita-o no navegador ou escreva as coordenadas.",
+  "stores.locationFailed": "Não foi possível obter a sua localização. Tente novamente ou escreva as coordenadas.",
+  "stores.locating": "A procurar a sua localização…",
+  "stores.useLocation": "Usar a minha localização atual",
+  "stores.pointBad": "A latitude vai de -90 a 90 e a longitude de -180 a 180; indique as duas ou nenhuma.",
 };
