@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Clock, Smartphone, XCircle } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
+import FilterSelect from "@/Components/Common/FilterSelect";
 import FitText from "@/Components/Common/FitText";
 import LoadingState from "@/Components/Common/LoadingState";
 import PhoneField from "@/Components/Common/PhoneField";
@@ -398,17 +399,14 @@ export default function MobileMoney() {
             </div>
           )}
           {usable.length > 1 && (
-            <label className="block text-sm font-semibold text-slate-700">
-              {sending ? t("send.from") : t("ext.toWallet", { defaultValue: "Into wallet" })}
-              <select value={from} onChange={(event) => setFrom(event.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-surface px-3 py-3 text-sm">
-                <option value="">{t("ext.mainWallet", { defaultValue: "Main wallet" })}</option>
-                {usable.map((w) => (
-                  <option key={w.acct_num} value={w.acct_num}>
-                    {w.acct_num} · {formatMoney(w.avail_bal, w.currency_code)}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <FilterSelect
+              label={sending ? t("send.from") : t("ext.toWallet", { defaultValue: "Into wallet" })}
+              placeholder={t("ext.mainWallet", { defaultValue: "Main wallet" })}
+              clearable
+              value={from}
+              onChange={setFrom}
+              options={usable.map((w) => ({ value: w.acct_num, label: w.acct_product_name ? `${w.acct_product_name} · ${w.acct_num}` : w.acct_num, description: formatMoney(w.avail_bal, w.currency_code) }))}
+            />
           )}
           {!sending && (
             <SegmentedTabs

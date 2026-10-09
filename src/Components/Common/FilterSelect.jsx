@@ -1,12 +1,14 @@
 import { useId } from "react";
 import * as Select from "@radix-ui/react-select";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/Utils/Lib/utils";
 // Native select popups cannot be consistently themed. Radix supplies a
 // portaled, keyboard-accessible listbox with focus and collision management.
 // Radix items can't carry "", so `clearable` adds a placeholder item under a
 // sentinel value that is reported back as "". An option's optional `image`
-// (e.g. a country flag) shows before its label.
+// (e.g. a country flag) shows before its label, and its optional `description`
+// (a balance, a code) on a second line in the list, not in the closed box.
+// Long lists scroll inside the popup, which never grows past the screen.
 const CLEAR_VALUE = "__clear__";
 export default function FilterSelect({
   label,
@@ -21,9 +23,11 @@ export default function FilterSelect({
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-sm font-medium">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={id} className="mb-2 block text-sm font-medium">
+          {label}
+        </label>
+      )}
       <Select.Root value={value} onValueChange={(v) => {
           // Radix can report "" on its own (e.g. while unmounting); only a
           // real pick, or the clear item, is a change.
@@ -45,8 +49,11 @@ export default function FilterSelect({
           <Select.Content
             position="popper"
             sideOffset={6}
-            className="z-50 max-h-64 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-slate-200 bg-surface p-1 shadow-xl"
+            className="z-50 max-h-[min(20rem,var(--radix-select-content-available-height))] min-w-[var(--radix-select-trigger-width)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-surface p-1 shadow-xl"
           >
+            <Select.ScrollUpButton className="flex h-6 items-center justify-center text-slate-500">
+              <ChevronUp size={14} />
+            </Select.ScrollUpButton>
             <Select.Viewport>
               {(clearable ? [{ value: CLEAR_VALUE, label: placeholder }, ...options] : options).map((option) => (
                 <Select.Item
@@ -64,9 +71,13 @@ export default function FilterSelect({
                     )}
                     {option.label}
                   </Select.ItemText>
+                  {option.description && <span className="mt-0.5 block truncate text-xs text-slate-500">{option.description}</span>}
                 </Select.Item>
               ))}
             </Select.Viewport>
+            <Select.ScrollDownButton className="flex h-6 items-center justify-center text-slate-500">
+              <ChevronDown size={14} />
+            </Select.ScrollDownButton>
           </Select.Content>
         </Select.Portal>
       </Select.Root>

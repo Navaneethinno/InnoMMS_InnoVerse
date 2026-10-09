@@ -3,9 +3,16 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, MonitorSmartphone, Settings2 } from "lucide-react";
 import Button from "@/Components/Common/Button";
-import CheckboxPill from "@/Components/Common/CheckboxPill";
+import CheckList from "@/Components/Common/CheckList";
 import EmptyState from "@/Components/Common/EmptyState";
 import ErrorState from "@/Components/Common/ErrorState";
+import FilterSelect from "@/Components/Common/FilterSelect";
+import {
+  ListSearch,
+  NoMatches,
+  ShowMore,
+} from "@/Components/Common/ListControls";
+import { useListControls } from "@/Hooks/Common/useListControls";
 import LoadingState from "@/Components/Common/LoadingState";
 import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
@@ -119,20 +126,22 @@ function SetupDialog({ terminal, stores, users, onClose, onSaved }) {
     >
       <form noValidate onSubmit={submit} className="space-y-4">
         {problem && <ErrorState message={problem} />}
-        <label className="block text-sm font-semibold text-slate-700">
-          {t("terminals.store", { defaultValue: "Store" })}
-          <select
-            value={storeId}
-            onChange={(event) => setStoreId(event.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-surface px-3 py-3 text-sm"
-          >
-            {activeStores.map((store) => (
-              <option key={store.id} value={store.id}>
-                {store.name} ({store.code})
-              </option>
-            ))}
-          </select>
-        </label>
+        <FilterSelect
+          label={t("terminals.store", { defaultValue: "Store" })}
+          placeholder={t("terminals.pickStore", {
+            defaultValue: "Choose a store",
+          })}
+          value={storeId ? String(storeId) : undefined}
+          onChange={setStoreId}
+          disabled={!activeStores.length}
+          options={activeStores.map((store) => ({
+            value: String(store.id),
+            label: store.name,
+            description: [store.code, store.address]
+              .filter(Boolean)
+              .join(" · "),
+          }))}
+        />
         {!activeStores.length && (
           <p className="text-sm text-amber-700">
             {t("terminals.noActiveStore", {
@@ -165,30 +174,22 @@ function SetupDialog({ terminal, stores, users, onClose, onSaved }) {
                 "Tick none to let every user of the store sign in. You can always sign in.",
             })}
           </p>
-          <div className="flex flex-col gap-2">
-            {storeUsers.length ? (
-              storeUsers.map((u) => (
-                <CheckboxPill
-                  key={u.id}
-                  label={`${u.name} · ${roleName(u.role, t)}`}
-                  checked={userIds.includes(u.id)}
-                  onChange={() =>
-                    setUserIds((list) =>
-                      list.includes(u.id)
-                        ? list.filter((x) => x !== u.id)
-                        : [...list, u.id],
-                    )
-                  }
-                />
-              ))
-            ) : (
+          <CheckList
+            layout="column"
+            options={storeUsers.map((u) => ({
+              value: u.id,
+              label: `${u.name} · ${roleName(u.role, t)}`,
+            }))}
+            value={userIds}
+            onChange={setUserIds}
+            empty={
               <p className="text-xs text-slate-400">
                 {t("terminals.noUsers", {
                   defaultValue: "No active users in this store.",
                 })}
               </p>
-            )}
-          </div>
+            }
+          />
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="secondary" disabled={pending} onClick={onClose}>
@@ -271,6 +272,15 @@ export default function Terminals() {
   const [users, setUsers] = useState([]);
   const [problem, setProblem] = useState("");
   const [dialog, setDialog] = useState(null);
+  const list = useListControls(terminals, {
+    textOf: (x) => [
+      x.name,
+      tidOf(x),
+      storeNameOf(x),
+      x.terminal_type_name,
+      x.status,
+    ],
+  });
 
   const load = useCallback(() => {
     loadTerminals()
@@ -332,146 +342,158 @@ export default function Terminals() {
           />
         </div>
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2">
-          {terminals.map((terminal) => {
-            const [statusKey, statusFallback, statusTone] = STATUS[
-              terminal.status
-            ] ?? [null, terminal.status, "bg-ink/5 text-ink"];
-            const storeName = storeNameOf(terminal);
-            const rows = [
-              [
-                t("terminals.type", { defaultValue: "Type" }),
+        <>
+          <ListSearch
+            list={list}
+            placeholder={t("terminals.search", {
+              defaultValue: "Search by name, TID or store",
+            })}
+          />
+          <NoMatches list={list} />
+          <ul className="grid gap-4 md:grid-cols-2">
+            {list.visible.map((terminal) => {
+              const [statusKey, statusFallback, statusTone] = STATUS[
+                terminal.status
+              ] ?? [null, terminal.status, "bg-ink/5 text-ink"];
+              const storeName = storeNameOf(terminal);
+              const rows = [
                 [
-                  terminal.terminal_type_name ?? terminal.terminal_type,
-                  terminal.make,
-                  terminal.model,
-                ]
-                  .filter(Boolean)
-                  .join(" · "),
-              ],
-              [
-                t("terminals.serial", { defaultValue: "Serial" }),
-                terminal.serial_number,
-              ],
-              [
-                t("terminals.store", { defaultValue: "Store" }),
-                storeName ??
-                  t("terminals.notPlaced", { defaultValue: "Not placed yet" }),
-              ],
-              [
-                t("terminals.lastSeen", { defaultValue: "Last seen" }),
-                terminal.last_seen_at
-                  ? [
-                      formatDateTime(terminal.last_seen_at),
-                      terminal.app_version && `v${terminal.app_version}`,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")
-                  : null,
-              ],
-              [
-                t("terminals.whoShort", { defaultValue: "Who may sign in" }),
-                storeName
-                  ? userIdsOf(terminal).length
-                    ? t("terminals.someUsers", {
-                        count: userIdsOf(terminal).length,
-                        defaultValue: "{{count}} chosen users",
-                      })
-                    : t("terminals.allUsers", {
-                        defaultValue: "Every user of the store",
-                      })
-                  : null,
-              ],
-            ];
-            return (
-              <li
-                key={terminal.id}
-                className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="brand-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lime">
-                      <MonitorSmartphone size={18} />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-slate-800">
-                        {terminal.name || tidOf(terminal)}
-                      </p>
-                      <p className="font-mono text-xs text-slate-500">
-                        {tidOf(terminal)}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className={cn(
-                      "rounded-full px-2.5 py-0.5 text-[11px] font-bold",
-                      statusTone,
-                    )}
-                  >
-                    {statusKey
-                      ? t(statusKey, { defaultValue: statusFallback })
-                      : statusFallback}
-                  </span>
-                </div>
-                <dl className="mt-4 divide-y divide-slate-100 text-xs">
-                  {rows
-                    .filter(([, value]) => value)
-                    .map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="flex justify-between gap-3 py-1.5"
-                      >
-                        <dt className="text-slate-500">{label}</dt>
-                        <dd className="text-right font-semibold text-slate-700">
-                          {value}
-                        </dd>
+                  t("terminals.type", { defaultValue: "Type" }),
+                  [
+                    terminal.terminal_type_name ?? terminal.terminal_type,
+                    terminal.make,
+                    terminal.model,
+                  ]
+                    .filter(Boolean)
+                    .join(" · "),
+                ],
+                [
+                  t("terminals.serial", { defaultValue: "Serial" }),
+                  terminal.serial_number,
+                ],
+                [
+                  t("terminals.store", { defaultValue: "Store" }),
+                  storeName ??
+                    t("terminals.notPlaced", {
+                      defaultValue: "Not placed yet",
+                    }),
+                ],
+                [
+                  t("terminals.lastSeen", { defaultValue: "Last seen" }),
+                  terminal.last_seen_at
+                    ? [
+                        formatDateTime(terminal.last_seen_at),
+                        terminal.app_version && `v${terminal.app_version}`,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")
+                    : null,
+                ],
+                [
+                  t("terminals.whoShort", { defaultValue: "Who may sign in" }),
+                  storeName
+                    ? userIdsOf(terminal).length
+                      ? t("terminals.someUsers", {
+                          count: userIdsOf(terminal).length,
+                          defaultValue: "{{count}} chosen users",
+                        })
+                      : t("terminals.allUsers", {
+                          defaultValue: "Every user of the store",
+                        })
+                    : null,
+                ],
+              ];
+              return (
+                <li
+                  key={terminal.id}
+                  className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="brand-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lime">
+                        <MonitorSmartphone size={18} />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-slate-800">
+                          {terminal.name || tidOf(terminal)}
+                        </p>
+                        <p className="font-mono text-xs text-slate-500">
+                          {tidOf(terminal)}
+                        </p>
                       </div>
-                    ))}
-                </dl>
-                {terminal.block_requested_at && (
-                  <p className="mt-3 flex items-center gap-1.5 rounded-xl bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
-                    <AlertTriangle size={13} />{" "}
-                    {t("terminals.blockRequested", {
-                      at: formatDateTime(terminal.block_requested_at),
-                      defaultValue: "Block asked for on {{at}}",
-                    })}
-                    {terminal.block_request_note &&
-                      ` · ${terminal.block_request_note}`}
-                  </p>
-                )}
-                {terminal.decision_note && terminal.status !== "ACTIVE" && (
-                  <p className="mt-3 rounded-xl bg-ink/5 px-3 py-2 text-xs text-slate-600">
-                    {terminal.decision_note}
-                  </p>
-                )}
-                {owner && usable(terminal) && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button
-                      variant="secondary"
-                      onClick={() => setDialog({ kind: "setup", terminal })}
-                      className="px-3 py-2"
+                    </div>
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-0.5 text-[11px] font-bold",
+                        statusTone,
+                      )}
                     >
-                      <Settings2 size={14} />{" "}
-                      {t("terminals.setupShort", { defaultValue: "Set up" })}
-                    </Button>
-                    {!terminal.block_requested_at && (
+                      {statusKey
+                        ? t(statusKey, { defaultValue: statusFallback })
+                        : statusFallback}
+                    </span>
+                  </div>
+                  <dl className="mt-4 divide-y divide-slate-100 text-xs">
+                    {rows
+                      .filter(([, value]) => value)
+                      .map(([label, value]) => (
+                        <div
+                          key={label}
+                          className="flex justify-between gap-3 py-1.5"
+                        >
+                          <dt className="text-slate-500">{label}</dt>
+                          <dd className="text-right font-semibold text-slate-700">
+                            {value}
+                          </dd>
+                        </div>
+                      ))}
+                  </dl>
+                  {terminal.block_requested_at && (
+                    <p className="mt-3 flex items-center gap-1.5 rounded-xl bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
+                      <AlertTriangle size={13} />{" "}
+                      {t("terminals.blockRequested", {
+                        at: formatDateTime(terminal.block_requested_at),
+                        defaultValue: "Block asked for on {{at}}",
+                      })}
+                      {terminal.block_request_note &&
+                        ` · ${terminal.block_request_note}`}
+                    </p>
+                  )}
+                  {terminal.decision_note && terminal.status !== "ACTIVE" && (
+                    <p className="mt-3 rounded-xl bg-ink/5 px-3 py-2 text-xs text-slate-600">
+                      {terminal.decision_note}
+                    </p>
+                  )}
+                  {owner && usable(terminal) && (
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Button
                         variant="secondary"
-                        onClick={() => setDialog({ kind: "block", terminal })}
-                        className="px-3 py-2 text-red-600"
+                        onClick={() => setDialog({ kind: "setup", terminal })}
+                        className="px-3 py-2"
                       >
-                        <AlertTriangle size={14} />{" "}
-                        {t("terminals.report", {
-                          defaultValue: "Report a problem",
-                        })}
+                        <Settings2 size={14} />{" "}
+                        {t("terminals.setupShort", { defaultValue: "Set up" })}
                       </Button>
-                    )}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                      {!terminal.block_requested_at && (
+                        <Button
+                          variant="secondary"
+                          onClick={() => setDialog({ kind: "block", terminal })}
+                          className="px-3 py-2 text-red-600"
+                        >
+                          <AlertTriangle size={14} />{" "}
+                          {t("terminals.report", {
+                            defaultValue: "Report a problem",
+                          })}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <ShowMore list={list} />
+        </>
       )}
       {dialog?.kind === "setup" && (
         <SetupDialog

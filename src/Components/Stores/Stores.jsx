@@ -21,6 +21,14 @@ import ConfirmDialog from "@/Components/Common/ConfirmDialog";
 import EmptyState from "@/Components/Common/EmptyState";
 import ErrorState from "@/Components/Common/ErrorState";
 import LoadingState from "@/Components/Common/LoadingState";
+import FilterSelect from "@/Components/Common/FilterSelect";
+import CheckList from "@/Components/Common/CheckList";
+import {
+  ListSearch,
+  NoMatches,
+  ShowMore,
+} from "@/Components/Common/ListControls";
+import { useListControls } from "@/Hooks/Common/useListControls";
 import Modal from "@/Components/Common/Modal";
 import PosReceipt from "@/Components/Account/PosReceipt";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
@@ -324,13 +332,6 @@ function UserDialog({ user, stores, onClose, onSaved }) {
   );
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
-  const toggleStore = (id) =>
-    setForm((previous) => ({
-      ...previous,
-      store_ids: previous.store_ids.includes(id)
-        ? previous.store_ids.filter((x) => x !== id)
-        : [...previous.store_ids, id],
-    }));
   const manager = form.role === "STORE_MANAGER";
   const pinShort = !editing && form.pin.length < pinRules.minLength;
   const submit = async (event) => {
@@ -463,16 +464,16 @@ function UserDialog({ user, stores, onClose, onSaved }) {
           <p className="mb-2 text-sm font-semibold text-slate-700">
             {t("storeUsers.stores", { defaultValue: "Works in" })}
           </p>
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
-            {stores.map((store) => (
-              <CheckboxPill
-                key={store.id}
-                label={`${store.name} (${store.code})`}
-                checked={form.store_ids.includes(store.id)}
-                onChange={() => toggleStore(store.id)}
-              />
-            ))}
-          </div>
+          <CheckList
+            options={stores.map((store) => ({
+              value: store.id,
+              label: `${store.name} (${store.code})`,
+            }))}
+            value={form.store_ids}
+            onChange={(storeIds) =>
+              setForm((previous) => ({ ...previous, store_ids: storeIds }))
+            }
+          />
         </div>
         {editing && (
           <CheckboxPill
@@ -684,20 +685,18 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
               onChange={setDirection}
             />
             {mainWallets.length > 1 && (
-              <label className="block text-sm font-semibold text-slate-700">
-                {t("storeWallets.mainWallet", { defaultValue: "Main wallet" })}
-                <select
-                  value={main}
-                  onChange={(event) => setMain(event.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-surface px-3 py-3 text-sm"
-                >
-                  {mainWallets.map((w) => (
-                    <option key={w.acct_num} value={w.acct_num}>
-                      {w.acct_num} · {formatMoney(w.avail_bal, w.currency_code)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <FilterSelect
+                label={t("storeWallets.mainWallet", {
+                  defaultValue: "Main wallet",
+                })}
+                value={main}
+                onChange={setMain}
+                options={mainWallets.map((w) => ({
+                  value: w.acct_num,
+                  label: w.acct_num,
+                  description: formatMoney(w.avail_bal, w.currency_code),
+                }))}
+              />
             )}
             <TextField
               name="amount"
@@ -772,6 +771,31 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
         </div>
       </form>
     </Modal>
+  );
+}
+
+// A store card's map, opened on request: with many stores, a map per card
+// would load dozens of maps at once.
+function MapToggle({ store }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  if (!validPoint(store.latitude, store.longitude)) return null;
+  return open ? (
+    <StoreMap
+      latitude={store.latitude}
+      longitude={store.longitude}
+      height="h-40"
+      className="mt-3"
+    />
+  ) : (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className="mt-2 inline-flex items-center gap-1.5 self-start rounded-lg px-2 py-1 text-xs font-semibold text-ink hover:bg-ink/5"
+    >
+      <MapPin size={13} />
+      {t("stores.showMap", { defaultValue: "Show on map" })}
+    </button>
   );
 }
 
@@ -861,6 +885,28 @@ export default function Stores() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canMove]);
   const storeName = (id) => stores?.find((s) => s.id === id)?.name;
+  // Each tab's search and "Show more", for when the lists grow.
+  const storeList = useListControls(stores, {
+    textOf: (s) => [
+      s.name,
+      s.code,
+      s.address,
+      s.province,
+      s.phone_number,
+      s.status,
+    ],
+  });
+  const userList = useListControls(users, {
+    textOf: (u) => [
+      u.name,
+      u.phone_number,
+      u.role,
+      ...(u.stores ?? []).map((s) => s.name ?? storeName(s.id)),
+    ],
+  });
+  const walletList = useListControls(storeWallets, {
+    textOf: (w) => [w.store_name ?? storeName(w.store_id), w.acct_num],
+  });
   const tabs = [
     { key: "stores", label: t("stores.tab", { defaultValue: "Stores" }) },
     ...(canSeeUsers
@@ -949,87 +995,92 @@ export default function Stores() {
             />
           </div>
         ) : (
-          <ul className="grid gap-4 md:grid-cols-2">
-            {stores.map((store) => {
-              const [key, fallback, tone] = STORE_STATUS[store.status] ?? [
-                null,
-                store.status,
-                "bg-ink/5 text-ink",
-              ];
-              return (
-                <li
-                  key={store.id}
-                  className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-slate-800">
-                        {store.name}
-                      </p>
-                      <p className="font-mono text-xs text-slate-500">
-                        {store.code}
-                      </p>
+          <>
+            <ListSearch
+              list={storeList}
+              placeholder={t("stores.search", {
+                defaultValue: "Search stores by name, code or address",
+              })}
+            />
+            <NoMatches list={storeList} />
+            <ul className="grid gap-4 md:grid-cols-2">
+              {storeList.visible.map((store) => {
+                const [key, fallback, tone] = STORE_STATUS[store.status] ?? [
+                  null,
+                  store.status,
+                  "bg-ink/5 text-ink",
+                ];
+                return (
+                  <li
+                    key={store.id}
+                    className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-slate-800">
+                          {store.name}
+                        </p>
+                        <p className="font-mono text-xs text-slate-500">
+                          {store.code}
+                        </p>
+                      </div>
+                      <Badge tone={tone}>
+                        {key ? t(key, { defaultValue: fallback }) : fallback}
+                      </Badge>
                     </div>
-                    <Badge tone={tone}>
-                      {key ? t(key, { defaultValue: fallback }) : fallback}
-                    </Badge>
-                  </div>
-                  {store.status === "REJECTED" && store.decision_note && (
-                    <p className="mt-3 rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300">
-                      {store.decision_note}
+                    {store.status === "REJECTED" && store.decision_note && (
+                      <p className="mt-3 rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300">
+                        {store.decision_note}
+                      </p>
+                    )}
+                    <p className="mt-3 flex items-start gap-1.5 text-xs text-slate-500">
+                      <MapPin size={13} className="mt-0.5 shrink-0" />
+                      {[store.address, store.province, store.phone_number]
+                        .filter(Boolean)
+                        .join(" · ") || "—"}
                     </p>
-                  )}
-                  <p className="mt-3 flex items-start gap-1.5 text-xs text-slate-500">
-                    <MapPin size={13} className="mt-0.5 shrink-0" />
-                    {[store.address, store.province, store.phone_number]
-                      .filter(Boolean)
-                      .join(" · ") || "—"}
-                  </p>
-                  <StoreMap
-                    latitude={store.latitude}
-                    longitude={store.longitude}
-                    height="h-40"
-                    className="mt-3"
-                  />
-                  {owner && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {store.status !== "INACTIVE" && (
-                        <Button
-                          variant="secondary"
-                          onClick={() => setDialog({ kind: "store", store })}
-                          className="px-3 py-2"
-                        >
-                          <Pencil size={14} />{" "}
-                          {t("stores.editShort", { defaultValue: "Edit" })}
-                        </Button>
-                      )}
-                      {store.status === "ACTIVE" && (
-                        <Button
-                          variant="secondary"
-                          onClick={() => setDialog({ kind: "toggle", store })}
-                          className="px-3 py-2 text-red-600"
-                        >
-                          <PowerOff size={14} />{" "}
-                          {t("stores.close", { defaultValue: "Close" })}
-                        </Button>
-                      )}
-                      {store.status === "INACTIVE" && (
-                        <Button
-                          variant="secondary"
-                          pending={busy === store.id}
-                          onClick={() => setDialog({ kind: "toggle", store })}
-                          className="px-3 py-2"
-                        >
-                          <Power size={14} />{" "}
-                          {t("stores.reopen", { defaultValue: "Reopen" })}
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                    <MapToggle store={store} />
+                    {owner && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {store.status !== "INACTIVE" && (
+                          <Button
+                            variant="secondary"
+                            onClick={() => setDialog({ kind: "store", store })}
+                            className="px-3 py-2"
+                          >
+                            <Pencil size={14} />{" "}
+                            {t("stores.editShort", { defaultValue: "Edit" })}
+                          </Button>
+                        )}
+                        {store.status === "ACTIVE" && (
+                          <Button
+                            variant="secondary"
+                            onClick={() => setDialog({ kind: "toggle", store })}
+                            className="px-3 py-2 text-red-600"
+                          >
+                            <PowerOff size={14} />{" "}
+                            {t("stores.close", { defaultValue: "Close" })}
+                          </Button>
+                        )}
+                        {store.status === "INACTIVE" && (
+                          <Button
+                            variant="secondary"
+                            pending={busy === store.id}
+                            onClick={() => setDialog({ kind: "toggle", store })}
+                            className="px-3 py-2"
+                          >
+                            <Power size={14} />{" "}
+                            {t("stores.reopen", { defaultValue: "Reopen" })}
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            <ShowMore list={storeList} />
+          </>
         ))}
 
       {tab === "users" &&
@@ -1053,131 +1104,157 @@ export default function Stores() {
             />
           </div>
         ) : (
-          <ul className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-surface shadow-sm">
-            {users.map((person) => (
-              <li
-                key={person.id}
-                className="flex flex-wrap items-center gap-3 p-4 sm:px-6"
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink">
-                  <UserRound size={16} />
-                </span>
-                <span className="min-w-[12rem] flex-1">
-                  <span className="block text-sm font-semibold text-slate-800">
-                    {person.name}{" "}
-                    <span className="font-normal text-slate-500">
-                      · {roleName(person.role, t)}
+          <>
+            <ListSearch
+              list={userList}
+              placeholder={t("storeUsers.search", {
+                defaultValue: "Search by name, phone or store",
+              })}
+            />
+            <NoMatches list={userList} />
+            {userList.matches > 0 && (
+              <ul className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-surface shadow-sm">
+                {userList.visible.map((person) => (
+                  <li
+                    key={person.id}
+                    className="flex flex-wrap items-center gap-3 p-4 sm:px-6"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink">
+                      <UserRound size={16} />
                     </span>
-                  </span>
-                  <span className="block text-xs text-slate-500">
-                    {[
-                      person.phone_number,
-                      (person.stores ?? [])
-                        .map((s) => s.name ?? storeName(s.id))
-                        .join(", "),
-                      person.role === "STORE_MANAGER" &&
-                      person.refund_limit != null
-                        ? t("storeUsers.limitShort", {
-                            amount: formatMoney(person.refund_limit),
-                            defaultValue: "Refunds up to {{amount}}",
-                          })
-                        : null,
-                      person.last_sign_in_at
-                        ? t("storeUsers.lastSeen", {
-                            at: formatDateTime(person.last_sign_in_at),
-                            defaultValue: "Last signed in {{at}}",
-                          })
-                        : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </span>
-                </span>
-                <Badge
-                  tone={
-                    person.status === "ACTIVE"
-                      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                      : "bg-slate-500/15 text-slate-600"
-                  }
-                >
-                  {person.status === "ACTIVE"
-                    ? t("myAgents.active", { defaultValue: "Active" })
-                    : t("myAgents.inactive", { defaultValue: "Inactive" })}
-                </Badge>
-                {owner && (
-                  <>
-                    <Button
-                      variant="secondary"
-                      onClick={() => setDialog({ kind: "user", user: person })}
-                      className="px-3 py-2"
+                    <span className="min-w-[12rem] flex-1">
+                      <span className="block text-sm font-semibold text-slate-800">
+                        {person.name}{" "}
+                        <span className="font-normal text-slate-500">
+                          · {roleName(person.role, t)}
+                        </span>
+                      </span>
+                      <span className="block text-xs text-slate-500">
+                        {[
+                          person.phone_number,
+                          (person.stores ?? [])
+                            .map((s) => s.name ?? storeName(s.id))
+                            .join(", "),
+                          person.role === "STORE_MANAGER" &&
+                          person.refund_limit != null
+                            ? t("storeUsers.limitShort", {
+                                amount: formatMoney(person.refund_limit),
+                                defaultValue: "Refunds up to {{amount}}",
+                              })
+                            : null,
+                          person.last_sign_in_at
+                            ? t("storeUsers.lastSeen", {
+                                at: formatDateTime(person.last_sign_in_at),
+                                defaultValue: "Last signed in {{at}}",
+                              })
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
+                    </span>
+                    <Badge
+                      tone={
+                        person.status === "ACTIVE"
+                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                          : "bg-slate-500/15 text-slate-600"
+                      }
                     >
-                      <Pencil size={14} />{" "}
-                      {t("stores.editShort", { defaultValue: "Edit" })}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => setDialog({ kind: "pin", user: person })}
-                      className="px-3 py-2"
-                    >
-                      <KeyRound size={14} />{" "}
-                      {t("storeUsers.resetPinShort", {
-                        defaultValue: "New PIN",
-                      })}
-                    </Button>
-                  </>
+                      {person.status === "ACTIVE"
+                        ? t("myAgents.active", { defaultValue: "Active" })
+                        : t("myAgents.inactive", { defaultValue: "Inactive" })}
+                    </Badge>
+                    {owner && (
+                      <>
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            setDialog({ kind: "user", user: person })
+                          }
+                          className="px-3 py-2"
+                        >
+                          <Pencil size={14} />{" "}
+                          {t("stores.editShort", { defaultValue: "Edit" })}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            setDialog({ kind: "pin", user: person })
+                          }
+                          className="px-3 py-2"
+                        >
+                          <KeyRound size={14} />{" "}
+                          {t("storeUsers.resetPinShort", {
+                            defaultValue: "New PIN",
+                          })}
+                        </Button>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <ShowMore list={userList} />
+          </>
+        ))}
+
+      {tab === "wallets" && (
+        <>
+          <ListSearch
+            list={walletList}
+            placeholder={t("storeWallets.search", {
+              defaultValue: "Search by store or account",
+            })}
+          />
+          <NoMatches list={walletList} />
+          <ul className="grid gap-4 md:grid-cols-2">
+            {walletList.visible.map((wallet) => (
+              <li
+                key={wallet.acct_num}
+                className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="brand-gradient flex h-10 w-10 items-center justify-center rounded-xl text-lime">
+                    <Wallet size={18} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-slate-800">
+                      {wallet.store_name ??
+                        storeName(wallet.store_id) ??
+                        wallet.acct_product_name}
+                    </p>
+                    <p className="break-all text-xs text-slate-500">
+                      {wallet.acct_num}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-xl font-black tracking-tight text-slate-800">
+                  {formatMoney(wallet.avail_bal, wallet.currency_code)}
+                </p>
+                {owner && mainWallets.length > 0 && (
+                  <Button
+                    variant="secondary"
+                    onClick={() =>
+                      setDialog({
+                        kind: "sweep",
+                        wallet: {
+                          ...wallet,
+                          store_name:
+                            wallet.store_name ?? storeName(wallet.store_id),
+                        },
+                      })
+                    }
+                    className="mt-4"
+                  >
+                    <ArrowRightLeft size={15} />{" "}
+                    {t("storeWallets.move", { defaultValue: "Move money" })}
+                  </Button>
                 )}
               </li>
             ))}
           </ul>
-        ))}
-
-      {tab === "wallets" && (
-        <ul className="grid gap-4 md:grid-cols-2">
-          {storeWallets.map((wallet) => (
-            <li
-              key={wallet.acct_num}
-              className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <span className="brand-gradient flex h-10 w-10 items-center justify-center rounded-xl text-lime">
-                  <Wallet size={18} />
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-slate-800">
-                    {wallet.store_name ??
-                      storeName(wallet.store_id) ??
-                      wallet.acct_product_name}
-                  </p>
-                  <p className="break-all text-xs text-slate-500">
-                    {wallet.acct_num}
-                  </p>
-                </div>
-              </div>
-              <p className="mt-4 text-xl font-black tracking-tight text-slate-800">
-                {formatMoney(wallet.avail_bal, wallet.currency_code)}
-              </p>
-              {owner && mainWallets.length > 0 && (
-                <Button
-                  variant="secondary"
-                  onClick={() =>
-                    setDialog({
-                      kind: "sweep",
-                      wallet: {
-                        ...wallet,
-                        store_name:
-                          wallet.store_name ?? storeName(wallet.store_id),
-                      },
-                    })
-                  }
-                  className="mt-4"
-                >
-                  <ArrowRightLeft size={15} />{" "}
-                  {t("storeWallets.move", { defaultValue: "Move money" })}
-                </Button>
-              )}
-            </li>
-          ))}
-        </ul>
+          <ShowMore list={walletList} />
+        </>
       )}
 
       {dialog?.kind === "store" && (
