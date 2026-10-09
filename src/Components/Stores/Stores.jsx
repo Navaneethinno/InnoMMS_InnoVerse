@@ -22,6 +22,8 @@ import EmptyState from "@/Components/Common/EmptyState";
 import ErrorState from "@/Components/Common/ErrorState";
 import LoadingState from "@/Components/Common/LoadingState";
 import Modal from "@/Components/Common/Modal";
+import PosReceipt from "@/Components/Account/PosReceipt";
+import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import PhoneField from "@/Components/Common/PhoneField";
 import SegmentedTabs from "@/Components/Common/SegmentedTabs";
 import TextField from "@/Components/Common/TextField";
@@ -594,6 +596,7 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
   const [pin, setPin] = useState("");
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
+  const [done, setDone] = useState(null);
   const reference = useRef(null);
   const ends =
     direction === "toMain"
@@ -610,7 +613,7 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
         );
         reference.current = newReference();
       } else {
-        await sendPayment({
+        const result = await sendPayment({
           expectedCharge: quote.fee?.total_charge,
           txnType: "STORE_SWEEP",
           ...ends,
@@ -621,7 +624,8 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
         notifications.success(
           t("storeWallets.moved", { defaultValue: "Money moved." }),
         );
-        onDone();
+        // The printed receipt; the lists refresh when it is closed.
+        setDone(result ?? {});
       }
     } catch (error) {
       setProblem(error.message);
@@ -633,6 +637,22 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
     }
   };
   const needPin = quote && quote.pin_required !== false;
+  const title = t("storeWallets.move", { defaultValue: "Move money" });
+  if (done) {
+    return (
+      <Modal open onOpenChange={(open) => !open && onDone()} title={title}>
+        <PosReceipt
+          transaction={receiptToTransaction(done.receipt, {
+            quote,
+            rrn: done.rrn,
+          })}
+          note={done.replayed ? t("send.replayed") : null}
+        >
+          <Button onClick={onDone}>{t("cards.done")}</Button>
+        </PosReceipt>
+      </Modal>
+    );
+  }
   return (
     <Modal
       open
