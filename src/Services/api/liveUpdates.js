@@ -50,6 +50,9 @@ export function connectLive() {
         // Several moves close together refresh once.
         clearTimeout(burst);
         burst = setTimeout(() => window.dispatchEvent(new CustomEvent("merchant:wallet-changed", { detail: message.data ?? [] })), 400);
+      } else if (message.action === "ext_order") {
+        // A mobile-money order ended (SUCCESS / FAILED): { order_ref, rrn, status, ... }.
+        window.dispatchEvent(new CustomEvent("merchant:ext-order", { detail: message.data ?? {} }));
       } else if (message.type === "changed" && message.action === "card") {
         window.dispatchEvent(new CustomEvent("merchant:card-changed", { detail: message.data ?? [] }));
       } else if (message.type === "changed" && (message.action === "store" || message.action === "terminal")) {
@@ -131,3 +134,4 @@ function useLiveEvent(name, callback) {
 }
 export const useStoreChanged = (callback) => useLiveEvent("merchant:store-changed", callback);
 export const useTerminalChanged = (callback) => useLiveEvent("merchant:terminal-changed", callback);
+export const useExtOrder = (callback) => useLiveEvent("merchant:ext-order", callback);

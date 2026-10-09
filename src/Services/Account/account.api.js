@@ -108,6 +108,10 @@ export const sendPayment = ({ txnType, toAcctNum, toPhone, orgRrn, customerPhone
 // The mobile wallets: [{ code, name, prefixes: ["84", ...], send, top_up }].
 export const loadExtProviders = async () => (await portalPost(ACCOUNT.EXT_PROVIDERS)).rows;
 
+// One mobile-money order's state (PENDING while open): the same object the
+// live `ext_order` event carries.
+export const loadExtOrder = (orderRef) => data(portalPost(ACCOUNT.EXT_ORDER, { order_ref: orderRef }));
+
 // Newest first, every module. Resolves to { items, total, page }.
 // `refundable`: only payments received with something left to refund.
 export const loadHistory = async ({ page = 1, limit = 20, acctId = null, txnType = "", from = "", to = "", refundable = false } = {}) => {

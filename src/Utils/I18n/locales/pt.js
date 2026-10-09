@@ -965,4 +965,11 @@ export default {
   "ext.otherNumber": "Outro número meu",
   "history.txnType.EXT_WALLET_OUT": "Enviado para carteira móvel",
   "history.txnType.EXT_WALLET_IN": "Recebido de carteira móvel",
+  "ext.sendFailed": "{{provider}} não aceitou a transferência",
+  "ext.sendFailedHint": "O seu dinheiro foi devolvido à sua carteira.",
+  "ext.topUpFailed": "O carregamento não foi aprovado",
+  "ext.topUpFailedHint": "Nada foi retirado e a sua carteira não mudou.",
+  "ext.letYouKnow": "Vamos avisá-lo",
+  "ext.letYouKnowHint": "O operador ainda não respondeu. Receberá uma notificação quando responder, e aparece no seu histórico.",
+  "ext.waiting": "A aguardar o operador…",
 };

@@ -224,7 +224,7 @@ export default function Send() {
       <div>
         <h1 className="text-2xl font-black tracking-tight text-slate-800">{refunding ? t("refund.title", { defaultValue: "Refund a payment" }) : t("send.title")}</h1>
         <p className="mt-1 text-sm text-slate-500">{refunding ? t("refund.subtitle", { defaultValue: "Return money to a customer who paid you." }) : t("send.subtitle")}</p>
-        {!refunding && !refundOnly && !quote && !paid && (
+        {!refunding && !refundOnly && !quote && !paid && user?.features?.mobile_money === true && (
           <Link to="/mobile-money" className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-ink underline-offset-2 hover:underline">
             {t("ext.sendLink", { defaultValue: "Send to M-Pesa, e-Mola or mKesh, or top up →" })}
           </Link>

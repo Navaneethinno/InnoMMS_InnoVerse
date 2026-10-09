@@ -20,7 +20,7 @@ export const navScreens = {
   signups: { to: "/signups", labelKey: "nav.signups", icon: UserPlus },
   my_agents: { to: "/my-agents", labelKey: "nav.myAgents", icon: Users },
   stores: { to: "/stores", labelKey: "nav.stores", icon: Store },
-  // M-Pesa / e-Mola / mKesh: placed under Send for the owner (the API menu has no key for it).
+  // M-Pesa / e-Mola / mKesh (the menu lists it for owners when the bank offers it).
   mobile_money: { to: "/mobile-money", labelKey: "nav.mobileMoney", icon: Smartphone },
   terminals: { to: "/terminals", labelKey: "nav.terminals", icon: MonitorSmartphone },
 };

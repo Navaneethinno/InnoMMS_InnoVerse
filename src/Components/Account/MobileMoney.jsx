@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { CheckCircle2, Clock, Smartphone } from "lucide-react";
+import { Clock, Smartphone, XCircle } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import FitText from "@/Components/Common/FitText";
@@ -13,8 +13,8 @@ import TextField from "@/Components/Common/TextField";
 import PosReceipt from "@/Components/Account/PosReceipt";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
-import { useWalletChanged } from "@/Services/api/liveUpdates";
-import { loadExtProviders, loadWallets, quotePayment, sendPayment } from "@/Services/Account/account.api";
+import { useExtOrder, useWalletChanged } from "@/Services/api/liveUpdates";
+import { loadExtOrder, loadExtProviders, loadReceipt, loadWallets, quotePayment, sendPayment } from "@/Services/Account/account.api";
 import { formatMoney, newReference } from "@/Utils/Lib/format";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
@@ -29,6 +29,9 @@ import { isStaff, sendableWallets } from "@/Utils/Lib/roles";
 // attempt (reused on a retry, so nothing is charged twice).
 const TXN = { send: "EXT_WALLET_OUT", topUp: "EXT_WALLET_IN" };
 const EMPTY = { phone: "", amount: "", note: "" };
+// How long the screen waits for the provider before saying "we'll let you know".
+const WAIT_MS = 3 * 60 * 1000;
+const POLL_MS = 15000;
 const digitsOf = (phone) => String(phone ?? "").replace(/\D/g, "").replace(/^258/, "");
 
 export default function MobileMoney() {
@@ -46,7 +49,11 @@ export default function MobileMoney() {
   const [quote, setQuote] = useState(null);
   const [pin, setPin] = useState("");
   const [done, setDone] = useState(null);
-  const [credited, setCredited] = useState(false);
+  // The order's final state (live `ext_order` event, or account/ext_order), the
+  // top-up's receipt once credited, and whether the screen stopped waiting.
+  const [order, setOrder] = useState(null);
+  const [topUpReceipt, setTopUpReceipt] = useState(null);
+  const [gaveUp, setGaveUp] = useState(false);
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
   const reference = useRef(null);
@@ -63,16 +70,40 @@ export default function MobileMoney() {
       .then((list) => setWallets(sendableWallets(list, user)))
       .catch(() => {});
   }, [user]);
-  // The top-up is credited when the merchant approves it on their phone.
   useWalletChanged(() => {
-    if (done && !sending) setCredited(true);
     loadWallets()
       .then((list) => setWallets(sendableWallets(list, user)))
       .catch(() => {});
   });
 
+  const orderRef = done?.external?.order_ref;
+  const open = Boolean(done) && !order && (done.external?.status ?? "PENDING") === "PENDING";
+  const settle = (next) => {
+    if (!next || next.status === "PENDING") return;
+    setOrder(next);
+    // A credited top-up has a receipt of its own.
+    if (next.status === "SUCCESS" && next.txn_type === TXN.topUp && next.rrn) loadReceipt({ rrn: next.rrn }).then(setTopUpReceipt).catch(() => {});
+  };
+  useExtOrder((detail) => {
+    if (open && ((orderRef && detail?.order_ref === orderRef) || (done.rrn && detail?.rrn === done.rrn))) settle(detail);
+  });
+  // Fallback when no event arrives: ask now and then, and stop after a while.
+  useEffect(() => {
+    if (!open || !orderRef) return undefined;
+    const poll = window.setInterval(() => loadExtOrder(orderRef).then(settle).catch(() => {}), POLL_MS);
+    const stop = window.setTimeout(() => setGaveUp(true), WAIT_MS);
+    return () => {
+      window.clearInterval(poll);
+      window.clearTimeout(stop);
+    };
+     
+  }, [open, orderRef]);
+
   const offered = useMemo(() => (providers ?? []).filter((p) => (sending ? p.send : p.top_up)), [providers, sending]);
   const names = offered.map((p) => p.name);
+  // Only wallets in a currency the providers use (MZN).
+  const currencies = new Set(offered.map((p) => p.currency_code).filter(Boolean));
+  const usable = currencies.size ? wallets.filter((w) => currencies.has(w.currency_code)) : wallets;
   const namesText = names.length > 1 ? `${names.slice(0, -1).join(", ")} ${t("ext.or", { defaultValue: "or" })} ${names.at(-1)}` : (names[0] ?? "");
   // The provider the typed number belongs to, for its logo (the server decides).
   const digits = digitsOf(form.phone);
@@ -109,7 +140,9 @@ export default function MobileMoney() {
     setQuote(null);
     setPreview(null);
     setDone(null);
-    setCredited(false);
+    setOrder(null);
+    setTopUpReceipt(null);
+    setGaveUp(false);
     setPin("");
     reference.current = null;
   };
@@ -201,50 +234,79 @@ export default function MobileMoney() {
       </div>
     );
   }
+  if (user?.features?.mobile_money === false) {
+    return (
+      <div>
+        {heading}
+        <ErrorState message={t("ext.none", { defaultValue: "Mobile money isn't available right now." })} />
+      </div>
+    );
+  }
   if (!providers) return <LoadingState />;
 
-  // Done: a successful send prints its receipt; anything still with the provider says so.
+  // Done. A successful send prints its receipt; a credited top-up prints its
+  // own; a failure says the money came back (send) or nothing moved (top-up).
   if (done) {
-    const external = done.external ?? quote?.external ?? {};
-    if (sending && external.status !== "PENDING") {
+    const external = { ...(quote?.external ?? {}), ...(done.external ?? {}), ...(order ?? {}) };
+    const status = order?.status ?? external.status ?? "PENDING";
+    const receipt = sending ? done.receipt : topUpReceipt;
+    const actions = (
+      <>
+        <Button onClick={reset}>{sending ? t("ext.again", { defaultValue: "Send again" }) : t("cards.done")}</Button>
+        <Link to="/history" className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-surface px-5 py-3.5 text-sm font-semibold text-ink hover:bg-slate-50">
+          {t("send.viewHistory")}
+        </Link>
+      </>
+    );
+    if (status === "SUCCESS" && receipt) {
       return (
-        <PosReceipt transaction={receiptToTransaction(done.receipt, { quote, user, rrn: done.rrn, toPhone: external.account, note: form.note.trim() })} note={done.replayed ? t("send.replayed") : null} className="py-2">
-          <Button onClick={reset}>{t("ext.again", { defaultValue: "Send again" })}</Button>
-          <Link to="/history" className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-surface px-5 py-3.5 text-sm font-semibold text-ink hover:bg-slate-50">
-            {t("send.viewHistory")}
-          </Link>
+        <PosReceipt
+          transaction={receiptToTransaction(receipt, { quote, user, rrn: order?.rrn ?? done.rrn, toPhone: sending ? external.account : undefined, note: form.note.trim() })}
+          note={done.replayed ? t("send.replayed") : sending ? null : t("ext.creditedHint", { amount: money(done.net_credit ?? quote?.net_credit), defaultValue: "{{amount}} is in your wallet." })}
+          className="py-2"
+        >
+          {actions}
         </PosReceipt>
       );
     }
-    const Icon = credited ? CheckCircle2 : sending ? Clock : Smartphone;
+    const failed = status === "FAILED";
+    const Icon = failed ? XCircle : sending ? Clock : Smartphone;
+    const title = failed
+      ? sending
+        ? t("ext.sendFailed", { provider: external.provider_name, defaultValue: "{{provider}} did not accept the transfer" })
+        : t("ext.topUpFailed", { defaultValue: "The top-up was not approved" })
+      : gaveUp
+        ? t("ext.letYouKnow", { defaultValue: "We'll let you know" })
+        : sending
+          ? t("ext.inProgress", { defaultValue: "Transfer in progress" })
+          : t("ext.approveOnPhone", { provider: external.provider_name, defaultValue: "Approve the request on your {{provider}} phone" });
+    const hint = failed
+      ? sending
+        ? t("ext.sendFailedHint", { defaultValue: "Your money was returned to your wallet." })
+        : t("ext.topUpFailedHint", { defaultValue: "Nothing was taken and your wallet is unchanged." })
+      : gaveUp
+        ? t("ext.letYouKnowHint", { defaultValue: "The provider hasn't answered yet. You'll get a notification when it does, and it shows in your history." })
+        : sending
+          ? t("ext.inProgressHint", { defaultValue: "It finishes by itself within a few minutes. If it fails, the money comes back and you are notified." })
+          : t("ext.approveHint", { amount: money(done.net_credit ?? quote?.net_credit), number: external.account, defaultValue: "We asked {{number}} for the money. Your wallet gets {{amount}} once you approve." });
+    const waiting = !failed && !gaveUp && status !== "SUCCESS";
     return (
       <div>
         {heading}
         <div className={`${card} text-center`}>
-          <span className="brand-gradient mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-lime shadow-md">
-            <Icon size={26} className={credited ? undefined : "animate-pulse"} />
+          <span className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl shadow-md ${failed ? "bg-red-500/10 text-red-600" : "brand-gradient text-lime"}`}>
+            <Icon size={26} className={waiting ? "animate-pulse" : undefined} />
           </span>
-          <p className="mt-4 text-lg font-black text-slate-800">
-            {sending
-              ? t("ext.inProgress", { defaultValue: "Transfer in progress" })
-              : credited
-                ? t("ext.credited", { defaultValue: "Your wallet was topped up" })
-                : t("ext.approveOnPhone", { provider: external.provider_name, defaultValue: "Approve the request on your {{provider}} phone" })}
-          </p>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-            {sending
-              ? t("ext.inProgressHint", { defaultValue: "It finishes by itself within a few minutes. If it fails, the money comes back and you are notified." })
-              : credited
-                ? t("ext.creditedHint", { amount: money(done.net_credit ?? quote?.net_credit), defaultValue: "{{amount}} is in your wallet." })
-                : t("ext.approveHint", { amount: money(done.net_credit ?? quote?.net_credit), number: external.account, defaultValue: "We asked {{number}} for the money. Your wallet gets {{amount}} once you approve." })}
-          </p>
-          {done.rrn && <p className="mt-3 text-xs font-semibold text-slate-500">{t("ext.reference", { rrn: done.rrn, defaultValue: "Reference {{rrn}}" })}</p>}
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Button onClick={reset}>{t("cards.done")}</Button>
-            <Link to="/history" className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-surface px-5 py-3.5 text-sm font-semibold text-ink hover:bg-slate-50">
-              {t("send.viewHistory")}
-            </Link>
-          </div>
+          <p className="mt-4 text-lg font-black text-slate-800">{title}</p>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">{hint}</p>
+          {waiting && (
+            <p className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
+              <span className="h-2 w-2 animate-ping rounded-full bg-ink" />
+              {t("ext.waiting", { defaultValue: "Waiting for the provider…" })}
+            </p>
+          )}
+          {(order?.rrn ?? done.rrn) && <p className="mt-3 text-xs font-semibold text-slate-500">{t("ext.reference", { rrn: order?.rrn ?? done.rrn, defaultValue: "Reference {{rrn}}" })}</p>}
+          <div className="mt-6 flex flex-wrap justify-center gap-3">{actions}</div>
         </div>
       </div>
     );
@@ -321,12 +383,12 @@ export default function MobileMoney() {
               ))}
             </div>
           )}
-          {wallets.length > 1 && (
+          {usable.length > 1 && (
             <label className="block text-sm font-semibold text-slate-700">
               {sending ? t("send.from") : t("ext.toWallet", { defaultValue: "Into wallet" })}
               <select value={from} onChange={(event) => setFrom(event.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-surface px-3 py-3 text-sm">
                 <option value="">{t("ext.mainWallet", { defaultValue: "Main wallet" })}</option>
-                {wallets.map((w) => (
+                {usable.map((w) => (
                   <option key={w.acct_num} value={w.acct_num}>
                     {w.acct_num} · {formatMoney(w.avail_bal, w.currency_code)}
                   </option>

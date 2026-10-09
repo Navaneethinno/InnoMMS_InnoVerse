@@ -960,4 +960,11 @@ export default {
   "ext.otherNumber": "Another of my numbers",
   "history.txnType.EXT_WALLET_OUT": "Sent to mobile wallet",
   "history.txnType.EXT_WALLET_IN": "Received from mobile wallet",
+  "ext.sendFailed": "{{provider}} did not accept the transfer",
+  "ext.sendFailedHint": "Your money was returned to your wallet.",
+  "ext.topUpFailed": "The top-up was not approved",
+  "ext.topUpFailedHint": "Nothing was taken and your wallet is unchanged.",
+  "ext.letYouKnow": "We'll let you know",
+  "ext.letYouKnowHint": "The provider hasn't answered yet. You'll get a notification when it does, and it shows in your history.",
+  "ext.waiting": "Waiting for the provider…",
 };
