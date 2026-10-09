@@ -114,7 +114,9 @@ api.interceptors.response.use(
     // point to the reset.
     if (error.response?.data?.error_code === "portal.pin_locked") window.dispatchEvent(new Event("merchant:pin-locked"));
     // The institution disabled this merchant's access: say so and sign out.
-    if (error.response?.status === 403 && request && !request.skipAuth) {
+    // `store.staff_not_allowed` only means this user's role can't make the
+    // call (a store user): the session is fine, so the screen just says so.
+    if (error.response?.status === 403 && request && !request.skipAuth && error.response.data?.error_code !== "store.staff_not_allowed") {
       notifications.error(error.response.data?.message || "");
       clearAuthSession();
       window.dispatchEvent(new Event("merchant:session-expired"));

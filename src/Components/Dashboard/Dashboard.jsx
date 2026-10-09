@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { isStaff } from "@/Utils/Lib/roles";
+import { navScreens } from "@/Utils/Config/routeConfig";
 import { useTranslation } from "react-i18next";
 import { Check, LayoutGrid, RotateCcw } from "lucide-react";
 import { DashboardGrid } from "./layout/DashboardGrid";
@@ -20,9 +23,19 @@ import { WIDGET_REGISTRY } from "./layout/widgetRegistry";
 //   widgets/*                 the widgets themselves
 const greetingKey = (hour = new Date().getHours()) => (hour < 12 ? "dash.goodMorning" : hour < 17 ? "dash.goodAfternoon" : "dash.goodEvening");
 
+// Store users have no dashboard (the menu says `dashboard: false`): they go to
+// their first screen, and the layout is never asked for.
 export default function Dashboard() {
-  const { t } = useTranslation();
   const user = useSelector((state) => state.auth.user);
+  if (user?.dashboard === false || isStaff(user)) {
+    const first = (user?.menu ?? []).map((item) => navScreens[item.key]?.to).find((to) => to && to !== "/dashboard");
+    return first ? <Navigate to={first} replace /> : null;
+  }
+  return <MerchantDashboard user={user} />;
+}
+
+function MerchantDashboard({ user }) {
+  const { t } = useTranslation();
   const server = useDashboardServer();
   const accountData = useAccountDataLoader();
   const serverLayout = useMemo(() => (server.loaded ? { layout: server.layout } : undefined), [server]);

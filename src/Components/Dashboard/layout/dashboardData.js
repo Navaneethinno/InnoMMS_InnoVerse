@@ -4,9 +4,10 @@ import { notifications } from "@/Utils/Lib/notifications";
 
 // The saved layout and the widgets this merchant may place, from the server
 // (`layout` is null until they customise; `widgets` null if it could not say).
-export function useDashboardServer() {
+export function useDashboardServer(enabled = true) {
   const [state, setState] = useState({ loaded: false, layout: null, widgets: null });
   useEffect(() => {
+    if (!enabled) return undefined;
     let cancelled = false;
     dashboardApi
       .getLayout()
@@ -20,7 +21,7 @@ export function useDashboardServer() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [enabled]);
   return state;
 }
 
