@@ -187,3 +187,24 @@
 html.dark:root {
   --toastify-color-info: rgb(var(--color-secondary));
 }
+
+/* Thin scrollbars everywhere, in the theme's colours (as the admin portal):
+   no bulky light browser bar on a dark card. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--color-ink) / 0.18) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgb(var(--color-ink) / 0.18);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+.thin-scrollbar {
+  scrollbar-gutter: stable;
+}

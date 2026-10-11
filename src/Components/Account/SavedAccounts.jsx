@@ -102,7 +102,7 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
           ) : (
             <span
               key={item.id}
-              className={`inline-flex items-center rounded-full border text-xs font-bold ${value === item.id ? "border-ink bg-ink text-lime" : "border-slate-200 text-slate-600"}`}
+              className={`inline-flex items-center rounded-full border text-xs font-bold ${value === item.id ? "border-forest bg-forest text-white dark:border-lime dark:bg-lime dark:text-on-secondary" : "border-slate-200 text-slate-600"}`}
             >
               <button
                 type="button"

@@ -105,6 +105,7 @@ export default function Airtime() {
         onChange={(who) => setForm((f) => ({ ...f, who }))}
       />
       <BuyAgain
+        currency={list?.[0]?.currency_code}
         onPick={(last) =>
           setForm({
             ...EMPTY,
@@ -174,7 +175,7 @@ export default function Airtime() {
 }
 
 // The last top-up, one tap to fill the form again.
-function BuyAgain({ onPick }) {
+function BuyAgain({ onPick, currency }) {
   const { t } = useTranslation();
   const [last, setLast] = useState(null);
   useEffect(() => {
@@ -191,7 +192,7 @@ function BuyAgain({ onPick }) {
     >
       <RotateCcw size={13} />
       {t("airtime.again", {
-        amount: formatMoney(last.amount),
+        amount: formatMoney(last.amount, last.currency_code ?? currency),
         number: last.account,
         defaultValue: "Buy again: {{amount}} for {{number}}",
       })}

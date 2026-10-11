@@ -120,7 +120,7 @@ export default function AppLayout() {
         )}
 
         <div className="flex min-w-0 flex-1 flex-col gap-4">
-          <div className="sticky top-3 z-30 sm:top-4">
+          <div className="sticky top-0 z-30 -mt-3 pt-3 sm:-mt-4 sm:pt-4 bg-paper bg-fixed bg-[linear-gradient(160deg,rgb(var(--color-secondary)/0.28),rgb(var(--color-secondary)/0.16)_50%,rgb(var(--color-secondary)/0.26))] dark:bg-[linear-gradient(160deg,rgb(var(--color-secondary)/0.07),rgb(var(--color-secondary)/0.02)_50%,rgb(var(--color-secondary)/0.06))]">
             <TopBar onMenu={() => setDrawer(true)} />
           </div>
           <main className="flex-1 px-1 pb-4 pt-2 sm:px-2">

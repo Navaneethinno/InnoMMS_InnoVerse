@@ -339,7 +339,7 @@ export default function ExtFlow({
       selected={wallet}
       onSelect={setFrom}
       footer={<LimitsList wallet={wallet} txnType={request?.txn_type} />}
-      className="lg:sticky lg:top-6"
+      className="h-auto lg:sticky lg:top-28"
     />
   );
   const card = "rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm";
@@ -596,7 +596,7 @@ export function Chips({ options, value, onChange, allowNone, highlight }) {
             onClick={() =>
               onChange?.(value === o.value && allowNone ? "" : o.value)
             }
-            className={`rounded-full border px-4 py-2 text-sm font-bold transition disabled:cursor-default ${on ? "border-ink bg-ink text-lime" : "border-slate-200 text-slate-600 hover:border-ink/40"}`}
+            className={`rounded-full border px-4 py-2 text-sm font-bold transition disabled:cursor-default ${on ? "border-forest bg-forest text-white dark:border-lime dark:bg-lime dark:text-on-secondary" : "border-slate-200 text-slate-600 hover:border-ink/40"}`}
           >
             {o.label}
           </button>

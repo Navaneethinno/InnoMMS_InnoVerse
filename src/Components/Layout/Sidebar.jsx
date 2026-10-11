@@ -47,7 +47,7 @@ export default function Sidebar({ collapsed = false, hovering = false, onHoverCh
         )}
       </div>
 
-      <nav aria-label={t("nav.main")} className="mt-4 grid gap-1">
+      <nav aria-label={t("nav.main")} className="thin-scrollbar -mr-1 mt-4 grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overflow-x-hidden pr-1">
         {items.map(({ key, to, labelKey, label, icon }) => {
           const Icon = icon;
           const name = label || t(labelKey);
@@ -79,7 +79,7 @@ export default function Sidebar({ collapsed = false, hovering = false, onHoverCh
         })}
       </nav>
 
-      <div className="mt-auto grid gap-1 border-t border-slate-200 pt-3">
+      <div className="mt-3 grid shrink-0 gap-1 border-t border-slate-200 pt-3">
         <button
           type="button"
           onClick={() => void signOut()}

@@ -3,8 +3,12 @@ import i18n from "@/Utils/I18n/i18n";
 // How many decimals each currency has (wallets and summaries say so), and the
 // institution's time zone (auth/me): amounts and times are shown by them.
 const decimalsOf = new Map();
+// The merchant's own currency (their first wallet's): used when a reply gives
+// an amount without one, rather than showing dollars.
+let homeCurrency;
 export function rememberCurrencies(list) {
   for (const item of list ?? []) {
+    if (item?.currency_code && !homeCurrency) homeCurrency = item.currency_code;
     const places = Number(item?.currency_decimals);
     if (item?.currency_code && Number.isInteger(places) && places >= 0) decimalsOf.set(item.currency_code, places);
   }
@@ -22,8 +26,9 @@ export function formatMoney(amount, currency, { signed = false } = {}) {
   try {
     // The decimal string goes in as it is, so a very large amount keeps every digit.
     const digits = String(amount).trim().replace(/^[-+]/, "");
-    const places = decimalsOf.get(currency);
-    const formatter = new Intl.NumberFormat(i18n.resolvedLanguage, { style: "currency", currency: currency || "USD", ...(places != null ? { minimumFractionDigits: places, maximumFractionDigits: places } : {}) });
+    const code = currency || homeCurrency || "USD";
+    const places = decimalsOf.get(code);
+    const formatter = new Intl.NumberFormat(i18n.resolvedLanguage, { style: "currency", currency: code, ...(places != null ? { minimumFractionDigits: places, maximumFractionDigits: places } : {}) });
     text = /^\d+(\.\d+)?$/.test(digits) ? formatter.format(digits) : formatter.format(Math.abs(value));
   } catch {
     // Not an ISO currency code: show the number and the code as sent.
