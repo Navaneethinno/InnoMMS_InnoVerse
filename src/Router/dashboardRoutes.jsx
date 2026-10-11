@@ -15,6 +15,11 @@ const AssistedSignup = lazy(() => import("@/Components/Agent/AssistedSignup"));
 const MyAgents = lazy(() => import("@/Components/Agent/MyAgents"));
 const Stores = lazy(() => import("@/Components/Stores/Stores"));
 const MobileMoney = lazy(() => import("@/Components/Account/MobileMoney"));
+const BankTransfer = lazy(() => import("@/Components/Account/BankTransfer"));
+const Airtime = lazy(() => import("@/Components/Account/Airtime"));
+const Electricity = lazy(() => import("@/Components/Account/Electricity"));
+const Bills = lazy(() => import("@/Components/Account/Bills"));
+const MyCode = lazy(() => import("@/Components/Account/MyCode"));
 const Terminals = lazy(() => import("@/Components/Terminals/Terminals"));
 export const dashboardRoutes = [
   { path: "dashboard", element: pageElement(Dashboard) },
@@ -32,5 +37,10 @@ export const dashboardRoutes = [
   { path: "my-agents", element: pageElement(MyAgents) },
   { path: "stores", element: pageElement(Stores) },
   { path: "mobile-money", element: pageElement(MobileMoney) },
+  { path: "bank-transfer", element: pageElement(BankTransfer) },
+  { path: "airtime", element: pageElement(Airtime) },
+  { path: "electricity", element: pageElement(Electricity) },
+  { path: "bills", element: pageElement(Bills) },
+  { path: "my-code", element: pageElement(MyCode) },
   { path: "terminals", element: pageElement(Terminals) },
 ];

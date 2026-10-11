@@ -1,4 +1,24 @@
-import { ArrowRightLeft, Banknote, Smartphone, Bell, CreditCard, FileText, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Store, UserPlus, UserRound, Users } from "lucide-react";
+import {
+  ArrowRightLeft,
+  Banknote,
+  Landmark,
+  Phone,
+  QrCode,
+  Receipt,
+  Smartphone,
+  Zap,
+  Bell,
+  CreditCard,
+  FileText,
+  History,
+  LayoutDashboard,
+  MonitorSmartphone,
+  ShieldCheck,
+  Store,
+  UserPlus,
+  UserRound,
+  Users,
+} from "lucide-react";
 
 // Ordered by merchant navigation. Extend only when actual screens are added.
 export const routeConfig = { login: { titleKey: "auth.title" } };
@@ -7,12 +27,20 @@ export const routeConfig = { login: { titleKey: "auth.title" } };
 // (which items, in what order, with what label) comes from the API; a key not
 // listed here is not shown, and a screen the API does not list is not offered.
 export const navScreens = {
-  dashboard: { to: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
+  dashboard: {
+    to: "/dashboard",
+    labelKey: "nav.dashboard",
+    icon: LayoutDashboard,
+  },
   send: { to: "/send", labelKey: "nav.send", icon: ArrowRightLeft },
   history: { to: "/history", labelKey: "nav.history", icon: History },
   cards: { to: "/cards", labelKey: "nav.cards", icon: CreditCard },
   statements: { to: "/statements", labelKey: "nav.statements", icon: FileText },
-  notifications: { to: "/notifications", labelKey: "nav.notifications", icon: Bell },
+  notifications: {
+    to: "/notifications",
+    labelKey: "nav.notifications",
+    icon: Bell,
+  },
   profile: { to: "/profile", labelKey: "nav.profile", icon: UserRound },
   security: { to: "/security", labelKey: "nav.security", icon: ShieldCheck },
   // Agents, stores and POS (shown only when the API's menu lists them).
@@ -21,16 +49,44 @@ export const navScreens = {
   my_agents: { to: "/my-agents", labelKey: "nav.myAgents", icon: Users },
   stores: { to: "/stores", labelKey: "nav.stores", icon: Store },
   // M-Pesa / e-Mola / mKesh (the menu lists it for owners when the bank offers it).
-  mobile_money: { to: "/mobile-money", labelKey: "nav.mobileMoney", icon: Smartphone },
-  terminals: { to: "/terminals", labelKey: "nav.terminals", icon: MonitorSmartphone },
+  mobile_money: {
+    to: "/mobile-money",
+    labelKey: "nav.mobileMoney",
+    icon: Smartphone,
+  },
+  // Bank, airtime, CREDELEC, bills and the Paga-Daki code (owners, when offered).
+  bank_transfer: {
+    to: "/bank-transfer",
+    labelKey: "nav.bankTransfer",
+    icon: Landmark,
+  },
+  airtime: { to: "/airtime", labelKey: "nav.airtime", icon: Phone },
+  electricity: { to: "/electricity", labelKey: "nav.electricity", icon: Zap },
+  bills: { to: "/bills", labelKey: "nav.bills", icon: Receipt },
+  my_code: { to: "/my-code", labelKey: "nav.myCode", icon: QrCode },
+  terminals: {
+    to: "/terminals",
+    labelKey: "nav.terminals",
+    icon: MonitorSmartphone,
+  },
 };
 
 // What the sidebar shows until the menu has been fetched (or when it cannot be).
-export const navItems = ["dashboard", "send", "history", "cards", "security"].map((key) => ({ key, ...navScreens[key] }));
+export const navItems = [
+  "dashboard",
+  "send",
+  "history",
+  "cards",
+  "security",
+].map((key) => ({ key, ...navScreens[key] }));
 
 // The API's menu -> the sidebar's items, in its order, unknown keys dropped.
 export const navFromMenu = (menu) =>
   [...(menu ?? [])]
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .filter((item) => navScreens[item.key])
-    .map((item) => ({ key: item.key, ...navScreens[item.key], label: item.label }));
+    .map((item) => ({
+      key: item.key,
+      ...navScreens[item.key],
+      label: item.label,
+    }));

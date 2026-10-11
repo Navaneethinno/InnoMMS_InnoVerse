@@ -118,6 +118,15 @@ export const API_ENDPOINTS = {
     // M-Pesa / e-Mola / mKesh: who the portal can send to and top up from.
     EXT_PROVIDERS: accountPath("ext_providers"),
     EXT_ORDER: accountPath("ext_order"),
+    // Bank transfer, airtime, CREDELEC and bills.
+    EXT_LAST: accountPath("ext_last"),
+    BILL_LOOKUP: accountPath("bill_lookup"),
+    SAVED_ACCOUNTS: accountPath("saved_accounts"),
+    SAVED_ACCOUNT_ADD: accountPath("saved_account_add"),
+    SAVED_ACCOUNT_RENAME: accountPath("saved_account_rename"),
+    SAVED_ACCOUNT_DELETE: accountPath("saved_account_delete"),
+    // The merchant's 7-digit Paga-Daki code.
+    MY_CODE: accountPath("my_code"),
     HISTORY_EXPORT: accountPath("history_export"),
     // Money sent to a number that is not a customer yet, waiting for them.
     PHONE_TRANSFERS: accountPath("phone_transfers"),
