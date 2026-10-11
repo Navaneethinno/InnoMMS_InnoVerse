@@ -339,7 +339,7 @@ export default function ExtFlow({
       selected={wallet}
       onSelect={setFrom}
       footer={<LimitsList wallet={wallet} txnType={request?.txn_type} />}
-      className="order-first lg:order-none"
+      className="lg:sticky lg:top-6"
     />
   );
   const card = "rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm";
@@ -442,7 +442,7 @@ export default function ExtFlow({
       <div className="max-w-6xl">
         <TransactionPinNotice />
       </div>
-      <div className="grid max-w-6xl items-stretch gap-6 lg:grid-cols-2">
+      <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-2">
         <form onSubmit={review} className={`${card} min-w-0 space-y-5`}>
           {children}
           <TextField
@@ -592,10 +592,11 @@ export function Chips({ options, value, onChange, allowNone, highlight }) {
             key={o.value}
             type="button"
             aria-pressed={value === o.value}
+            disabled={!onChange}
             onClick={() =>
               onChange?.(value === o.value && allowNone ? "" : o.value)
             }
-            className={`rounded-full border px-4 py-2 text-sm font-bold transition ${on ? "border-ink bg-ink text-lime" : "border-slate-200 text-slate-600 hover:border-ink/40"}`}
+            className={`rounded-full border px-4 py-2 text-sm font-bold transition disabled:cursor-default ${on ? "border-ink bg-ink text-lime" : "border-slate-200 text-slate-600 hover:border-ink/40"}`}
           >
             {o.label}
           </button>

@@ -128,7 +128,7 @@ export default function MyCode() {
   return (
     <div>
       {heading}
-      <div className="grid max-w-6xl items-stretch gap-6 lg:grid-cols-2">
+      <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-2">
         <div className="flex flex-col items-center rounded-3xl border border-slate-200 bg-surface p-8 text-center shadow-sm">
           <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
             {label}
@@ -153,7 +153,7 @@ export default function MyCode() {
           <p className="mt-6 font-mono text-5xl font-black tracking-[0.15em] text-slate-800 sm:text-6xl">
             {spaced(code)}
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-6 grid w-full gap-3 sm:flex sm:w-auto sm:flex-wrap sm:justify-center">
             <CopyButton
               value={code}
               label={t("myCode.copy", { defaultValue: "Copy code" })}
