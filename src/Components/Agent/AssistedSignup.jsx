@@ -16,6 +16,7 @@ import OnboardingWizardView from "@/Components/Onboarding/OnboardingWizardView";
 import { assistedFlows } from "@/Services/Agent/agent.api";
 import { STORAGE_KEYS } from "@/Utils/Constant";
 import { isSuperAgent } from "@/Utils/Lib/roles";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 // Assisted sign-up (handoff, phase 4): an agent signs a CUSTOMER up from its own
 // session, and a super agent also signs AGENTS up. It is the self sign-up form
@@ -114,9 +115,9 @@ export default function AssistedSignup() {
       </Link>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-800">
+          <PageHeading>
             {title}
-          </h1>
+          </PageHeading>
           <p className="mt-1 text-sm text-slate-500">
             {who === "agent"
               ? t("signups.agentHint", {

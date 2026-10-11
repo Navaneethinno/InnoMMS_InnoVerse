@@ -1099,4 +1099,9 @@ export default {
   "myCode.step3": "The money arrives in your wallet at once, and shows in your history.",
   "myCode.step3Agent": "The money arrives at once. For a cash-out it lands in your float: hand over the cash.",
   "myCode.private": "The code only receives money: showing it is safe. Nobody can take money with it.",
+  "ext.sendHint": "From your wallet to an M-Pesa, e-Mola or mKesh number.",
+  "ext.topUpHint": "Into your wallet from your mobile wallet. You approve on your phone.",
+  "agent.sendFloatHint": "Move float to one of your agents.",
+  "send.modeSendHint": "To anyone by their phone number.",
+  "send.modeRefundHint": "Give a customer back a payment they made.",
 };

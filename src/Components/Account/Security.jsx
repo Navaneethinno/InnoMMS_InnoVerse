@@ -19,6 +19,7 @@ import { usePolicy } from "@/Hooks/Auth/usePolicy";
 import { fitsPasswordRules, passwordRuleText } from "@/Utils/Lib/policy";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { fitsPinRules, pinRuleText, sanitizePin } from "@/Utils/Lib/pinRules";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 // The signed-in merchant's password and transaction PIN: change the
 // password, change the PIN, or reset the PIN with a code (which also unlocks
@@ -285,7 +286,7 @@ export default function Security() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-black tracking-tight text-slate-800">{t("security.title")}</h1>
+        <PageHeading>{t("security.title")}</PageHeading>
         <p className="mt-1 text-sm text-slate-500">{t("security.subtitle")}</p>
         <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-ink/10 px-3 py-1 text-xs font-bold text-ink">
           <KeyRound size={13} />

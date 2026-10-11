@@ -15,7 +15,8 @@ import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import FitText from "@/Components/Common/FitText";
 import PhoneField from "@/Components/Common/PhoneField";
-import SegmentedTabs from "@/Components/Common/SegmentedTabs";
+import ModeSwitch from "@/Components/Common/ModeSwitch";
+import PageTitle from "@/Components/Common/PageTitle";
 import TextField from "@/Components/Common/TextField";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
@@ -190,33 +191,52 @@ export default function AgentCash() {
   };
 
   const tabs = [
-    { key: "cashIn", label: t("agent.cashIn", { defaultValue: "Cash in" }) },
-    { key: "cashOut", label: t("agent.cashOut", { defaultValue: "Cash out" }) },
+    {
+      key: "cashIn",
+      icon: ArrowDownToLine,
+      label: t("agent.cashIn", { defaultValue: "Cash in" }),
+      description: t("agent.cashInHint", {
+        defaultValue: "The customer gives you cash; their wallet is credited.",
+      }),
+    },
+    {
+      key: "cashOut",
+      icon: ArrowUpFromLine,
+      label: t("agent.cashOut", { defaultValue: "Cash out" }),
+      description: t("agent.cashOutHint", {
+        defaultValue: "The customer takes cash; they approve with their PIN.",
+      }),
+    },
     ...(canSendFloat
       ? [
           {
             key: "float",
+            icon: SendIcon,
             label: t("agent.sendFloat", { defaultValue: "Send float" }),
+            description: t("agent.sendFloatHint", {
+              defaultValue: "Move float to one of your agents.",
+            }),
           },
         ]
       : []),
   ];
   const heading = (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 className="text-2xl font-black tracking-tight text-slate-800">
-          {t("agent.title", { defaultValue: "Cash in / out" })}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          {t("agent.subtitle", {
-            defaultValue: "Serve customers with your agent wallet.",
-          })}
-        </p>
-      </div>
+    <>
+      <PageTitle
+        title={t("agent.title", { defaultValue: "Cash in / out" })}
+        subtitle={t("agent.subtitle", {
+          defaultValue: "Serve customers with your agent wallet.",
+        })}
+      />
       {!quote && !done && (
-        <SegmentedTabs items={tabs} value={mode} onChange={switchMode} />
+        <ModeSwitch
+          label={t("agent.title", { defaultValue: "Cash in / out" })}
+          items={tabs}
+          value={mode}
+          onChange={switchMode}
+        />
       )}
-    </div>
+    </>
   );
   const errorBox = problem && (
     <div className="mb-5 max-w-6xl">
@@ -562,23 +582,15 @@ export default function AgentCash() {
           onSubmit={review}
           className="space-y-5 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm"
         >
-          <p className="flex items-center gap-2 text-sm text-slate-600">
-            <Icon size={16} className="shrink-0 text-ink" />
-            {mode === "cashIn"
-              ? t("agent.cashInHint", {
-                  defaultValue:
-                    "The customer gives you cash; the same amount goes from your agent wallet to theirs.",
-                })
-              : cashOut
-                ? t("agent.cashOutHint", {
-                    defaultValue:
-                      "The customer's wallet pays your agent wallet and you hand over cash. They approve with their own PIN.",
-                  })
-                : t("agent.floatHintTransfer", {
-                    defaultValue:
-                      "Float moves only between a super agent and its own agents.",
-                  })}
-          </p>
+          {/* The cards above say what cash in and out are; float has a rule. */}
+          {!cashOut && mode !== "cashIn" && (
+            <p className="rounded-xl bg-ink/5 px-3 py-2.5 text-sm text-slate-600">
+              {t("agent.floatHintTransfer", {
+                defaultValue:
+                  "Float moves only between a super agent and its own agents.",
+              })}
+            </p>
+          )}
           <PhoneField
             name="phone"
             label={phoneLabel}

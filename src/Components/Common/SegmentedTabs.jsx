@@ -12,7 +12,7 @@ export default function SegmentedTabs({ items, value, onChange, className }) {
           role="tab"
           aria-selected={value === item.key}
           onClick={() => onChange(item.key)}
-          className={cn("rounded-lg px-4 py-1.5 text-xs font-bold transition", value === item.key ? "bg-surface text-ink shadow-sm" : "text-slate-500 hover:text-ink")}
+          className={cn("rounded-lg px-4 py-1.5 text-xs font-bold transition duration-200 active:scale-95", value === item.key ? "bg-surface text-ink shadow-sm" : "text-slate-500 hover:text-ink")}
         >
           {item.label}
         </button>

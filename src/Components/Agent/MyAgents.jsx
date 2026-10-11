@@ -14,6 +14,7 @@ import { useListControls } from "@/Hooks/Common/useListControls";
 import { loadAgents } from "@/Services/Agent/agent.api";
 import { formatMoney } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 // A super agent's agents (agent/agents) with their agent-wallet balance, lowest
 // first so whoever needs float stands out; "Send float" opens Cash In / Out on
@@ -51,9 +52,9 @@ export default function MyAgents() {
     <div className="max-w-6xl">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-800">
+          <PageHeading>
             {t("myAgents.title", { defaultValue: "My agents" })}
-          </h1>
+          </PageHeading>
           <p className="mt-1 text-sm text-slate-500">
             {t("myAgents.subtitle", {
               defaultValue: "Your agents and the float in their agent wallets.",

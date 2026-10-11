@@ -30,6 +30,7 @@ import {
 import { notifications } from "@/Utils/Lib/notifications";
 import { isOwner, roleName } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 // POS terminals (Agents, stores and POS, phase 6). The bank registers them and
 // assigns them to the merchant; the owner places each in an Active store, names
@@ -313,9 +314,9 @@ export default function Terminals() {
   return (
     <div className="max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-black tracking-tight text-slate-800">
+        <PageHeading>
           {t("terminals.title", { defaultValue: "Terminals" })}
-        </h1>
+        </PageHeading>
         <p className="mt-1 text-sm text-slate-500">
           {t("terminals.subtitle", {
             defaultValue:

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import ModeSwitch from "@/Components/Common/ModeSwitch";
 import PhoneField from "@/Components/Common/PhoneField";
 import SegmentedTabs from "@/Components/Common/SegmentedTabs";
 import TextField from "@/Components/Common/TextField";
@@ -64,11 +66,28 @@ export default function MobileMoney() {
           ? t("ext.sendSubtitle", { names: namesText })
           : t("ext.topUpSubtitle", { names: namesText })
       }
-      actions={
-        <SegmentedTabs
+      switcher={
+        <ModeSwitch
+          label={t("ext.title")}
           items={[
-            { key: "send", label: t("ext.send", { defaultValue: "Send" }) },
-            { key: "topUp", label: t("ext.topUp", { defaultValue: "Top up" }) },
+            {
+              key: "send",
+              icon: ArrowUpRight,
+              label: t("ext.send", { defaultValue: "Send" }),
+              description: t("ext.sendHint", {
+                defaultValue:
+                  "From your wallet to an M-Pesa, e-Mola or mKesh number.",
+              }),
+            },
+            {
+              key: "topUp",
+              icon: ArrowDownLeft,
+              label: t("ext.topUp", { defaultValue: "Top up" }),
+              description: t("ext.topUpHint", {
+                defaultValue:
+                  "Into your wallet from your mobile wallet. You approve on your phone.",
+              }),
+            },
           ]}
           value={mode}
           onChange={(next) => {

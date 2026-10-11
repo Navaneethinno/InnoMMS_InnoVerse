@@ -6,10 +6,16 @@ import TopBar from "./TopBar";
 import Footer from "./Footer";
 import IdleWarning from "./IdleWarning";
 import SessionEndWarning from "./SessionEndWarning";
-import { TransactionPinDialog, useNeedsTransactionPin } from "@/Components/Account/TransactionPinSetup";
+import {
+  TransactionPinDialog,
+  useNeedsTransactionPin,
+} from "@/Components/Account/TransactionPinSetup";
 import { loadMenu } from "@/Services/Menu/menu.api";
 import { loadUnreadCount } from "@/Services/Inbox/inbox.api";
-import { connectLive, useNotificationReceived } from "@/Services/api/liveUpdates";
+import {
+  connectLive,
+  useNotificationReceived,
+} from "@/Services/api/liveUpdates";
 import { useDispatch } from "react-redux";
 import { userUpdated } from "@/Redux/slices/authSlice";
 import { useIdleSignOut } from "@/Hooks/Auth/useIdleSignOut";
@@ -56,7 +62,10 @@ export default function AppLayout() {
       .catch(() => {});
   }, [dispatch, i18n.language]);
   // The inbox's unread count, for the badge; live while the portal is open.
-  const refreshUnread = () => loadUnreadCount().then((unread) => dispatch(userUpdated({ unread }))).catch(() => {});
+  const refreshUnread = () =>
+    loadUnreadCount()
+      .then((unread) => dispatch(userUpdated({ unread })))
+      .catch(() => {});
   useEffect(() => {
     void refreshUnread();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,7 +85,8 @@ export default function AppLayout() {
     let last = Date.now();
     void refreshMe();
     const back = () => {
-      if (document.visibilityState !== "visible" || Date.now() - last < 60000) return;
+      if (document.visibilityState !== "visible" || Date.now() - last < 60000)
+        return;
       last = Date.now();
       void refreshMe();
     };
@@ -106,13 +116,26 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-paper bg-fixed bg-[linear-gradient(160deg,rgb(var(--color-secondary)/0.28),rgb(var(--color-secondary)/0.16)_50%,rgb(var(--color-secondary)/0.26))] dark:bg-[linear-gradient(160deg,rgb(var(--color-secondary)/0.07),rgb(var(--color-secondary)/0.02)_50%,rgb(var(--color-secondary)/0.06))]">
       <div className="flex gap-4 p-3 sm:p-4">
-        <div className="sticky top-4 hidden h-[calc(100dvh-2rem)] shrink-0 self-start transition-[width] duration-200 lg:block" style={{ width: collapsed && !hovering ? RAIL_W : OPEN_W }}>
-          <Sidebar collapsed={collapsed} hovering={hovering} onHoverChange={setHovering} onToggle={toggle} />
+        <div
+          className="sticky top-4 hidden h-[calc(100dvh-2rem)] shrink-0 self-start transition-[width] duration-200 lg:block"
+          style={{ width: collapsed && !hovering ? RAIL_W : OPEN_W }}
+        >
+          <Sidebar
+            collapsed={collapsed}
+            hovering={hovering}
+            onHoverChange={setHovering}
+            onToggle={toggle}
+          />
         </div>
 
         {drawer && (
           <div className="fixed inset-0 z-50 lg:hidden">
-            <button type="button" aria-label={t("nav.closeMenu")} onClick={() => setDrawer(false)} className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" />
+            <button
+              type="button"
+              aria-label={t("nav.closeMenu")}
+              onClick={() => setDrawer(false)}
+              className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
+            />
             <div className="absolute inset-y-3 left-3 w-[min(272px,calc(100%-1.5rem))]">
               <Sidebar onNavigate={() => setDrawer(false)} className="w-full" />
             </div>
@@ -124,14 +147,28 @@ export default function AppLayout() {
             <TopBar onMenu={() => setDrawer(true)} />
           </div>
           <main className="flex-1 px-1 pb-4 pt-2 sm:px-2">
-            <Outlet />
+            {/* Each screen rises in as it opens. */}
+            <div key={location.pathname} className="page-enter">
+              <Outlet />
+            </div>
           </main>
           <Footer className="py-2" />
         </div>
       </div>
-      <IdleWarning seconds={idle.warning} onStay={idle.stay} onLeave={idle.leave} />
-      <SessionEndWarning seconds={sessionEnd.secondsLeft} onClose={sessionEnd.dismiss} onLeave={() => void signOut()} />
-      <TransactionPinDialog open={needsTxnPin && !pinDialogClosed} onOpenChange={(open) => !open && setPinDialogClosed(true)} />
+      <IdleWarning
+        seconds={idle.warning}
+        onStay={idle.stay}
+        onLeave={idle.leave}
+      />
+      <SessionEndWarning
+        seconds={sessionEnd.secondsLeft}
+        onClose={sessionEnd.dismiss}
+        onLeave={() => void signOut()}
+      />
+      <TransactionPinDialog
+        open={needsTxnPin && !pinDialogClosed}
+        onOpenChange={(open) => !open && setPinDialogClosed(true)}
+      />
     </div>
   );
 }

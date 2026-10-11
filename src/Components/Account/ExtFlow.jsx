@@ -41,12 +41,14 @@ import { isStaff, sendableWallets } from "@/Utils/Lib/roles";
 //   ready     whether the request is complete enough to quote
 //   lines     (quote) => [[label, value]] for the confirm screen
 //   extra     (done, details) => what the done screen adds ("save this meter")
-//   actions   the header's controls on the first step (tabs)
+//   actions   the header's controls on the first step
+//   switcher  the page's choice (a ModeSwitch), under the title on the first step
 //   credit    money comes in (a top-up): totals are "You receive"
 //   texts     { submit, pendingTitle, pendingHint, failedTitle, failedHint } to
 //             override the wording of the steps
 export default function ExtFlow({
   title,
+  switcher,
   subtitle,
   actions,
   featureKey,
@@ -183,12 +185,17 @@ export default function ExtFlow({
   const totalLabel = credit ? t("ext.netIn") : t("ext.totalOut");
   const totalOf = (q) => (credit ? q.net_credit : (q.total_debit ?? q.amount));
   const step = done ? "done" : quote ? "confirm" : "form";
+  // The page's choice (send or top up) sits under the title on the first
+  // step; once a payment is under way the title says enough.
   const heading = (
-    <PageTitle
-      title={title}
-      subtitle={subtitle}
-      actions={step === "form" ? actions : null}
-    />
+    <>
+      <PageTitle
+        title={title}
+        subtitle={subtitle}
+        actions={step === "form" ? actions : null}
+      />
+      {step === "form" && switcher}
+    </>
   );
   const errorBox = problem && (
     <div className="mb-5 max-w-6xl">
@@ -248,7 +255,7 @@ export default function ExtFlow({
     );
     if (status === "SUCCESS") {
       return (
-        <div className="space-y-5">
+        <div key="done" className="step-enter space-y-5">
           <ExtDetails details={details} />
           {extra?.(done, details)}
           {receipt ? (
@@ -294,7 +301,7 @@ export default function ExtFlow({
     const pendingHint =
       texts.pendingHint?.(external, quote) ?? t("ext.inProgressHint");
     return (
-      <div>
+      <div key="wait" className="step-enter">
         {heading}
         <StatusCard
           icon={
@@ -348,7 +355,7 @@ export default function ExtFlow({
     const needPin = quote.pin_required !== false;
     const holder = quote.external?.account_name;
     return (
-      <div>
+      <div key="confirm" className="step-enter">
         {heading}
         {errorBox}
         <div className="max-w-6xl">
@@ -436,7 +443,7 @@ export default function ExtFlow({
   }
 
   return (
-    <div>
+    <div key="form" className="step-enter">
       {heading}
       {errorBox}
       <div className="max-w-6xl">
@@ -596,7 +603,7 @@ export function Chips({ options, value, onChange, allowNone, highlight }) {
             onClick={() =>
               onChange?.(value === o.value && allowNone ? "" : o.value)
             }
-            className={`rounded-full border px-4 py-2 text-sm font-bold transition disabled:cursor-default ${on ? "border-forest bg-forest text-white dark:border-lime dark:bg-lime dark:text-on-secondary" : "border-slate-200 text-slate-600 hover:border-ink/40"}`}
+            className={`rounded-full border px-4 py-2 text-sm font-bold transition duration-200 active:scale-95 disabled:cursor-default disabled:active:scale-100 ${on ? "border-forest bg-forest text-white dark:border-lime dark:bg-lime dark:text-on-secondary" : "border-slate-200 text-slate-600 hover:border-ink/40"}`}
           >
             {o.label}
           </button>

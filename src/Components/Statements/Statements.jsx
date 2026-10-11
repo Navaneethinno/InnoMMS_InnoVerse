@@ -10,6 +10,7 @@ import { loadWallets } from "@/Services/Account/account.api";
 import { downloadStatement, exportHistory, listStatements, loadStatement } from "@/Services/Statements/statements.api";
 import { saveBlob } from "@/Utils/Lib/download";
 import { formatDate, formatMoney } from "@/Utils/Lib/format";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 const LIMIT = 20;
 const DAY = 86400000;
@@ -77,7 +78,7 @@ export default function Statements() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-black tracking-tight text-slate-800">{t("statements.title")}</h1>
+        <PageHeading>{t("statements.title")}</PageHeading>
         <p className="mt-1 text-sm text-slate-500">{t("statements.subtitle")}</p>
       </div>
       {problem && (

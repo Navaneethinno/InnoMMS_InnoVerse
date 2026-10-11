@@ -59,6 +59,8 @@ import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { isOwner, isOwnMoney, roleName, staffRole } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
 import StoreMap, { UseMyLocation, validPoint } from "./StoreMap";
+import { PageHeading } from "@/Components/Common/PageTitle";
+import SectionTabs from "@/Components/Common/SectionTabs";
 
 // Stores and store users (Agents, stores and POS, phase 5), and store wallets
 // (phase 6). The owner (the merchant) adds stores, which wait for the bank; adds
@@ -931,9 +933,9 @@ export default function Stores() {
     <div className="max-w-6xl">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-800">
+          <PageHeading>
             {t("stores.title", { defaultValue: "Stores" })}
-          </h1>
+          </PageHeading>
           <p className="mt-1 text-sm text-slate-500">
             {owner
               ? t("stores.subtitle", {
@@ -946,9 +948,6 @@ export default function Stores() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {tabs.length > 1 && (
-            <SegmentedTabs items={tabs} value={tab} onChange={setTab} />
-          )}
           {owner && tab === "stores" && (
             <Button
               onClick={() => setDialog({ kind: "store", store: null })}
@@ -970,6 +969,9 @@ export default function Stores() {
           )}
         </div>
       </div>
+      {tabs.length > 1 && (
+        <SectionTabs items={tabs} value={tab} onChange={setTab} />
+      )}
       {problem && (
         <div className="mb-4">
           <ErrorState message={problem} onRetry={loadAll} />

@@ -16,6 +16,7 @@ import { parseNotification } from "@/Utils/Lib/parseNotification";
 import NotificationDetail from "./NotificationDetail";
 import NotificationRow from "./NotificationRow";
 import "./inbox.css";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 const LIMIT = 20;
 const ICONS = { money_in: ArrowDownLeft, money_out: ArrowUpRight, security: ShieldAlert, statement: FileText, interest: Percent, generic: Bell };
@@ -143,7 +144,7 @@ export default function Inbox() {
     <div className="notif w-full">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-black tracking-tight text-slate-800">{t("inbox.title")}</h1>
+          <PageHeading>{t("inbox.title")}</PageHeading>
           <p className="mt-1 text-sm text-slate-500">{t("inbox.tagline", { defaultValue: "Payments, security alerts and statements from your bank." })}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

@@ -12,6 +12,7 @@ import { loadSignups } from "@/Services/Agent/agent.api";
 import { formatDateTime } from "@/Utils/Lib/format";
 import { isSuperAgent } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 // The sign-ups this agent started (agent/signups), newest first, with a filter
 // by status, and buttons to start one: a customer (any agent) or an agent (a
@@ -95,9 +96,9 @@ export default function Signups() {
     <div className="max-w-6xl">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-800">
+          <PageHeading>
             {t("signups.title", { defaultValue: "Sign-ups" })}
-          </h1>
+          </PageHeading>
           <p className="mt-1 text-sm text-slate-500">
             {t("signups.subtitle", {
               defaultValue:

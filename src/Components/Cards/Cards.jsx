@@ -10,6 +10,7 @@ import { cn } from "@/Utils/Lib/utils";
 import CardFace from "./CardFace";
 import { TransactionPinNotice } from "@/Components/Account/TransactionPinSetup";
 import { CardDetailsDialog, CardMoneyDialog, CardPinDialog, CardStatusDialog, GetCardDialog, PlasticDialog, ReissueDialog } from "./CardDialogs";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 // Cards: the merchant's cards and requests, what they can get, and
 // everything they can do with a card. Live: a change to any of their cards
@@ -74,7 +75,7 @@ export default function Cards() {
   return (
     <div className="max-w-6xl space-y-8">
       <div>
-        <h1 className="text-2xl font-black tracking-tight text-slate-800">{t("cards.title")}</h1>
+        <PageHeading>{t("cards.title")}</PageHeading>
         <p className="mt-1 text-sm text-slate-500">{t("cards.subtitle")}</p>
       </div>
       <TransactionPinNotice />

@@ -26,6 +26,7 @@ import { downloadReceiptPdf } from "@/Utils/Lib/receiptPdf";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import ReceiptView from "./ReceiptView";
+import { PageHeading } from "@/Components/Common/PageTitle";
 
 // Newest first, every module (transfers, payments, refunds, cash, deposits,
 // loans, reversals). A line opens that transaction and its receipt.
@@ -526,9 +527,9 @@ export default function History() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-black tracking-tight text-slate-800">
+        <PageHeading>
           {t("history.title")}
-        </h1>
+        </PageHeading>
         <p className="mt-1 text-sm text-slate-500">{t("history.subtitle")}</p>
       </div>
       <form

@@ -1104,4 +1104,9 @@ export default {
   "myCode.step3": "O dinheiro chega à sua carteira na hora e aparece no histórico.",
   "myCode.step3Agent": "O dinheiro chega na hora. Num levantamento entra no seu float: entregue o dinheiro.",
   "myCode.private": "O código só recebe dinheiro: mostrá-lo é seguro. Ninguém pode tirar dinheiro com ele.",
+  "ext.sendHint": "Da sua carteira para um número M-Pesa, e-Mola ou mKesh.",
+  "ext.topUpHint": "Para a sua carteira a partir da carteira móvel. Aprova no telemóvel.",
+  "agent.sendFloatHint": "Envie float para um dos seus agentes.",
+  "send.modeSendHint": "Para qualquer pessoa pelo número de telefone.",
+  "send.modeRefundHint": "Devolva a um cliente um pagamento que ele fez.",
 };

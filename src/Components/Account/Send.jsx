@@ -3,11 +3,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Info, KeyRound, Store, UserRound } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Info, KeyRound, Store, Undo2, UserRound } from "lucide-react";
+import ModeSwitch from "@/Components/Common/ModeSwitch";
+import PageTitle from "@/Components/Common/PageTitle";
 import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import PhoneField from "@/Components/Common/PhoneField";
-import SegmentedTabs from "@/Components/Common/SegmentedTabs";
 import TextField from "@/Components/Common/TextField";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { checkPayee, loadWallets, quotePayment, sendPayment } from "@/Services/Account/account.api";
@@ -220,27 +221,29 @@ export default function Send() {
     )
   );
   const heading = (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 className="text-2xl font-black tracking-tight text-slate-800">{refunding ? t("refund.title", { defaultValue: "Refund a payment" }) : t("send.title")}</h1>
-        <p className="mt-1 text-sm text-slate-500">{refunding ? t("refund.subtitle", { defaultValue: "Return money to a customer who paid you." }) : t("send.subtitle")}</p>
+    <>
+      <PageTitle
+        title={refunding ? t("refund.title", { defaultValue: "Refund a payment" }) : t("send.title")}
+        subtitle={refunding ? t("refund.subtitle", { defaultValue: "Return money to a customer who paid you." }) : t("send.subtitle")}
+      >
         {!refunding && !refundOnly && !quote && !paid && user?.features?.mobile_money === true && (
           <Link to="/mobile-money" className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-ink underline-offset-2 hover:underline">
             {t("ext.sendLink", { defaultValue: "Send to M-Pesa, e-Mola or mKesh, or top up →" })}
           </Link>
         )}
-      </div>
+      </PageTitle>
       {!quote && !paid && !refundOnly && (
-        <SegmentedTabs
+        <ModeSwitch
+          label={t("send.title")}
           items={[
-            { key: "send", label: t("send.modeSend", { defaultValue: "Send money" }) },
-            { key: "refund", label: t("send.modeRefund", { defaultValue: "Refund" }) },
+            { key: "send", icon: ArrowUpRight, label: t("send.modeSend", { defaultValue: "Send money" }), description: t("send.modeSendHint", { defaultValue: "To anyone by their phone number." }) },
+            { key: "refund", icon: Undo2, label: t("send.modeRefund", { defaultValue: "Refund" }), description: t("send.modeRefundHint", { defaultValue: "Give a customer back a payment they made." }) },
           ]}
           value={mode}
           onChange={switchMode}
         />
       )}
-    </div>
+    </>
   );
   const errorBox = problem && (
     <div className="mb-5">
