@@ -47,7 +47,19 @@ const modeOf = (service) =>
     ? service.amount
     : (service?.amount?.mode ?? service?.amount_mode ?? "ENTERED")
   ).toUpperCase();
-const priceOf = (product) => product?.price ?? product?.amount;
+const priceOf = (product) => product?.amount ?? product?.price;
+// "DStv Compact, 1 mês".
+const productName = (product) =>
+  [nameOf(product), product?.option].filter(Boolean).join(", ");
+// A field's optional `pattern` (the server checks it too).
+export const fitsPattern = (field, value) => {
+  if (!field?.pattern || !String(value ?? "").trim()) return true;
+  try {
+    return new RegExp(field.pattern).test(String(value).trim());
+  } catch {
+    return true;
+  }
+};
 const INPUT_MODE = { NUMBER: "numeric", PHONE: "tel", NUIT: "numeric" };
 const EMPTY = {
   biller: "",
@@ -96,7 +108,9 @@ export default function Bills() {
   const products = listOf(service?.products);
   const product = products.find((p) => idOf(p) === form.product);
   const mode = modeOf(service);
-  const mustLookUp = Boolean(service?.lookup) || mode === "DUE";
+  // `lookup` (and `partial`, `token`) are left out when false.
+  const mustLookUp = service?.lookup === true;
+  const currency = biller?.currency_code;
 
   const billBody = {
     provider: form.biller,
@@ -109,12 +123,16 @@ export default function Bills() {
   const amount =
     mode === "PRODUCT" ? String(priceOf(product) ?? "") : form.amount;
   const fieldsDone = fields.every(
-    (f) => !f.required || String(form.fields[idOf(f)] ?? "").trim(),
+    (f) =>
+      (!f.required || String(form.fields[idOf(f)] ?? "").trim()) &&
+      fitsPattern(f, form.fields[idOf(f)]),
   );
+  const accountOk = fitsPattern(accountType, form.account);
   const ready =
     Boolean(service) &&
     (!accountTypes.length || Boolean(accountType)) &&
     form.account.trim().length > 0 &&
+    accountOk &&
     fieldsDone &&
     (!mustLookUp || Boolean(bill)) &&
     (mode === "PRODUCT" ? Boolean(product) : Number(amount) > 0);
@@ -174,7 +192,7 @@ export default function Bills() {
         ],
         [
           t("bills.product", { defaultValue: "Package" }),
-          product ? nameOf(product) : null,
+          product ? productName(product) : null,
         ],
         ...fields
           .filter((f) => form.fields[idOf(f)])
@@ -304,8 +322,16 @@ export default function Bills() {
                 name="billAccount"
                 autoComplete="off"
                 label={accountType ? nameOf(accountType) : t("bills.account")}
+                inputMode={
+                  INPUT_MODE[String(accountType?.type ?? "").toUpperCase()]
+                }
                 value={form.account}
                 onChange={(event) => change({ account: event.target.value })}
+                error={
+                  accountOk
+                    ? undefined
+                    : t("bills.invalid", { defaultValue: "Check this value." })
+                }
               />
               {fields.map((f) => (
                 <BillField
@@ -347,7 +373,7 @@ export default function Bills() {
                       label={t("bills.due", { defaultValue: "Total to pay" })}
                       strong
                     >
-                      {formatMoney(bill.amount_due, bill.currency_code)}
+                      {formatMoney(bill.amount_due, currency)}
                     </Line>
                   )}
                   {Object.entries(bill.details ?? {})
@@ -375,10 +401,10 @@ export default function Bills() {
                   onChange={(v) => setForm((f) => ({ ...f, product: v }))}
                   options={products.map((p) => ({
                     value: idOf(p),
-                    label: nameOf(p),
+                    label: productName(p),
                     description:
                       priceOf(p) != null
-                        ? formatMoney(priceOf(p), p.currency_code)
+                        ? formatMoney(priceOf(p), currency)
                         : undefined,
                   }))}
                 />
@@ -444,7 +470,7 @@ function BillField({ field, value, onChange }) {
       inputMode={INPUT_MODE[type]}
       autoComplete="off"
       label={label}
-      maxLength={field.max_length ?? undefined}
+      error={fitsPattern(field, value) ? undefined : t("bills.invalid")}
       value={value}
       onChange={(event) =>
         onChange(

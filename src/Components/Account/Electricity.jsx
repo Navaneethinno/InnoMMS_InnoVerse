@@ -156,18 +156,11 @@ function ResendLast({ meter }) {
       )}
       {state.result && (
         <div className="mt-3">
-          {state.result.message && (
-            <p className="mb-2 text-xs font-semibold text-emerald-600">
-              {state.result.message}
-            </p>
-          )}
-          <ExtDetails
-            details={
-              state.result.details ??
-              state.result.external?.details ??
-              state.result
-            }
-          />
+          <p className="mb-2 text-xs font-semibold text-emerald-600">
+            {state.result.message ||
+              t("power.resent", { defaultValue: "The token was sent again." })}
+          </p>
+          <ExtDetails details={state.result.details} />
         </div>
       )}
     </div>

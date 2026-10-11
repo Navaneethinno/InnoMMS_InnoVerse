@@ -1087,4 +1087,11 @@ export default {
   "saved.rename": "Mudar o nome",
   "saved.delete": "Remover",
   "saved.done": "Guardado.",
+  "ext.error.BILL_NOT_FOUND": "{{provider}} não encontrou esta conta",
+  "ext.error.OTHER": "{{provider}} não concluiu",
+  "bills.invalid": "Verifique este valor.",
+  "bills.detail.entity": "Entidade",
+  "bills.detail.reference": "Referência",
+  "power.resent": "O token foi reenviado.",
+  "airtime.again": "Comprar de novo: {{amount}} para {{number}}",
 };

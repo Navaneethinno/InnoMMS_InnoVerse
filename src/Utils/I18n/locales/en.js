@@ -1082,4 +1082,11 @@ export default {
   "saved.rename": "Rename",
   "saved.delete": "Remove",
   "saved.done": "Saved.",
+  "ext.error.BILL_NOT_FOUND": "{{provider}} could not find this bill",
+  "ext.error.OTHER": "{{provider}} did not complete it",
+  "bills.invalid": "Check this value.",
+  "bills.detail.entity": "Entity",
+  "bills.detail.reference": "Reference",
+  "power.resent": "The token was sent again.",
+  "airtime.again": "Buy again: {{amount}} for {{number}}",
 };

@@ -77,7 +77,7 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
               <input
                 autoFocus
                 value={renaming.name}
-                maxLength={40}
+                maxLength={64}
                 onChange={(event) =>
                   setRenaming({ ...renaming, name: event.target.value })
                 }
@@ -188,7 +188,7 @@ export function SaveAccount({ saved, kind, account, label }) {
           name="saveName"
           icon={Bookmark}
           label={label}
-          maxLength={40}
+          maxLength={64}
           placeholder={account}
           value={name}
           onChange={(event) => setName(event.target.value)}

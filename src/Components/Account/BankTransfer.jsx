@@ -10,8 +10,9 @@ import ExtFlow, {
 // Bank transfer (BANK_OUT). A NIB (21 digits) or an IBAN (MZ59…) finds its
 // bank by itself; an account number needs the bank picked.
 const EMPTY = { account: "", bank: "", amount: "" };
+const clean = (value) => value.replace(/[\s.-]/g, "").toUpperCase();
 const kindOf = (account) => {
-  const text = account.replace(/\s/g, "").toUpperCase();
+  const text = clean(account);
   if (/^[A-Z]{2}\d{2}/.test(text)) return "iban";
   if (/^\d{21}$/.test(text)) return "nib";
   return text ? "account_number" : "";
@@ -21,7 +22,7 @@ export default function BankTransfer() {
   const { t } = useTranslation();
   const { list, problem } = useProviders("BANK");
   const [form, setForm] = useState(EMPTY);
-  const account = form.account.replace(/\s/g, "").toUpperCase();
+  const account = clean(form.account);
   const kind = kindOf(form.account);
   // Banks taking a plain account number need picking; NIB/IBAN banks find themselves.
   const banks = useMemo(
@@ -31,7 +32,7 @@ export default function BankTransfer() {
   const bank = banks.find((b) => b.code === form.bank);
   const needBank = kind === "account_number";
   const ready =
-    account.length >= 6 &&
+    /^[A-Z0-9]{5,34}$/.test(account) &&
     Number(form.amount) > 0 &&
     (!needBank || Boolean(form.bank));
   const request = {

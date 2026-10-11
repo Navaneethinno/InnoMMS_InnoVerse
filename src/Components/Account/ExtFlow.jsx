@@ -15,6 +15,7 @@ import { useExtOrder, useWalletChanged } from "@/Services/api/liveUpdates";
 import {
   loadExtOrder,
   loadExtProviders,
+  loadReceipt,
   loadWallets,
   quoteExt,
   sendExt,
@@ -92,6 +93,11 @@ export default function ExtFlow({
   const settle = (next) => {
     if (!next || next.status === "PENDING") return;
     setOrder(next);
+    // The receipt now carries the provider's details (token, receipt_no).
+    if (next.status === "SUCCESS" && (next.rrn ?? done?.rrn))
+      loadReceipt({ rrn: next.rrn ?? done.rrn })
+        .then((receipt) => receipt && setDone((d) => ({ ...d, receipt })))
+        .catch(() => {});
     if (next.status === "FAILED" && !next.message && next.order_ref)
       loadExtOrder(next.order_ref)
         .then(
@@ -122,7 +128,7 @@ export default function ExtFlow({
       window.clearInterval(poll);
       window.clearTimeout(stop);
     };
-     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, orderRef]);
 
   const body = () => ({ ...request, ...(from ? { from_acct_num: from } : {}) });
@@ -386,8 +392,7 @@ export default function ExtFlow({
 
   if (quote) {
     const needPin = quote.pin_required !== false;
-    const holder =
-      quote.external?.account_name ?? quote.recipient_name ?? quote.to?.name;
+    const holder = quote.external?.account_name;
     return (
       <div>
         {heading}

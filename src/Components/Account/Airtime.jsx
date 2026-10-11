@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PhoneField from "@/Components/Common/PhoneField";
 import SegmentedTabs from "@/Components/Common/SegmentedTabs";
@@ -14,6 +14,9 @@ import SavedAccounts, {
   useSavedAccounts,
 } from "@/Components/Account/SavedAccounts";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
+import { loadExtLast } from "@/Services/Account/account.api";
+import { formatMoney } from "@/Utils/Lib/format";
+import { RotateCcw } from "lucide-react";
 
 // Airtime (AIRTIME) for the merchant's own number, another number, or a saved
 // one. The operator comes from the number's prefix unless one is picked.
@@ -101,6 +104,17 @@ export default function Airtime() {
         value={form.who}
         onChange={(who) => setForm((f) => ({ ...f, who }))}
       />
+      <BuyAgain
+        onPick={(last) =>
+          setForm({
+            ...EMPTY,
+            who: "other",
+            phone: last.account ?? "",
+            amount: String(last.amount ?? ""),
+            provider: last.provider_code ?? "",
+          })
+        }
+      />
       {form.who === "other" && (
         <PhoneField
           name="phone"
@@ -156,5 +170,31 @@ export default function Airtime() {
         </div>
       </div>
     </ExtFlow>
+  );
+}
+
+// The last top-up, one tap to fill the form again.
+function BuyAgain({ onPick }) {
+  const { t } = useTranslation();
+  const [last, setLast] = useState(null);
+  useEffect(() => {
+    loadExtLast({ txnType: "AIRTIME" })
+      .then((order) => order?.account && setLast(order))
+      .catch(() => {});
+  }, []);
+  if (!last) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => onPick(last)}
+      className="inline-flex items-center gap-2 rounded-xl border border-dashed border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-ink/40 hover:text-ink"
+    >
+      <RotateCcw size={13} />
+      {t("airtime.again", {
+        amount: formatMoney(last.amount),
+        number: last.account,
+        defaultValue: "Buy again: {{amount}} for {{number}}",
+      })}
+    </button>
   );
 }
