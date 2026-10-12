@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { cn } from "@/Utils/Lib/utils";
 import { formatDateTime, formatMoney } from "@/Utils/Lib/format";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // One receipt, as the API returns it: rrn, txn_short_desc, txn_time,
 // currency_code, txn_amount, fee_amount, entry_amount (the balance after),
@@ -41,7 +42,7 @@ export default function ReceiptView({ receipt, className }) {
         <Line label={t("receipt.from")}>{payload.from?.name ?? receipt.customer_name}</Line>
         <Line label={t("receipt.wallet")}>{receipt.acct_mask}</Line>
         <Line label={t("receipt.to")}>{payload.to?.name ?? receipt.merchant_name ?? receipt.counterparty_name ?? payload.to?.phone}</Line>
-        <Line label={t("receipt.balance")}>{money(receipt.entry_amount)}</Line>
+        <Line label={<span className="inline-flex items-center gap-1">{t("receipt.balance")}<BalanceEye size={13} className="-my-2 h-7 w-7" /></span>}>{receipt.entry_amount != null ? <Balance value={receipt.entry_amount} currency={receipt.currency_code} /> : null}</Line>
         <Line label={t("receipt.reason")}>{payload.note || payload.reason}</Line>
         <Line label={t("receipt.time")}>{formatDateTime(receipt.txn_time)}</Line>
         <Line label={t("receipt.status")}>{receipt.status}</Line>

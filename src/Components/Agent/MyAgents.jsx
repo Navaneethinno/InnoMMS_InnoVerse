@@ -12,9 +12,9 @@ import {
 } from "@/Components/Common/ListControls";
 import { useListControls } from "@/Hooks/Common/useListControls";
 import { loadAgents } from "@/Services/Agent/agent.api";
-import { formatMoney } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 import { PageHeading } from "@/Components/Common/PageTitle";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // A super agent's agents (agent/agents) with their agent-wallet balance, lowest
 // first so whoever needs float stands out; "Send float" opens Cash In / Out on
@@ -127,10 +127,11 @@ export default function MyAgents() {
                         : t("myAgents.inactive", { defaultValue: "Inactive" })}
                     </span>
                   </div>
-                  <p className="mt-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                  <p className="mt-4 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
                     {t("wallet.purpose.AGENT_FLOAT", {
                       defaultValue: "Agent wallet",
                     })}
+                    <BalanceEye className="-my-2 -mr-1" />
                   </p>
                   <p
                     className={cn(
@@ -138,7 +139,7 @@ export default function MyAgents() {
                       empty ? "text-amber-600" : "text-slate-800",
                     )}
                   >
-                    {formatMoney(agent.float_balance ?? 0, agent.currency_code)}
+                    <Balance value={agent.float_balance ?? 0} currency={agent.currency_code} />
                   </p>
                   {agent.float_acct_num && (
                     <p className="break-all text-xs text-slate-400">

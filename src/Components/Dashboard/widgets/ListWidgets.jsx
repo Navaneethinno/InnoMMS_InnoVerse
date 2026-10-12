@@ -5,9 +5,9 @@ import { Activity, ArrowRight, ArrowRightLeft, History, Landmark, ShieldCheck } 
 import { useSelector } from "react-redux";
 import { TransactionLine } from "@/Components/Account/History";
 import FitText from "@/Components/Common/FitText";
-import { formatMoney } from "@/Utils/Lib/format";
 import { useAccountData } from "../layout/accountData";
 import { WidgetCard } from "./WidgetCard";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 const Status = ({ loading, error, empty, children }) => {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ export function WalletsWidget() {
   const owner = !useSelector((state) => state.auth.user?.staff);
   const hasSpecial = (wallets ?? []).some((w) => w.wallet_purpose === "AGENT_FLOAT" || w.wallet_purpose === "STORE");
   return (
-    <WidgetCard title={t("dash.accounts")} icon={Landmark}>
+    <WidgetCard title={t("dash.accounts")} icon={Landmark} action={<BalanceEye />}>
       <Status loading={loading && !wallets} error={!wallets && error} empty={wallets?.length === 0 && t("dash.noWallets")}>
         <ul className="grid grid-cols-1 gap-3">
           {(wallets ?? []).map((wallet) => (
@@ -44,7 +44,7 @@ export function WalletsWidget() {
                 <p className="break-all text-[11px] text-slate-500">{wallet.acct_num}</p>
                 <WalletBadges wallet={wallet} className="mt-1" />
               </div>
-              <FitText max={13} min={9} className="w-full text-right font-bold text-slate-800">{formatMoney(wallet.avail_bal, wallet.currency_code)}</FitText>
+              <FitText max={13} min={9} className="w-full text-right font-bold text-slate-800"><Balance value={wallet.avail_bal} currency={wallet.currency_code} /></FitText>
               {wallet.wallet_purpose === "AGENT_FLOAT" && (
                 <Link to="/agent" className="text-[11px] font-bold text-ink hover:underline">
                   {t("agent.title", { defaultValue: "Cash in / out" })} →

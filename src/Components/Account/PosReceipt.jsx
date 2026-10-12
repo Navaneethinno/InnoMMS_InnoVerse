@@ -6,6 +6,7 @@ import { formatDate, formatMoney, formatTime } from "@/Utils/Lib/format";
 import { downloadReceiptPdf } from "@/Utils/Lib/receiptPdf";
 import { accountLine, receiptTexts } from "@/Utils/Lib/receiptTransaction";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 import "./posReceipt.css";
 
 // A handheld POS terminal printing a thermal receipt. The printer is on top;
@@ -442,7 +443,7 @@ const PosReceipt = forwardRef(function PosReceipt({ transaction, children, note,
           <Row label={t("pos.total")} className="pos-total">
             {money(tx.total ?? tx.amount)}
           </Row>
-          <Row label={t("receipt.balance")}>{money(tx.balanceAfter)}</Row>
+          <Row label={<span className="inline-flex items-center gap-1">{t("receipt.balance")}<BalanceEye size={13} className="-my-2 h-7 w-7 print:hidden" /></span>}>{tx.balanceAfter != null ? <Balance value={tx.balanceAfter} currency={tx.currency} /> : null}</Row>
           <Rule />
           {tx.reference && <Barcode value={tx.reference} />}
           {tx.reference && <div className="ln pos-small" style={{ letterSpacing: "0.12em" }}>{tx.reference}</div>}

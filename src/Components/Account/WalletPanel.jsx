@@ -2,8 +2,9 @@ import { useTranslation } from "react-i18next";
 import { Check, Landmark } from "lucide-react";
 import FitText from "@/Components/Common/FitText";
 import WalletBadges from "@/Components/Common/WalletBadges";
-import { formatDate, formatMoney } from "@/Utils/Lib/format";
+import { formatDate } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // The merchant's Active wallets beside the payment form: which one the money
 // leaves, with what is in it. It is one card, as tall as the form next to it,
@@ -59,13 +60,13 @@ export default function WalletPanel({ wallets, selected, onSelect, footer, class
                     </span>
                   )}
                 </div>
-                <p className="mt-5 text-[11px] font-bold uppercase tracking-widest text-slate-500">{t("send.available")}</p>
+                <p className="mt-5 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">{t("send.available")}<BalanceEye className="-my-2 -mr-1" /></p>
                 <FitText max={26} min={12} className="mt-1 font-black tracking-tight text-slate-800">
-                  {formatMoney(wallet.avail_bal, wallet.currency_code)}
+                  <Balance value={wallet.avail_bal} currency={wallet.currency_code} />
                 </FitText>
                 {/* Pushed to the bottom so the card fills the height of the form. */}
                 <dl className="mt-auto divide-y divide-slate-200/70 border-t border-slate-200/70 pt-3">
-                  {wallet.ledger_bal != null && Number(wallet.ledger_bal) !== Number(wallet.avail_bal) && <Row label={t("send.ledger")}>{formatMoney(wallet.ledger_bal, wallet.currency_code)}</Row>}
+                  {wallet.ledger_bal != null && Number(wallet.ledger_bal) !== Number(wallet.avail_bal) && <Row label={t("send.ledger")}><Balance value={wallet.ledger_bal} currency={wallet.currency_code} /></Row>}
                   <Row label={t("send.currency")}>{[wallet.currency_name, wallet.currency_code].filter(Boolean).join(" · ")}</Row>
                   {loyalty > 0 && <Row label={t("send.points")}>{loyalty.toLocaleString(i18n.resolvedLanguage)}</Row>}
                   <Row label={t("send.status")}>

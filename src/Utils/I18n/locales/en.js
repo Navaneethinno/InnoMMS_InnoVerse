@@ -1104,4 +1104,6 @@ export default {
   "agent.sendFloatHint": "Move float to one of your agents.",
   "send.modeSendHint": "To anyone by their phone number.",
   "send.modeRefundHint": "Give a customer back a payment they made.",
+  "balance.show": "Show balance for 10 seconds",
+  "balance.hide": "Hide balance",
 };

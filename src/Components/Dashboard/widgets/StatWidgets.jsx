@@ -3,12 +3,16 @@ import { ArrowDownRight, ArrowUpDown, ArrowUpRight, Wallet } from "lucide-react"
 import FitText from "@/Components/Common/FitText";
 import { formatMoney } from "@/Utils/Lib/format";
 import { monthTotals, useAccountData } from "../layout/accountData";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
-function StatCard({ label, value, sub, icon, loading }) {
+function StatCard({ label, value, sub, icon, loading, action }) {
   const Icon = icon;
   return (
     <div className="relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm">
-      <p className="pr-10 text-[11px] font-bold uppercase tracking-widest text-slate-500">{label}</p>
+      <p className="flex items-center gap-1 pr-10 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+        {label}
+        {action}
+      </p>
       <span className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-xl brand-gradient text-lime shadow-md">
         <Icon size={15} strokeWidth={2} />
       </span>
@@ -35,8 +39,9 @@ export function BalanceWidget() {
     <StatCard
       label={t("dash.totalBalance")}
       loading={loading && !wallets}
-      value={first ? formatMoney(first[1], first[0]) : "—"}
-      sub={others.map(([currency, total]) => formatMoney(total, currency)).join(" · ") || null}
+      value={first ? <Balance value={first[1]} currency={first[0]} /> : "—"}
+      sub={others.length ? others.map(([currency, total]) => <span key={currency} className="mr-2"><Balance value={total} currency={currency} /></span>) : null}
+      action={<BalanceEye size={14} className="-my-2 h-7 w-7" />}
       icon={Wallet}
     />
   );

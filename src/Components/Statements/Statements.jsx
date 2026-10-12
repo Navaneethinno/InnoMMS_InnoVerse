@@ -11,6 +11,7 @@ import { downloadStatement, exportHistory, listStatements, loadStatement } from 
 import { saveBlob } from "@/Utils/Lib/download";
 import { formatDate, formatMoney } from "@/Utils/Lib/format";
 import { PageHeading } from "@/Components/Common/PageTitle";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 const LIMIT = 20;
 const DAY = 86400000;
@@ -78,7 +79,7 @@ export default function Statements() {
   return (
     <div>
       <div className="mb-6">
-        <PageHeading>{t("statements.title")}</PageHeading>
+        <div className="flex items-center gap-1"><PageHeading>{t("statements.title")}</PageHeading><BalanceEye /></div>
         <p className="mt-1 text-sm text-slate-500">{t("statements.subtitle")}</p>
       </div>
       {problem && (
@@ -145,7 +146,7 @@ export default function Statements() {
                 </span>
                 <span className="text-right text-xs text-slate-500">
                   <span className="block">{t("statements.closing")}</span>
-                  <span className="block text-sm font-bold text-slate-800">{formatMoney(statement.closing_balance, currency)}</span>
+                  <span className="block text-sm font-bold text-slate-800"><Balance value={statement.closing_balance} currency={currency} /></span>
                 </span>
                 <span className="flex gap-2">
                   <Button variant="secondary" onClick={() => void open(statement)} className="px-3 py-2">
@@ -184,6 +185,8 @@ export default function Statements() {
 function StatementDetail({ detail, currency }) {
   const { t } = useTranslation();
   const { statement, lines, loading, error } = detail;
+  // Opening and closing are balances (hidden until the eye); the totals are not.
+  const balanceKeys = new Set([t("statements.opening"), t("statements.closing")]);
   const figures = [
     [t("statements.opening"), statement.opening_balance],
     [t("statements.credits"), statement.total_credits],
@@ -196,7 +199,7 @@ function StatementDetail({ detail, currency }) {
         {figures.map(([label, value]) => (
           <div key={label} className="min-w-0 rounded-xl bg-paper/70 px-3 py-2.5">
             <dt className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</dt>
-            <dd className="mt-0.5 break-words text-sm font-bold text-slate-800">{formatMoney(value, currency)}</dd>
+            <dd className="mt-0.5 break-words text-sm font-bold text-slate-800">{balanceKeys.has(label) ? <Balance value={value} currency={currency} /> : formatMoney(value, currency)}</dd>
           </div>
         ))}
       </dl>
@@ -217,7 +220,7 @@ function StatementDetail({ detail, currency }) {
               </span>
               <span className="text-right">
                 <span className={`block font-bold ${Number(line.amount) < 0 ? "text-slate-800" : "text-emerald-600 dark:text-emerald-400"}`}>{formatMoney(line.amount, currency, { signed: true })}</span>
-                <span className="block text-xs text-slate-500">{formatMoney(line.balance, currency)}</span>
+                <span className="block text-xs text-slate-500"><Balance value={line.balance} currency={currency} /></span>
               </span>
             </li>
           ))}

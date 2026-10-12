@@ -28,6 +28,7 @@ import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import { isSuperAgent } from "@/Utils/Lib/roles";
 import PosReceipt from "@/Components/Account/PosReceipt";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // Cash In / Out for agents and super agents (Agents, stores and POS, phases 2-3).
 // Every action moves the AGENT wallet (float), never the agent's own money:
@@ -258,8 +259,9 @@ export default function AgentCash() {
           )}
         </div>
       </div>
-      <p className="mt-5 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+      <p className="mt-5 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
         {t("send.available")}
+        <BalanceEye className="-my-2 -mr-1" />
       </p>
       {float ? (
         <FitText
@@ -267,7 +269,7 @@ export default function AgentCash() {
           min={12}
           className="mt-1 font-black tracking-tight text-slate-800"
         >
-          {formatMoney(float.avail_bal, float.currency_code)}
+          <Balance value={float.avail_bal} currency={float.currency_code} />
         </FitText>
       ) : (
         <p className="mt-1 text-sm text-slate-500">

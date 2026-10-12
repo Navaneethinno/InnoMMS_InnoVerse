@@ -6,9 +6,10 @@ import { loadCards } from "@/Services/Cards/cards.api";
 import { listNotifications } from "@/Services/Inbox/inbox.api";
 import { listStatements } from "@/Services/Statements/statements.api";
 import { useCardChanged, useNotificationReceived } from "@/Services/api/liveUpdates";
-import { formatDate, formatDateTime, formatMoney } from "@/Utils/Lib/format";
+import { formatDate, formatDateTime } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 import { WidgetCard } from "./WidgetCard";
+import { Balance } from "@/Components/Common/Balance";
 
 // A small widget's own data: `load` once, again when `refresh` events say so.
 function useWidgetData(load) {
@@ -104,7 +105,7 @@ export function StatementsWidget() {
                 {formatDate(statement.period_from)} – {formatDate(statement.period_to)}
               </span>
               <span className="block truncate text-[11px] text-slate-500">
-                {t("statements.closing")}: {formatMoney(statement.closing_balance, statement.currency_code)}
+                {t("statements.closing")}: <Balance value={statement.closing_balance} currency={statement.currency_code} />
               </span>
             </li>
           ))}

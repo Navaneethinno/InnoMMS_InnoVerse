@@ -25,6 +25,7 @@ import { formatMoney, newReference } from "@/Utils/Lib/format";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import PosReceipt from "../Account/PosReceipt";
+import { balanceText, useBalancesShown } from "@/Components/Common/Balance";
 
 // The card dialogs. Each makes its one call; `onDone` refreshes the page.
 // `pin` is always the transaction PIN, `card_pin` the card's own.
@@ -343,6 +344,7 @@ export function ReissueDialog({ card, reasons, onClose, onDone }) {
 // client reference per attempt makes a retry safe.
 export function CardMoneyDialog({ card, txnType, onClose, onDone }) {
   const { t } = useTranslation();
+  const balancesShown = useBalancesShown();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
   const [wallets, setWallets] = useState([]);
@@ -414,7 +416,7 @@ export function CardMoneyDialog({ card, txnType, onClose, onDone }) {
   }
   return (
     <Shell title={title} description={t(txnType === "CARD_LOAD" ? "cards.loadHint" : "cards.unloadHint")} problem={problem} onClose={onClose} pending={pending} confirm={t("cards.review")} disabled={!(Number(amount) > 0)} onConfirm={review}>
-      {wallets.length > 1 && <FilterSelect label={t(txnType === "CARD_LOAD" ? "cards.fromWallet" : "cards.toWallet")} value={from} onChange={setFrom} options={wallets.map((w) => ({ value: w.acct_num, label: `${w.acct_product_name ?? w.acct_num} · ${w.acct_num} · ${formatMoney(w.avail_bal, w.currency_code)}` }))} />}
+      {wallets.length > 1 && <FilterSelect label={t(txnType === "CARD_LOAD" ? "cards.fromWallet" : "cards.toWallet")} value={from} onChange={setFrom} options={wallets.map((w) => ({ value: w.acct_num, label: `${w.acct_product_name ?? w.acct_num} · ${w.acct_num} · ${balanceText(balancesShown, w.avail_bal, w.currency_code)}` }))} />}
       <TextField name="amount" label={t("cards.amountIn", { currency: card.currency_code ?? "" })} inputMode="decimal" autoComplete="off" value={amount} onChange={(event) => setAmount(event.target.value.replace(/[^\d.]/g, ""))} />
     </Shell>
   );

@@ -26,6 +26,7 @@ import RefundPicker from "./RefundPicker";
 import WalletPanel from "./WalletPanel";
 import { TransactionPinNotice, useNeedsTransactionPin } from "./TransactionPinSetup";
 import { isStaff, sendableWallets } from "@/Utils/Lib/roles";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // Money out of the merchant's wallet, two ways:
 //  - "send": to a person by their number (P2P_TRANSFER). A number with no
@@ -374,8 +375,8 @@ export default function Send() {
             <>
               {balanceAfter != null && (
                 <div className="mt-4 rounded-2xl bg-ink/5 p-4">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.balanceAfter", { defaultValue: "Balance after this payment" })}</p>
-                  <FitText className="mt-1 font-black tracking-tight text-slate-800">{formatMoney(balanceAfter, quote.currency_code)}</FitText>
+                  <p className="flex items-center justify-between gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.balanceAfter", { defaultValue: "Balance after this payment" })}<BalanceEye className="-my-2 -mr-1" /></p>
+                  <FitText className="mt-1 font-black tracking-tight text-slate-800"><Balance value={balanceAfter} currency={quote.currency_code} /></FitText>
                 </div>
               )}
               <LimitsList wallet={payingWallet} txnType={quote.txn_type} />

@@ -27,6 +27,7 @@ import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import ReceiptView from "./ReceiptView";
 import { PageHeading } from "@/Components/Common/PageTitle";
+import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // Newest first, every module (transfers, payments, refunds, cash, deposits,
 // loans, reversals). A line opens that transaction and its receipt.
@@ -174,7 +175,7 @@ export function TransactionLine({ item, onOpen }) {
           {item.balance_after != null && (
             <span className="block truncate text-[11px] text-slate-400">
               {t("history.balance")}{" "}
-              {formatMoney(item.balance_after, item.currency_code)}
+              <Balance value={item.balance_after} currency={item.currency_code} />
             </span>
           )}
         </span>
@@ -216,7 +217,14 @@ function HistoryTable({ items, onOpen }) {
                     column.className,
                   )}
                 >
-                  {t(`history.col.${column.key}`)}
+                  {column.key === "balance" ? (
+                    <span className="inline-flex items-center gap-1">
+                      {t("history.col.balance")}
+                      <BalanceEye size={13} className="-my-2 h-7 w-7" />
+                    </span>
+                  ) : (
+                    t(`history.col.${column.key}`)
+                  )}
                 </th>
               ))}
             </tr>
@@ -334,7 +342,7 @@ function HistoryTable({ items, onOpen }) {
                   )}
                   <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-slate-600">
                     {item.balance_after != null
-                      ? formatMoney(item.balance_after, item.currency_code)
+                      ? <Balance value={item.balance_after} currency={item.currency_code} />
                       : "—"}
                   </td>
                 </tr>

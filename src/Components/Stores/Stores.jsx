@@ -61,6 +61,7 @@ import { cn } from "@/Utils/Lib/utils";
 import StoreMap, { UseMyLocation, validPoint } from "./StoreMap";
 import { PageHeading } from "@/Components/Common/PageTitle";
 import SectionTabs from "@/Components/Common/SectionTabs";
+import { Balance, balanceText, useBalancesShown } from "@/Components/Common/Balance";
 
 // Stores and store users (Agents, stores and POS, phase 5), and store wallets
 // (phase 6). The owner (the merchant) adds stores, which wait for the bank; adds
@@ -586,6 +587,7 @@ function PinDialog({ user, onClose }) {
 // quote, then the owner's PIN.
 function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
   const { t } = useTranslation();
+  const balancesShown = useBalancesShown();
   const pinRules = usePinRules();
   const [direction, setDirection] = useState("toMain");
   const [main, setMain] = useState(
@@ -696,7 +698,7 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
                 options={mainWallets.map((w) => ({
                   value: w.acct_num,
                   label: w.acct_num,
-                  description: formatMoney(w.avail_bal, w.currency_code),
+                  description: balanceText(balancesShown, w.avail_bal, w.currency_code),
                 }))}
               />
             )}
@@ -1231,7 +1233,7 @@ export default function Stores() {
                   </div>
                 </div>
                 <p className="mt-4 text-xl font-black tracking-tight text-slate-800">
-                  {formatMoney(wallet.avail_bal, wallet.currency_code)}
+                  <Balance value={wallet.avail_bal} currency={wallet.currency_code} />
                 </p>
                 {owner && mainWallets.length > 0 && (
                   <Button

@@ -22,6 +22,7 @@ import { useIdleSignOut } from "@/Hooks/Auth/useIdleSignOut";
 import { useMeRefresh } from "@/Hooks/Auth/useMeRefresh";
 import { useSessionEnd } from "@/Hooks/Auth/useSessionEnd";
 import { useSignOut } from "@/Hooks/Auth/useSignOut";
+import { hideBalances, useHideBalancesOnLeave } from "@/Components/Common/Balance";
 import { STORAGE_KEYS } from "@/Utils/Constant";
 
 // The signed-in area: a floating sidebar (the menu) on the left, the top bar
@@ -44,6 +45,9 @@ const readCollapsed = () => {
 export default function AppLayout() {
   const { t } = useTranslation();
   const location = useLocation();
+  // Balances hide again on every new page, and when the tab is left.
+  useHideBalancesOnLeave();
+  useEffect(() => hideBalances(), [location.pathname]);
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const [drawer, setDrawer] = useState(false);
   const [hovering, setHovering] = useState(false);
