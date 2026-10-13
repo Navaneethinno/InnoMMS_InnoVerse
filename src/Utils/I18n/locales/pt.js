@@ -1102,4 +1102,9 @@ export default {
   "send.modeRefundHint": "Devolva a um cliente um pagamento que ele fez.",
   "balance.show": "Mostrar o saldo por 10 segundos",
   "balance.hide": "Ocultar o saldo",
+  "datePicker.select": "Selecionar uma data",
+  "datePicker.clear": "Limpar",
+  "datePicker.today": "Hoje",
+  "datePicker.previous": "Anterior",
+  "datePicker.next": "Seguinte",
 };

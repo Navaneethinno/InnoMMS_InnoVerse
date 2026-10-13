@@ -1097,4 +1097,9 @@ export default {
   "send.modeRefundHint": "Give a customer back a payment they made.",
   "balance.show": "Show balance for 10 seconds",
   "balance.hide": "Hide balance",
+  "datePicker.select": "Select a date",
+  "datePicker.clear": "Clear",
+  "datePicker.today": "Today",
+  "datePicker.previous": "Previous",
+  "datePicker.next": "Next",
 };

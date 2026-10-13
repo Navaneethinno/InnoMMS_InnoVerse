@@ -28,6 +28,7 @@ import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import ReceiptView from "./ReceiptView";
 import { PageHeading } from "@/Components/Common/PageTitle";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
+import DatePicker from "@/Components/Common/DatePicker";
 
 // Newest first, every module (transfers, payments, refunds, cash, deposits,
 // loans, reversals). A line opens that transaction and its receipt.
@@ -573,29 +574,19 @@ export default function History() {
         />
         <label className="block text-sm font-medium">
           <span className="mb-2 block">{t("history.from")}</span>
-          <input
-            type="date"
+          <DatePicker
             value={filters.from}
-            onChange={(event) =>
-              setFilters((previous) => ({
-                ...previous,
-                from: event.target.value,
-              }))
-            }
+            max={filters.to || undefined}
+            onChange={(value) => setFilters((previous) => ({ ...previous, from: value }))}
             className={dateInput}
           />
         </label>
         <label className="block text-sm font-medium">
           <span className="mb-2 block">{t("history.to")}</span>
-          <input
-            type="date"
+          <DatePicker
             value={filters.to}
-            onChange={(event) =>
-              setFilters((previous) => ({
-                ...previous,
-                to: event.target.value,
-              }))
-            }
+            min={filters.from || undefined}
+            onChange={(value) => setFilters((previous) => ({ ...previous, to: value }))}
             className={dateInput}
           />
         </label>

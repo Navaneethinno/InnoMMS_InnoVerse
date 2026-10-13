@@ -12,6 +12,7 @@ import { saveBlob } from "@/Utils/Lib/download";
 import { formatDate, formatMoney } from "@/Utils/Lib/format";
 import { PageHeading } from "@/Components/Common/PageTitle";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
+import DatePicker from "@/Components/Common/DatePicker";
 
 const LIMIT = 20;
 const DAY = 86400000;
@@ -103,11 +104,11 @@ export default function Statements() {
           />
           <label className="block text-sm font-medium">
             <span className="mb-2 block">{t("history.from")}</span>
-            <input type="date" value={range.from} max={range.to || undefined} onChange={(event) => setRange((previous) => ({ ...previous, from: event.target.value }))} className={dateInput} />
+            <DatePicker value={range.from} max={range.to || undefined} onChange={(value) => setRange((previous) => ({ ...previous, from: value }))} className={dateInput} />
           </label>
           <label className="block text-sm font-medium">
             <span className="mb-2 block">{t("history.to")}</span>
-            <input type="date" value={range.to} min={range.from || undefined} onChange={(event) => setRange((previous) => ({ ...previous, to: event.target.value }))} className={dateInput} />
+            <DatePicker value={range.to} min={range.from || undefined} onChange={(value) => setRange((previous) => ({ ...previous, to: value }))} className={dateInput} />
           </label>
           <Button type="submit" pending={busy === "export"} className="h-11 py-0">
             <Download size={15} /> {t("statements.downloadCsv")}

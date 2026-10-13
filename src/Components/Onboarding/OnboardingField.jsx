@@ -6,6 +6,7 @@ import FilterSelect from "@/Components/Common/FilterSelect";
 import CheckboxPill from "@/Components/Common/CheckboxPill";
 import FileUploadField from "@/Components/Common/FileUploadField";
 import { cn } from "@/Utils/Lib/utils";
+import DatePicker from "@/Components/Common/DatePicker";
 
 // Renders one wizard field exactly as the institution's form builder
 // describes it. `field.field_type` picks the control; nothing here depends
@@ -80,7 +81,7 @@ export default function OnboardingField({ field, value, onChange, error, choices
       case "DATE": {
         const { min, max } = dateLimits(options);
         return (
-          <input type="date" min={min} max={max} className={commonInput} value={value ?? ""} disabled={disabled} onChange={(e) => onChange(e.target.value)} />
+          <DatePicker min={min} max={max} className={commonInput} value={value ?? ""} disabled={disabled} aria-invalid={Boolean(error) || undefined} onChange={onChange} />
         );
       }
       case "PHONE":
