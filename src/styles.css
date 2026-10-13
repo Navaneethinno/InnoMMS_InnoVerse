@@ -234,3 +234,18 @@ html.dark:root {
   to { stroke-dashoffset: 100; }
 }
 .balance-countdown { animation: balance-countdown 10s linear both; }
+
+/* Sign-in page: a slow drifting glow and a gently floating preview card. */
+@keyframes login-glow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.08); }
+}
+@keyframes login-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.login-glow { animation: login-glow 14s ease-in-out infinite; }
+.login-float { animation: login-float 6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .login-glow, .login-float { animation: none; }
+}
