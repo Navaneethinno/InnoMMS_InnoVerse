@@ -3,10 +3,10 @@
 // via an `x-api-lang` request header; `remark` (internal diagnostic) always
 // stays English regardless. English is the backend's own default, so the
 // header is omitted entirely for it rather than sent as "en".
-export const DEFAULT_API_LANGUAGE = "en";
+const DEFAULT_API_LANGUAGE = "en";
 const STORAGE_KEY = "apiLang";
 
-export function getApiLanguage() {
+function getApiLanguage() {
   try {
     return window.localStorage.getItem(STORAGE_KEY) || DEFAULT_API_LANGUAGE;
   } catch {

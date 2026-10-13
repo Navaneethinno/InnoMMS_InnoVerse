@@ -21,8 +21,6 @@ import {
 } from "lucide-react";
 
 // Ordered by merchant navigation. Extend only when actual screens are added.
-export const routeConfig = { login: { titleKey: "auth.title" } };
-
 // The screens the portal has, by the key the API's menu uses. The menu itself
 // (which items, in what order, with what label) comes from the API; a key not
 // listed here is not shown, and a screen the API does not list is not offered.

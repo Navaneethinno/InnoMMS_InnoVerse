@@ -23,17 +23,20 @@ export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "")
   .replace(/\/merchant\/(web|app)$/, "");
 // Public files (country flags) are served at the API host's root
 // (`/master/file/<path>`). VITE_ASSET_BASE_URL overrides the API host.
-export const ASSET_BASE_URL = (import.meta.env.VITE_ASSET_BASE_URL || API_BASE_URL).replace(/\/+$/, "");
+const ASSET_BASE_URL = (
+  import.meta.env.VITE_ASSET_BASE_URL || API_BASE_URL
+).replace(/\/+$/, "");
 // A stored path (relative to the server's assets/ folder) passed through
 // unchanged, as the API requires.
-export const publicFileUrl = (path) => (path ? `${ASSET_BASE_URL}/master/file/${path}` : "");
-export const PORTAL_AUTHORIZATION = import.meta.env.VITE_PORTAL_AUTHORIZATION || "";
+export const PORTAL_AUTHORIZATION =
+  import.meta.env.VITE_PORTAL_AUTHORIZATION || "";
 // The digital product this portal runs under (its id), sent as
 // X-Digital-Product-Id on every call: the account opened at approval is of
 // this product's account type. Left out, the institution's only Active
 // digital product is used. Each deployment (web, app) sets its own.
 export const DIGITAL_PRODUCT_ID = import.meta.env.VITE_DIGITAL_PRODUCT_ID || "";
-export const INST_PROFILE_ID = Number(import.meta.env.VITE_INST_PROFILE_ID) || null;
+export const INST_PROFILE_ID =
+  Number(import.meta.env.VITE_INST_PROFILE_ID) || null;
 // One onboarding flow's calls: /merchant/{kind}/web/{call}, kind being
 // `individual` (a person) or `corporate` (a company).
 // `base` overrides the path root: an agent's assisted sign-up runs the same
@@ -137,8 +140,16 @@ export const API_ENDPOINTS = {
   // The signed-in menu and the features this merchant has.
   MENU: "/merchant/web/menu",
   // The inbox of everything the institution sent the merchant.
-  INBOX: { LIST: inboxPath("list"), READ: inboxPath("read"), UNREAD_COUNT: inboxPath("unread_count") },
-  STATEMENT: { LIST: statementPath("list"), GET: statementPath("get"), DOWNLOAD: statementPath("download") },
+  INBOX: {
+    LIST: inboxPath("list"),
+    READ: inboxPath("read"),
+    UNREAD_COUNT: inboxPath("unread_count"),
+  },
+  STATEMENT: {
+    LIST: statementPath("list"),
+    GET: statementPath("get"),
+    DOWNLOAD: statementPath("download"),
+  },
   // The merchant's own details (read-only) and their avatar.
   PROFILE: {
     GET: "/merchant/web/profile",
@@ -151,24 +162,86 @@ export const API_ENDPOINTS = {
   },
   // "Complete your verification": a merchant approved at a lower KYC level
   // completes the next one, signed in.
-  KYC: { STATUS: kycPath("status"), UPGRADE: kycPath("upgrade"), UPGRADE_BACK: kycPath("upgrade_back"), UPGRADE_UPLOAD: kycPath("upgrade_upload"), UPGRADE_FILE: kycPath("upgrade_file"), UPGRADE_SUBMIT: kycPath("upgrade_submit"), UPGRADE_CANCEL: kycPath("upgrade_cancel") },
-  DASHBOARD: { LAYOUT_GET: dashboardPath("layout_get"), LAYOUT_SAVE: dashboardPath("layout_save") },
+  KYC: {
+    STATUS: kycPath("status"),
+    UPGRADE: kycPath("upgrade"),
+    UPGRADE_BACK: kycPath("upgrade_back"),
+    UPGRADE_UPLOAD: kycPath("upgrade_upload"),
+    UPGRADE_FILE: kycPath("upgrade_file"),
+    UPGRADE_SUBMIT: kycPath("upgrade_submit"),
+    UPGRADE_CANCEL: kycPath("upgrade_cancel"),
+  },
+  DASHBOARD: {
+    LAYOUT_GET: dashboardPath("layout_get"),
+    LAYOUT_SAVE: dashboardPath("layout_save"),
+  },
   // Cards (Merchant portals: cards, 3 Oct 2026).
-  CARD: Object.fromEntries(["list", "get", "offers", "issue", "request", "request_cancel", "activate", "pin_set", "pin_change", "pin_reset", "status", "details", "reissue"].map((call) => [call, cardPath(call)])),
-  BRANDING: { GET: "/merchant/web/branding", FILE: "/merchant/web/branding/file" },
+  CARD: Object.fromEntries(
+    [
+      "list",
+      "get",
+      "offers",
+      "issue",
+      "request",
+      "request_cancel",
+      "activate",
+      "pin_set",
+      "pin_change",
+      "pin_reset",
+      "status",
+      "details",
+      "reissue",
+    ].map((call) => [call, cardPath(call)]),
+  ),
+  BRANDING: {
+    GET: "/merchant/web/branding",
+    FILE: "/merchant/web/branding/file",
+  },
   INDIVIDUAL_ONBOARDING: onboardingEndpoints("individual"),
   CORPORATE_ONBOARDING: onboardingEndpoints("corporate"),
   // Agents and super agents (Agents, stores and POS handoff, phases 1-4): the
   // agent wallet (float), the sign-ups an agent started, a super agent's agents.
-  AGENT: { FLOAT: agentPath("float"), SIGNUPS: agentPath("signups"), AGENTS: agentPath("agents") },
+  AGENT: {
+    FLOAT: agentPath("float"),
+    SIGNUPS: agentPath("signups"),
+    AGENTS: agentPath("agents"),
+  },
   // Assisted sign-up: the self sign-up calls, signed in as the agent.
-  ASSISTED_CUSTOMER_INDIVIDUAL: onboardingEndpoints("individual", "/customer/individual/agent"),
-  ASSISTED_CUSTOMER_CORPORATE: onboardingEndpoints("corporate", "/customer/corporate/agent"),
-  ASSISTED_AGENT_INDIVIDUAL: onboardingEndpoints("individual", "/merchant/individual/agent"),
-  ASSISTED_AGENT_CORPORATE: onboardingEndpoints("corporate", "/merchant/corporate/agent"),
+  ASSISTED_CUSTOMER_INDIVIDUAL: onboardingEndpoints(
+    "individual",
+    "/customer/individual/agent",
+  ),
+  ASSISTED_CUSTOMER_CORPORATE: onboardingEndpoints(
+    "corporate",
+    "/customer/corporate/agent",
+  ),
+  ASSISTED_AGENT_INDIVIDUAL: onboardingEndpoints(
+    "individual",
+    "/merchant/individual/agent",
+  ),
+  ASSISTED_AGENT_CORPORATE: onboardingEndpoints(
+    "corporate",
+    "/merchant/corporate/agent",
+  ),
   // Stores and their users (phase 5); terminals placed in stores (phase 6).
-  STORE: Object.fromEntries(["list", "add", "edit", "close", "reopen", "users", "user_add", "user_edit", "user_pin"].map((call) => [call, storePath(call)])),
-  TERMINAL: { LIST: terminalPath("list"), SETUP: terminalPath("setup"), BLOCK_REQUEST: terminalPath("block_request") },
+  STORE: Object.fromEntries(
+    [
+      "list",
+      "add",
+      "edit",
+      "close",
+      "reopen",
+      "users",
+      "user_add",
+      "user_edit",
+      "user_pin",
+    ].map((call) => [call, storePath(call)]),
+  ),
+  TERMINAL: {
+    LIST: terminalPath("list"),
+    SETUP: terminalPath("setup"),
+    BLOCK_REQUEST: terminalPath("block_request"),
+  },
 };
 // Until the API says otherwise (the `session` block of sign-in and refresh): a
 // web session unused for this long ends on the server, and the portal signs the

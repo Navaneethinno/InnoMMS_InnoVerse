@@ -18,7 +18,7 @@ const subscribe = (listener) => {
   return () => listeners.delete(listener);
 };
 const isShown = () => shownUntil > Date.now();
-export function showBalances() {
+function showBalances() {
   window.clearTimeout(timer);
   shownUntil = Date.now() + SHOW_MS;
   timer = window.setTimeout(hideBalances, SHOW_MS);

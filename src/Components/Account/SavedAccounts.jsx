@@ -12,7 +12,7 @@ import {
 
 // Saved meters or numbers (kind ELECTRICITY | AIRTIME, up to 20): tap one to
 // use it; "Edit" renames or removes them.
-export const SAVED_MAX = 20;
+const SAVED_MAX = 20;
 
 export function useSavedAccounts(kind) {
   const [items, setItems] = useState([]);

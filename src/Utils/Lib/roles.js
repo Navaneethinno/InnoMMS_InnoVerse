@@ -4,14 +4,11 @@
 //  - staff: present for a store manager or cashier, who works only in their
 //    stores; the owner (the merchant) has none.
 
-export const rolesOf = (user) => (Array.isArray(user?.roles) ? user.roles : []);
+const rolesOf = (user) => (Array.isArray(user?.roles) ? user.roles : []);
 export const isStaff = (user) => Boolean(user?.staff);
 export const staffRole = (user) => user?.staff?.role ?? null;
 export const isOwner = (user) => !isStaff(user);
 export const isSuperAgent = (user) => rolesOf(user).includes("SUPER_AGENT");
-export const isAgent = (user) =>
-  rolesOf(user).includes("AGENT") || isSuperAgent(user);
-export const isMerchant = (user) => rolesOf(user).includes("MERCHANT");
 
 const ROLE_LABEL = {
   MERCHANT: ["roles.merchant", "Merchant"],

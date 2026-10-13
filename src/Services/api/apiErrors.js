@@ -4,27 +4,24 @@ export class ApiConfigurationError extends Error {
     this.code = "API_NOT_CONFIGURED";
   }
 }
-export function normalizeApiError(error) {
-  return {
-    code: error.code || "REQUEST_FAILED",
-    status: error.response?.status || null,
-    messageKey:
-      error.code === "API_NOT_CONFIGURED"
-        ? "auth.notConnected"
-        : error.response?.status === 401
-          ? "auth.invalidCredentials"
-          : "common.requestFailed",
-  };
-}
-
 // A refusal from the merchant-portal API. `message` is the API's own
 // plain-language text (already in the caller's language) and is shown as
 // is; `problems` is the optional list of reasons under it
 // (`data[0].problems`, or `data.problems`); `status` is the HTTP status, which decides the kind
 // of state to show (403 = channel not offered, 409 = conflict, ...). The
 // English `remark` is technical detail and is never used.
-export class ApiRequestError extends Error {
-  constructor(message, { status = null, problems = [], errorCode = null, remark = "", retryAfterSeconds = null, lockedUntil = null } = {}) {
+class ApiRequestError extends Error {
+  constructor(
+    message,
+    {
+      status = null,
+      problems = [],
+      errorCode = null,
+      remark = "",
+      retryAfterSeconds = null,
+      lockedUntil = null,
+    } = {},
+  ) {
     super(message);
     this.name = "ApiRequestError";
     this.status = status;
