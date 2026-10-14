@@ -127,10 +127,10 @@ export default function Login() {
     window.setTimeout(() => navigate("/dashboard", { replace: true }), 700);
   };
   return (
-    <div className="min-h-screen bg-paper min-[880px]:grid min-[880px]:h-screen min-[880px]:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] min-[880px]:overflow-hidden">
+    <div className="min-h-screen bg-paper min-[880px]:grid min-[880px]:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       {/* Brand panel: one hero message, vertically centred. */}
       <aside
-        className="brand-gradient relative isolate hidden h-screen flex-col overflow-hidden px-10 py-9 text-white min-[880px]:flex xl:px-16"
+        className="brand-gradient login-hero sticky isolate top-0 hidden h-screen flex-col overflow-hidden px-10 py-9 text-white min-[880px]:flex xl:px-16"
         // The bank's own picture, under a wash of its colour so the text stays readable.
         style={
           background
@@ -186,7 +186,7 @@ export default function Login() {
           <p className="mt-6 max-w-[38ch] text-base leading-7 text-white/[0.72]">
             {t("auth.heroDescription")}
           </p>
-          <ul className="stagger mt-9 space-y-3.5">
+          <ul className="login-features stagger mt-9 space-y-3.5">
             {FEATURES.map(([icon, key, fallback]) => (
               <li
                 key={key}
@@ -202,7 +202,7 @@ export default function Login() {
           {/* A glimpse of the portal: an illustration, not real figures. */}
           <div
             aria-hidden="true"
-            className="login-float mt-10 hidden w-[300px] rounded-2xl bg-white/[0.1] p-4 ring-1 ring-white/20 backdrop-blur-md min-[1100px]:block [@media(max-height:820px)]:!hidden"
+            className="login-float mt-10 hidden w-[300px] rounded-2xl bg-white/[0.1] p-4 ring-1 ring-white/20 backdrop-blur-md login-preview"
           >
             <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-widest text-white/60">
               <span className="flex items-center gap-1.5">
@@ -246,7 +246,7 @@ export default function Login() {
       </aside>
 
       {/* Sign-in form, centred on the same axis as the hero. */}
-      <div className="flex min-h-screen min-w-0 flex-col px-5 sm:px-10 min-[880px]:h-screen min-[880px]:min-h-0">
+      <div className="flex min-h-screen min-w-0 flex-col px-5 sm:px-10">
         <header className="flex items-center justify-between gap-3 py-5 min-[880px]:justify-end">
           <div className="min-w-0 [&_span:last-child]:whitespace-nowrap [&_span:last-child]:text-base sm:[&_span:last-child]:text-xl min-[880px]:hidden">
             <Brand />

@@ -249,3 +249,15 @@ html.dark:root {
 @media (prefers-reduced-motion: reduce) {
   .login-glow, .login-float { animation: none; }
 }
+
+/* Sign-in brand panel on shorter screens: the preview card goes first, then
+   the feature list, then the type shrinks, so nothing is ever cut off. */
+@media (min-width: 1100px) and (min-height: 860px) {
+  .login-preview { display: block; }
+}
+@media (max-height: 700px) {
+  .login-features { display: none; }
+}
+@media (max-height: 560px) {
+  .login-hero h2 { font-size: 2.5rem; }
+}
