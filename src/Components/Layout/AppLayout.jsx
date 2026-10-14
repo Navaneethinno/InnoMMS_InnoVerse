@@ -22,7 +22,10 @@ import { useIdleSignOut } from "@/Hooks/Auth/useIdleSignOut";
 import { useMeRefresh } from "@/Hooks/Auth/useMeRefresh";
 import { useSessionEnd } from "@/Hooks/Auth/useSessionEnd";
 import { useSignOut } from "@/Hooks/Auth/useSignOut";
-import { hideBalances, useHideBalancesOnLeave } from "@/Components/Common/Balance";
+import {
+  hideBalances,
+  useHideBalancesOnLeave,
+} from "@/Components/Common/Balance";
 import { STORAGE_KEYS } from "@/Utils/Constant";
 
 // The signed-in area: a floating sidebar (the menu) on the left, the top bar
@@ -121,7 +124,7 @@ export default function AppLayout() {
     <div className="min-h-screen bg-paper bg-fixed bg-[linear-gradient(160deg,rgb(var(--color-secondary)/0.28),rgb(var(--color-secondary)/0.16)_50%,rgb(var(--color-secondary)/0.26))] dark:bg-[linear-gradient(160deg,rgb(var(--color-secondary)/0.07),rgb(var(--color-secondary)/0.02)_50%,rgb(var(--color-secondary)/0.06))]">
       <div className="flex gap-4 p-3 sm:p-4">
         <div
-          className="sticky top-4 hidden h-[calc(100dvh-2rem)] shrink-0 self-start transition-[width] duration-200 lg:block"
+          className="sticky top-4 hidden h-[calc(100dvh-2rem)] shrink-0 self-start transition-[width] duration-300 ease-[cubic-bezier(0.2,0.7,0.2,1)] lg:block"
           style={{ width: collapsed && !hovering ? RAIL_W : OPEN_W }}
         >
           <Sidebar
@@ -138,9 +141,9 @@ export default function AppLayout() {
               type="button"
               aria-label={t("nav.closeMenu")}
               onClick={() => setDrawer(false)}
-              className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
+              className="drawer-backdrop absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
             />
-            <div className="absolute inset-y-3 left-3 w-[min(272px,calc(100%-1.5rem))]">
+            <div className="drawer-panel absolute inset-y-3 left-3 w-[min(272px,calc(100%-1.5rem))]">
               <Sidebar onNavigate={() => setDrawer(false)} className="w-full" />
             </div>
           </div>

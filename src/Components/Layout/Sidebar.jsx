@@ -13,7 +13,14 @@ import { cn } from "@/Utils/Lib/utils";
 // rail (desktop) that opens while the mouse (or keyboard focus) is on it and
 // folds back after (`hovering` and `onHoverChange` are the page's, because the
 // page moves with it); `onNavigate` closes the drawer on a phone.
-export default function Sidebar({ collapsed = false, hovering = false, onHoverChange, onToggle, onNavigate, className }) {
+export default function Sidebar({
+  collapsed = false,
+  hovering = false,
+  onHoverChange,
+  onToggle,
+  onNavigate,
+  className,
+}) {
   const { t } = useTranslation();
   const logo = useBrandingLogo();
   const signOut = useSignOut();
@@ -25,13 +32,24 @@ export default function Sidebar({ collapsed = false, hovering = false, onHoverCh
 
   return (
     <aside
-      className={cn("flex h-full w-full flex-col rounded-2xl border border-ink/[0.06] bg-surface/90 p-3 shadow-[0_14px_30px_-18px_rgb(var(--color-primary)/0.4)] backdrop-blur", className)}
+      className={cn(
+        "flex h-full w-full flex-col rounded-2xl border border-ink/[0.06] bg-surface/90 p-3 shadow-[0_14px_30px_-18px_rgb(var(--color-primary)/0.4)] backdrop-blur",
+        className,
+      )}
       onMouseEnter={() => onHoverChange?.(true)}
       onMouseLeave={() => onHoverChange?.(false)}
       onFocus={() => onHoverChange?.(true)}
-      onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && onHoverChange?.(false)}
+      onBlur={(event) =>
+        !event.currentTarget.contains(event.relatedTarget) &&
+        onHoverChange?.(false)
+      }
     >
-      <div className={cn("flex items-center gap-3 rounded-xl border border-black bg-paper/70 p-3 dark:border-white/40", slim && "justify-center px-0")}>
+      <div
+        className={cn(
+          "flex items-center gap-3 rounded-xl border border-black bg-paper/70 p-3 dark:border-white/40",
+          slim && "justify-center px-0",
+        )}
+      >
         {logo ? (
           <BrandLogo src={logo} size={44} />
         ) : (
@@ -40,14 +58,21 @@ export default function Sidebar({ collapsed = false, hovering = false, onHoverCh
           </span>
         )}
         {!slim && (
-          <div className="min-w-0">
-            <p className="truncate text-[15px] font-bold leading-tight text-ink">{t("brand.name")}</p>
-            <p className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">{t("brand.portal")}</p>
+          <div className="sidebar-label min-w-0">
+            <p className="truncate text-[15px] font-bold leading-tight text-ink">
+              {t("brand.name")}
+            </p>
+            <p className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+              {t("brand.portal")}
+            </p>
           </div>
         )}
       </div>
 
-      <nav aria-label={t("nav.main")} className="thin-scrollbar -mr-1 mt-4 grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overflow-x-hidden pr-1">
+      <nav
+        aria-label={t("nav.main")}
+        className="sidebar-nav thin-scrollbar -mr-1 mt-4 grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overflow-x-hidden pr-1"
+      >
         {items.map(({ key, to, labelKey, label, icon }) => {
           const Icon = icon;
           const name = label || t(labelKey);
@@ -59,18 +84,42 @@ export default function Sidebar({ collapsed = false, hovering = false, onHoverCh
               title={slim ? name : undefined}
               className={({ isActive }) =>
                 cn(
-                  "relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition",
+                  "group relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition-colors duration-200",
                   slim && "justify-center px-0",
-                  isActive ? "brand-gradient text-white shadow-md" : "text-slate-600 hover:bg-ink/5 hover:text-ink",
+                  isActive
+                    ? "sidebar-active brand-gradient text-white shadow-md"
+                    : "text-slate-600 hover:bg-ink/5 hover:text-ink",
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={18} className={cn("shrink-0", isActive && "text-lime")} />
-                  {!slim && <span className="truncate">{name}</span>}
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="sidebar-bar absolute inset-y-2 left-0 w-1 rounded-r-full bg-lime"
+                    />
+                  )}
+                  <Icon
+                    size={18}
+                    className={cn(
+                      "shrink-0 transition-transform duration-200 group-hover:scale-110",
+                      !isActive && "group-hover:translate-x-0.5",
+                      isActive && "text-lime",
+                    )}
+                  />
+                  {!slim && (
+                    <span className="sidebar-label truncate">{name}</span>
+                  )}
                   {key === "notifications" && unread > 0 && (
-                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full bg-lime px-1.5 text-[10px] font-bold text-on-secondary", slim ? "absolute right-2 top-1.5" : "ml-auto")}>{unread > 99 ? "99+" : unread}</span>
+                    <span
+                      className={cn(
+                        "flex h-5 min-w-5 items-center justify-center rounded-full bg-lime px-1.5 text-[10px] font-bold text-on-secondary",
+                        slim ? "absolute right-2 top-1.5" : "ml-auto",
+                      )}
+                    >
+                      {unread > 99 ? "99+" : unread}
+                    </span>
                   )}
                 </>
               )}
@@ -84,10 +133,18 @@ export default function Sidebar({ collapsed = false, hovering = false, onHoverCh
           type="button"
           onClick={() => void signOut()}
           title={slim ? t("common.signOut") : undefined}
-          className={cn("flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-500/10 dark:text-red-300", slim && "justify-center px-0")}
+          className={cn(
+            "group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-500/10 dark:text-red-300",
+            slim && "justify-center px-0",
+          )}
         >
-          <LogOut size={17} className="shrink-0" />
-          {!slim && t("common.signOut")}
+          <LogOut
+            size={17}
+            className="shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5"
+          />
+          {!slim && (
+            <span className="sidebar-label">{t("common.signOut")}</span>
+          )}
         </button>
         {onToggle && (
           <button
@@ -95,10 +152,21 @@ export default function Sidebar({ collapsed = false, hovering = false, onHoverCh
             onClick={onToggle}
             aria-label={t(collapsed ? "nav.expand" : "nav.collapse")}
             title={slim ? t("nav.expand") : undefined}
-            className={cn("flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-ink/5 hover:text-ink", slim && "justify-center px-0")}
+            className={cn(
+              "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-ink/5 hover:text-ink",
+              slim && "justify-center px-0",
+            )}
           >
-            {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
-            {!slim && t(collapsed ? "nav.expand" : "nav.collapse")}
+            {collapsed ? (
+              <PanelLeftOpen size={17} />
+            ) : (
+              <PanelLeftClose size={17} />
+            )}
+            {!slim && (
+              <span className="sidebar-label">
+                {t(collapsed ? "nav.expand" : "nav.collapse")}
+              </span>
+            )}
           </button>
         )}
       </div>
