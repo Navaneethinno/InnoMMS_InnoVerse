@@ -12,6 +12,8 @@ import ReviewScreen from "./ReviewScreen";
 import OnboardingCodeDialog from "./OnboardingCodeDialog";
 import OnboardingField from "./OnboardingField";
 import OnboardingTour from "./OnboardingTour";
+import SignupConsent from "@/Components/Documents/SignupConsent";
+import { rememberConsent } from "@/Services/Documents/documents.api";
 
 // Shared rendering for every self-service onboarding wizard, once it has
 // started: progress bar, KYC panel (individual only — a no-op otherwise),
@@ -21,7 +23,9 @@ import OnboardingTour from "./OnboardingTour";
 // nav. `identityFields` is the one thing each flow supplies itself — the
 // party-type-and-what picker fields are the only part that genuinely
 // differs between individual and corporate.
-export default function OnboardingWizardView({ flow, identityFields, onSubmitted, onActiveChange, tourRequest, tourEnabled = false }) {
+export default function OnboardingWizardView({ flow, identityFields, onSubmitted, onActiveChange, tourRequest, tourEnabled = false, askConsent = false }) {
+  // Sign-up only: the documents the institution requires, accepted before submitting.
+  const [consent, setConsent] = useState({ ok: !askConsent, ids: [] });
   const {
     options,
     pick,
@@ -377,11 +381,21 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
                 <p className="font-semibold text-ink">{finishCopy.title}</p>
                 <p className="mt-1 text-sm leading-6 text-slate-500">{finishCopy.body}</p>
               </div>
-              <Button type="button" pending={submitting} onClick={() => void submitForApproval()} className="px-6">
+              <Button
+                type="button"
+                pending={submitting}
+                disabled={!consent.ok}
+                onClick={() => {
+                  rememberConsent(consent.ids);
+                  void submitForApproval();
+                }}
+                className="px-6"
+              >
                 {t("onb.submit")}
                 {!submitting && <Check size={16} />}
               </Button>
             </div>
+            {askConsent && <SignupConsent onChange={setConsent} />}
             {tiers.length > 0 && (
               <ul className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
                 {tiers.map((tier) => (

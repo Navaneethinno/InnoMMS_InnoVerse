@@ -7,6 +7,7 @@ const ActivateAccess = lazy(() => import("@/Components/Auth/ActivateAccess"));
 const ForgotPassword = lazy(() => import("@/Components/Auth/ForgotPassword"));
 const ForgotPin = lazy(() => import("@/Components/Auth/ForgotPin"));
 const LegalPage = lazy(() => import("@/Components/Auth/LegalPage"));
+const DocumentPage = lazy(() => import("@/Components/Documents/DocumentPage"));
 export const publicRoutes = [
   { index: true, element: <Navigate to="/login" replace /> },
   { path: "login", element: pageElement(Login) },
@@ -15,6 +16,7 @@ export const publicRoutes = [
   { path: "forgot-pin", element: pageElement(ForgotPin) },
   { path: "terms", element: pageElement(LegalPage, { kind: "terms" }) },
   { path: "privacy", element: pageElement(LegalPage, { kind: "privacy" }) },
+  { path: "legal/:code", element: pageElement(DocumentPage) },
   ...onboardingRoutes,
   { path: "*", element: <Navigate to="/login" replace /> },
 ];

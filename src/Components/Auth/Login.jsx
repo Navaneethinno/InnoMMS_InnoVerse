@@ -23,6 +23,7 @@ import LanguageToggle from "@/Components/Common/LanguageToggle";
 import Modal from "@/Components/Common/Modal";
 import ErrorState from "@/Components/Common/ErrorState";
 import LegalLink from "@/Components/Common/LegalLink";
+import { useDocuments } from "@/Hooks/useDocuments";
 import Footer from "@/Components/Layout/Footer";
 import { useLogin } from "@/Hooks/Auth/useLogin";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
@@ -73,6 +74,9 @@ export default function Login() {
   const { t } = useTranslation();
   const logo = useBrandingLogo();
   const legal = useBrandingLinks();
+  const docs = useDocuments();
+  // The institution's own published document, else its branding link, else the portal's page.
+  const legalLink = (code, href, fallback) => (docs?.some((d) => d.code === code) ? { fallback: `/legal/${code}` } : { href, fallback });
   const background = useBrandingLoginBackground();
   const navigate = useNavigate();
   const policy = usePortalPolicy();
@@ -521,8 +525,8 @@ export default function Login() {
             <Trans
               i18nKey="auth.terms"
               components={{
-                terms: <LegalLink href={legal.terms} fallback="/terms" />,
-                privacy: <LegalLink href={legal.privacy} fallback="/privacy" />,
+                terms: <LegalLink {...legalLink("TERMS", legal.terms, "/terms")} />,
+                privacy: <LegalLink {...legalLink("PRIVACY", legal.privacy, "/privacy")} />,
               }}
             />
           </p>

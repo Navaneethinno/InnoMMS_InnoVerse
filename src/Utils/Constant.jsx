@@ -81,6 +81,7 @@ export const API_ENDPOINTS = {
   LIVE: "/merchant/web/live",
   // The platform's languages (before and after sign-in).
   LANGUAGE: "/merchant/web/language",
+  DOCUMENT: { LIST: "/merchant/web/document/list", GET: "/merchant/web/document/get", ACCEPT: "/merchant/web/document/accept" },
   // The platform's public key: passwords, PINs and codes are sealed with it
   // before they leave the browser (see Services/api/credentialSeal.js).
   CREDENTIAL_KEY: "/auth/public_key",

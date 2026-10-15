@@ -1,4 +1,16 @@
 export default {
+  // Institution documents (terms, privacy and others).
+  "docs.loading": "Loading…",
+  "docs.unavailable": "This document isn't available",
+  "docs.versionOn": "Version {{n}} · {{date}}",
+  "docs.iAccept": "I accept the <doc>{{name}}</doc>",
+  "docs.acceptTitle": "Please review and accept",
+  "docs.acceptBody": "To keep using the portal, read and accept the documents below.",
+  "docs.updatedTitle": "We've updated our terms",
+  "docs.updatedBody": "Some documents you accepted have changed. Read the new versions below and accept them to continue.",
+  "docs.accept": "Accept and continue",
+  "docs.signOut": "Sign out",
+  "docs.legal": "Legal",
   "onb.standard": "Standard",
   "onb.remove": "Remove",
   "onb.noFields": "There's nothing to fill in yet. Please check back later.",

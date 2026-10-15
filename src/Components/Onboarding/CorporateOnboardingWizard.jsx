@@ -12,5 +12,5 @@ export default function CorporateOnboardingWizard({ onSubmitted, onActiveChange,
   const { t } = useTranslation();
   const flow = useCorporateOnboardingWizard({ partyType });
   const identityFields = <CategoryField flow={flow} label={t("onb.companyType")} icon={Building2} heading={t("onb.aboutCompany")} />;
-  return <OnboardingWizardView flow={flow} identityFields={identityFields} onSubmitted={onSubmitted} onActiveChange={onActiveChange} />;
+  return <OnboardingWizardView askConsent flow={flow} identityFields={identityFields} onSubmitted={onSubmitted} onActiveChange={onActiveChange} />;
 }

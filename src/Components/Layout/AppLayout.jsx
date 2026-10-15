@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import Footer from "./Footer";
+import DocumentGate from "@/Components/Documents/DocumentGate";
 import IdleWarning from "./IdleWarning";
 import SessionEndWarning from "./SessionEndWarning";
 import {
@@ -162,6 +163,7 @@ export default function AppLayout() {
           <Footer className="py-2" />
         </div>
       </div>
+      <DocumentGate onSignOut={() => void signOut()} />
       <IdleWarning
         seconds={idle.warning}
         onStay={idle.stay}

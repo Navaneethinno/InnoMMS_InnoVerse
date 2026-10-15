@@ -1,4 +1,16 @@
 export default {
+  // Institution documents (terms, privacy and others).
+  "docs.loading": "A carregar…",
+  "docs.unavailable": "Este documento não está disponível",
+  "docs.versionOn": "Versão {{n}} · {{date}}",
+  "docs.iAccept": "Aceito os <doc>{{name}}</doc>",
+  "docs.acceptTitle": "Reveja e aceite",
+  "docs.acceptBody": "Para continuar a usar o portal, leia e aceite os documentos abaixo.",
+  "docs.updatedTitle": "Atualizámos os nossos termos",
+  "docs.updatedBody": "Alguns documentos que aceitou mudaram. Leia as novas versões abaixo e aceite-as para continuar.",
+  "docs.accept": "Aceitar e continuar",
+  "docs.signOut": "Terminar sessão",
+  "docs.legal": "Legal",
   "onb.standard": "Padr\u00e3o",
   "auth.activateTitle": "Ativar o seu acesso",
   "auth.activateDescription": "Introduza o endere\u00e7o de e-mail ou n\u00famero de telem\u00f3vel com que se registou. Enviaremos um c\u00f3digo.",

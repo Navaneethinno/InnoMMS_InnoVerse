@@ -14,5 +14,5 @@ export default function IndividualOnboardingWizard({ onSubmitted, onActiveChange
   const { t } = useTranslation();
   const flow = useIndividualOnboardingWizard({ partyType });
   const identityFields = <CategoryField flow={flow} icon={Users} heading={t("onb.aboutYou")} />;
-  return <OnboardingWizardView flow={flow} identityFields={identityFields} onSubmitted={onSubmitted} onActiveChange={onActiveChange} tourRequest={tourRequest} tourEnabled />;
+  return <OnboardingWizardView askConsent flow={flow} identityFields={identityFields} onSubmitted={onSubmitted} onActiveChange={onActiveChange} tourRequest={tourRequest} tourEnabled />;
 }
