@@ -36,9 +36,9 @@ export default function ReceiptView({ receipt, className }) {
         {receipt.print_count > 0 && <span className="shrink-0 rounded-full bg-amber-400/25 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-amber-700 dark:text-amber-300">{t("receipt.duplicate")}</span>}
       </div>
       <dl className="divide-y divide-slate-100">
-        <Line label={t("receipt.amount")} strong>{money(receipt.txn_amount)}</Line>
+        <Line label={t("receipt.amount")}>{money(receipt.txn_amount)}</Line>
         <Line label={t("receipt.fee")}>{receipt.fee_amount != null && Number(receipt.fee_amount) !== 0 ? money(receipt.fee_amount) : null}</Line>
-        <Line label={t("receipt.total")}>{money(payload.total_debit)}</Line>
+        <Line label={t("receipt.total")} strong>{money(receipt.total_amount ?? payload.total_debit)}</Line>
         <Line label={t("receipt.from")}>{payload.from?.name ?? receipt.customer_name}</Line>
         <Line label={t("receipt.wallet")}>{receipt.acct_mask}</Line>
         <Line label={t("receipt.to")}>{payload.to?.name ?? receipt.merchant_name ?? receipt.counterparty_name ?? payload.to?.phone}</Line>

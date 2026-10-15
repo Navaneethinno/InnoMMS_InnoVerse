@@ -21,7 +21,7 @@ import {
   loadWallets,
 } from "@/Services/Account/account.api";
 import { cn } from "@/Utils/Lib/utils";
-import { formatDateTime, formatMoney } from "@/Utils/Lib/format";
+import { formatDateTime, formatMoney, lineAmount } from "@/Utils/Lib/format";
 import { downloadReceiptPdf } from "@/Utils/Lib/receiptPdf";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
@@ -169,7 +169,7 @@ export function TransactionLine({ item, onOpen }) {
               out ? "text-slate-800" : "text-emerald-600 dark:text-emerald-400",
             )}
           >
-            {formatMoney(item.net_amount ?? item.amount, item.currency_code, {
+            {formatMoney(lineAmount(item), item.currency_code, {
               signed: true,
             })}
           </span>
@@ -331,7 +331,7 @@ function HistoryTable({ items, onOpen }) {
                     )}
                   >
                     {formatMoney(
-                      item.net_amount ?? item.amount,
+                      lineAmount(item),
                       item.currency_code,
                       { signed: true },
                     )}

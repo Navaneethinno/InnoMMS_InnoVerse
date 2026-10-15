@@ -117,3 +117,8 @@ export const newReference = () =>
   `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 // What the API will check again: a quick look before sending.
+
+// A history line's amount: the total the party paid or got (amount + fee),
+// signed by its direction. Older lines without a total use the net amount.
+export const lineAmount = (item) =>
+  item?.total_amount != null ? `${item.direction === "DR" ? "-" : ""}${String(item.total_amount).replace(/^[-+]/, "")}` : (item?.net_amount ?? item?.amount);

@@ -94,7 +94,8 @@ export default function PhoneTransfers({ version = 0, onCancelled, className }) 
               </span>
               <span className="min-w-[12rem] flex-1">
                 <span className="block text-sm font-semibold text-slate-800">
-                  {formatMoney(row.amount, row.currency_code)} · {row.phone_number}
+                  {formatMoney(row.total_amount ?? row.amount, row.currency_code)}
+                  {Number(row.fee_amount) > 0 && <span className="font-normal text-slate-500"> ({t("receipt.fee")} {formatMoney(row.fee_amount, row.currency_code)})</span>} · {row.phone_number}
                 </span>
                 <span className="block text-xs text-slate-500">{[formatDateTime(row.created_at), row.note].filter(Boolean).join(" · ")}</span>
               </span>
