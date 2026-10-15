@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "@/Utils/Constant";
+import { clearReadCache } from "./readCache";
 // The signed-in session: a short-lived access token (JWT, 15 minutes) and a
 // refresh token (30 days) that changes on every refresh. Kept in
 // sessionStorage (gone when the tab closes), with an in-memory copy for
@@ -98,6 +99,7 @@ export function updateAuthUser(user) {
     );
 }
 export function clearAuthSession() {
+  clearReadCache();
   memorySession = null;
   try {
     window.sessionStorage.removeItem(STORAGE_KEYS.session);

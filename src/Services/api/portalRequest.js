@@ -2,6 +2,7 @@ import i18n from "@/Utils/I18n/i18n";
 import { api, requireEndpoint } from "./client";
 import { portalHeaders } from "./portalHeaders";
 import { readBlobPayload, toApiRequestError } from "./apiErrors";
+import { cachedPost } from "./readCache";
 
 // One call to the merchant API. Every reply is { status, code, message,
 // data: [ ... ] }; `message` is the API's own words for the user and is shown
@@ -35,14 +36,18 @@ export async function portalDownload(endpoint, body = {}) {
 
 export async function portalPost(endpoint, body = {}, { signedIn = true } = {}) {
   try {
-    const response = await api.post(requireEndpoint(endpoint), body, signedIn ? undefined : { skipAuth: true, headers: portalHeaders() });
-    const payload = response.data;
-    if (String(payload?.status).toLowerCase() === "fail" || payload?.code === 0) {
-      throw toApiRequestError(payload, response.status, i18n.t("common.requestFailed"));
-    }
-    const rows = Array.isArray(payload?.data) ? payload.data : payload?.data ? [payload.data] : [];
-    // `data` is the first item; `rows` the whole list (for calls that answer with one).
-    return { data: rows[0] ?? null, rows, message: payload?.message ?? "" };
+    const send = async () => {
+      const response = await api.post(requireEndpoint(endpoint), body, signedIn ? undefined : { skipAuth: true, headers: portalHeaders() });
+      const payload = response.data;
+      if (String(payload?.status).toLowerCase() === "fail" || payload?.code === 0) {
+        throw toApiRequestError(payload, response.status, i18n.t("common.requestFailed"));
+      }
+      const rows = Array.isArray(payload?.data) ? payload.data : payload?.data ? [payload.data] : [];
+      // `data` is the first item; `rows` the whole list (for calls that answer with one).
+      return { data: rows[0] ?? null, rows, message: payload?.message ?? "" };
+    };
+    // Sign-in calls are never shared or kept.
+    return await (signedIn ? cachedPost(endpoint, body, send) : send());
   } catch (error) {
     if (error.name === "ApiRequestError") throw error;
     if (error.response) {
