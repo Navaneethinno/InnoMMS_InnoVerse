@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   ArrowRightLeft,
   KeyRound,
+  Clock,
   MapPin,
   Pencil,
   Plus,
@@ -59,6 +60,7 @@ import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { isOwner, isOwnMoney, roleName, staffRole } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
 import StoreMap, { UseMyLocation, validPoint } from "./StoreMap";
+import StoreHoursEditor, { hoursText, rulesToWeek, weekToRules, weekValid } from "./StoreHours";
 import { PageHeading } from "@/Components/Common/PageTitle";
 import SectionTabs from "@/Components/Common/SectionTabs";
 import { Balance, balanceText, useBalancesShown } from "@/Components/Common/Balance";
@@ -99,6 +101,7 @@ const EMPTY_STORE = {
   address: "",
   province: "",
   phone_number: "",
+  whatsapp_number: "",
   latitude: "",
   longitude: "",
 };
@@ -140,7 +143,10 @@ function StoreDialog({ store, onClose, onSaved }) {
     ...(store ?? {}),
     latitude: store?.latitude ?? "",
     longitude: store?.longitude ?? "",
+    whatsapp_number: store?.whatsapp_number ?? "",
   }));
+  const [week, setWeek] = useState(() => rulesToWeek(store?.opening_hours));
+  const hoursBad = !weekValid(week);
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
   const set = (key) => (event) =>
@@ -160,6 +166,9 @@ function StoreDialog({ store, onClose, onSaved }) {
         address: form.address.trim(),
         province: form.province.trim(),
         phone_number: form.phone_number.trim(),
+        // Edit sends the whole store: both are always sent, empty to clear.
+        whatsapp_number: form.whatsapp_number.trim(),
+        opening_hours: weekToRules(week),
         ...(numberOrNull(form.latitude) != null
           ? { latitude: numberOrNull(form.latitude) }
           : {}),
@@ -258,6 +267,18 @@ function StoreDialog({ store, onClose, onSaved }) {
               setForm((previous) => ({ ...previous, phone_number: value }))
             }
           />
+          <PhoneField
+            name="whatsapp_number"
+            label={t("stores.whatsapp", { defaultValue: "WhatsApp number (optional)" })}
+            countries={portalPolicy.phone.countries}
+            value={form.whatsapp_number}
+            onChange={(value) =>
+              setForm((previous) => ({ ...previous, whatsapp_number: value }))
+            }
+          />
+          <p className="self-end pb-2 text-xs text-slate-500">
+            {t("stores.findHint", { defaultValue: "Customers see the store on the map in the app's Find screen when it has a location, with its hours and a WhatsApp button." })}
+          </p>
           <TextField
             name="latitude"
             inputMode="decimal"
@@ -294,6 +315,14 @@ function StoreDialog({ store, onClose, onSaved }) {
             )}
             <StoreMap latitude={form.latitude} longitude={form.longitude} />
           </div>
+          <div className="sm:col-span-2">
+            <StoreHoursEditor week={week} onChange={setWeek} />
+            {hoursBad && (
+              <p className="mt-2 text-xs text-red-600">
+                {t("stores.hoursBad", { defaultValue: "Each open day needs an opening and a closing time, and they can't be the same." })}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="secondary" disabled={pending} onClick={onClose}>
@@ -305,6 +334,7 @@ function StoreDialog({ store, onClose, onSaved }) {
             disabled={
               !form.name.trim() ||
               pointBad ||
+              hoursBad ||
               (!editing && (!form.code || codeBad))
             }
           >
@@ -804,7 +834,7 @@ function MapToggle({ store }) {
 }
 
 export default function Stores() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useSelector((state) => state.auth.user);
   const owner = isOwner(user);
   // A cashier may list stores only; a manager also sees users and wallets.
@@ -1043,6 +1073,12 @@ export default function Stores() {
                         .filter(Boolean)
                         .join(" · ") || "—"}
                     </p>
+                    {(hoursText(store.opening_hours, i18n.language) || store.whatsapp_number) && (
+                      <p className="mt-1.5 flex items-start gap-1.5 text-xs text-slate-500">
+                        <Clock size={13} className="mt-0.5 shrink-0" />
+                        {[hoursText(store.opening_hours, i18n.language), store.whatsapp_number && `WhatsApp ${store.whatsapp_number}`].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
                     <MapToggle store={store} />
                     {owner && (
                       <div className="mt-4 flex flex-wrap gap-2">
