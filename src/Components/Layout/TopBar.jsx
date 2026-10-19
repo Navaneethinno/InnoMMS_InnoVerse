@@ -5,7 +5,7 @@ import LanguageToggle from "@/Components/Common/LanguageToggle";
 import ThemeToggle from "@/Components/Common/ThemeToggle";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
-import { TourButton } from "@/Components/Tour/PortalTour";
+import TourButton from "@/Components/Tour/TourButton";
 
 // The bar across the top of the signed-in pages: the portal's name on the
 // left (and the menu button on a phone), language, theme, the notifications

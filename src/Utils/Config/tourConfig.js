@@ -1,0 +1,31 @@
+// Routes with a shared header tour button; public routes use a floating button.
+export const TOUR_PAGE_ROUTES = [
+  "dashboard",
+  "send",
+  "history",
+  "cards",
+  "statements",
+  "notifications",
+  "profile",
+  "verification",
+  "security",
+  "agent",
+  "signups",
+  "signups/new",
+  "my-agents",
+  "stores",
+  "mobile-money",
+  "bank-transfer",
+  "airtime",
+  "electricity",
+  "bills",
+  "my-code",
+  "terminals",
+  "login",
+  "activate",
+  "forgot-password",
+  "forgot-pin",
+  "terms",
+  "privacy"
+];
+export const PUBLIC_TOUR_ROUTES = ['login', 'activate', 'forgot-password', 'forgot-pin', 'terms', 'privacy'];
