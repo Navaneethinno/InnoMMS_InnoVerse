@@ -5,8 +5,10 @@
 // header is omitted entirely for it rather than sent as "en".
 const DEFAULT_API_LANGUAGE = "en";
 const STORAGE_KEY = "apiLang";
+let selectedLanguage = null;
 
 function getApiLanguage() {
+  if (selectedLanguage) return selectedLanguage;
   try {
     return window.localStorage.getItem(STORAGE_KEY) || DEFAULT_API_LANGUAGE;
   } catch {
@@ -15,7 +17,8 @@ function getApiLanguage() {
 }
 
 export function setApiLanguage(code) {
-  const next = code || DEFAULT_API_LANGUAGE;
+  const next = String(code || DEFAULT_API_LANGUAGE).toLowerCase().split(/[-_]/)[0];
+  selectedLanguage = next;
   try {
     window.localStorage.setItem(STORAGE_KEY, next);
   } catch {

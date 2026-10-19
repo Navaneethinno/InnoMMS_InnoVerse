@@ -245,7 +245,7 @@ export default function AgentCash() {
     </div>
   );
   const floatCard = (
-    <aside className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
+    <aside data-tour="agent-wallet" className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <span className="brand-gradient flex h-10 w-10 items-center justify-center rounded-xl text-lime shadow-md">
           <Banknote size={18} />

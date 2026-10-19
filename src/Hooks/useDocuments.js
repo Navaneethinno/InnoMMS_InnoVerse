@@ -16,15 +16,15 @@ export function forgetDocuments() {
 export function useDocuments() {
   const { i18n } = useTranslation();
   const signedIn = Boolean(getStoredAccessToken());
-  const [docs, setDocs] = useState(null);
+  const key = `${signedIn}|${i18n.language}`;
+  const [result, setResult] = useState(null);
   useEffect(() => {
-    const key = `${signedIn}|${i18n.language}`;
     if (cached?.key !== key) cached = { key, promise: listDocuments().catch(() => []) };
     let live = true;
-    cached.promise.then((rows) => live && setDocs(rows));
+    cached.promise.then((rows) => live && setResult({ key, rows }));
     return () => {
       live = false;
     };
-  }, [signedIn, i18n.language]);
-  return docs;
+  }, [key]);
+  return result?.key === key ? result.rows : null;
 }

@@ -51,7 +51,7 @@ export default function PhoneField({ label, value, onChange, countries = [], all
     ...(allowOther ? [{ value: OTHER, label: t("phone.other", { defaultValue: "Other" }) }] : []),
   ];
   return (
-    <div>
+    <div data-tour="phone-field" data-tour-label={label}>
       <span className="mb-2 block text-sm font-semibold text-slate-700">{label}</span>
       <div className="flex items-start gap-2">
         <div className="w-[8.5rem] shrink-0 [&_label]:sr-only">

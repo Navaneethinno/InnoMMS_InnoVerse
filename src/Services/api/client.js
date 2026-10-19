@@ -75,6 +75,9 @@ api.interceptors.request.use(async (config) => {
   config.headers.Deviceinfo = deviceInfoHeader();
   // The API words its messages in the language the portal is showing (nothing
   // is sent for English, the API's own default).
+  // A retry can carry a previous language header. Remove it before applying
+  // the current choice, including English (which uses the API default).
+  config.headers.delete("x-api-lang");
   Object.assign(config.headers, apiLanguageHeader());
   if (DIGITAL_PRODUCT_ID) config.headers["X-Digital-Product-Id"] = DIGITAL_PRODUCT_ID;
   // Secrets in a JSON body are sealed with the platform's public key. The

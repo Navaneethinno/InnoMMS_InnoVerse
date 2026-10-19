@@ -5,6 +5,7 @@ import LanguageToggle from "@/Components/Common/LanguageToggle";
 import ThemeToggle from "@/Components/Common/ThemeToggle";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
+import { TourButton } from "@/Components/Tour/PortalTour";
 
 // The bar across the top of the signed-in pages: the portal's name on the
 // left (and the menu button on a phone), language, theme, the notifications
@@ -26,6 +27,7 @@ export default function TopBar({ onMenu }) {
         <p className="hidden truncate text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 sm:block">{t("brand.portal")}</p>
       </div>
       <div className="flex shrink-0 items-center gap-1.5 min-[360px]:gap-2 sm:gap-3">
+        <TourButton />
         <LanguageToggle className="w-[104px] max-[359px]:w-[84px] sm:w-[130px] [&_button]:px-3 sm:[&_button]:px-4" />
         <ThemeToggle className="h-9 w-9 border-ink/15" />
         <NotificationBell />

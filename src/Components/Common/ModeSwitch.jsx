@@ -16,6 +16,7 @@ export default function ModeSwitch({
   return (
     <div
       role="radiogroup"
+      data-tour="mode-switch"
       aria-label={label}
       className={cn(
         "mb-6 grid max-w-6xl gap-3",
@@ -30,6 +31,10 @@ export default function ModeSwitch({
             key={item.key}
             type="button"
             role="radio"
+            data-tour="mode-option"
+            data-tour-title={item.label}
+            data-tour-description={item.description}
+            data-tour-mode={item.key}
             aria-checked={on}
             onClick={() => onChange(item.key)}
             className={cn(

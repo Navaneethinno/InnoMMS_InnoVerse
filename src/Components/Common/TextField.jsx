@@ -24,7 +24,7 @@ export default function TextField({
   const [visible, setVisible] = useState(false);
   const { t } = useTranslation();
   return (
-    <div>
+    <div data-tour="field">
       <label
         htmlFor={id}
         className="mb-2 block text-sm font-semibold text-slate-700"
