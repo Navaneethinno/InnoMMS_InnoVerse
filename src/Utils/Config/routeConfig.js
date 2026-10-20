@@ -1,4 +1,5 @@
 import {
+  MessagesSquare,
   ArrowRightLeft,
   Banknote,
   Landmark,
@@ -39,6 +40,7 @@ export const navScreens = {
     labelKey: "nav.notifications",
     icon: Bell,
   },
+  cases: { to: "/cases", labelKey: "nav.cases", icon: MessagesSquare },
   profile: { to: "/profile", labelKey: "nav.profile", icon: UserRound },
   security: { to: "/security", labelKey: "nav.security", icon: ShieldCheck },
   // Agents, stores and POS (shown only when the API's menu lists them).

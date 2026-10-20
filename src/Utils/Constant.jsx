@@ -76,6 +76,7 @@ const contactsPath = channelPath("contacts");
 const agentPath = channelPath("agent");
 const storePath = channelPath("store");
 const terminalPath = channelPath("terminal");
+const casePath = channelPath("case");
 export const API_ENDPOINTS = {
   // WebSocket path (the host is API_BASE_URL with ws/wss).
   LIVE: "/merchant/web/live",
@@ -141,6 +142,8 @@ export const API_ENDPOINTS = {
   // The signed-in menu and the features this merchant has.
   MENU: "/merchant/web/menu",
   // The inbox of everything the institution sent the merchant.
+  // Cases staff opened about this merchant: the thread, replies with files.
+  CASE: { LIST: casePath("list"), GET: casePath("get"), UPLOAD: casePath("upload"), REPLY: casePath("reply"), FILE: casePath("file") },
   INBOX: {
     LIST: inboxPath("list"),
     READ: inboxPath("read"),

@@ -9,6 +9,7 @@ const Inbox = lazy(() => import("@/Components/Inbox/Inbox"));
 const Profile = lazy(() => import("@/Components/Profile/Profile"));
 const KycUpgrade = lazy(() => import("@/Components/Kyc/KycUpgrade"));
 const Statements = lazy(() => import("@/Components/Statements/Statements"));
+const Cases = lazy(() => import("@/Components/Cases/Cases"));
 const AgentCash = lazy(() => import("@/Components/Agent/AgentCash"));
 const Signups = lazy(() => import("@/Components/Agent/Signups"));
 const AssistedSignup = lazy(() => import("@/Components/Agent/AssistedSignup"));
@@ -28,6 +29,7 @@ export const dashboardRoutes = [
   { path: "cards", element: pageElement(Cards) },
   { path: "statements", element: pageElement(Statements) },
   { path: "notifications", element: pageElement(Inbox) },
+  { path: "cases", element: pageElement(Cases) },
   { path: "profile", element: pageElement(Profile) },
   { path: "verification", element: pageElement(KycUpgrade) },
   { path: "security", element: pageElement(Security) },
