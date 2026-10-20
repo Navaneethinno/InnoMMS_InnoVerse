@@ -17,14 +17,14 @@ import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { formatMoney, newReference } from "@/Utils/Lib/format";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { rememberPayee } from "@/Utils/Lib/recentPayees";
-import LimitsList from "./LimitsList";
+import LimitsList from "../Common/Payments/LimitsList";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
-import PosReceipt from "./PosReceipt";
+import PosReceipt from "../Common/Payments/PosReceipt";
 import PhoneTransfers from "./PhoneTransfers";
 import RecentPayees from "./RecentPayees";
 import RefundPicker from "./RefundPicker";
-import WalletPanel from "./WalletPanel";
-import { TransactionPinNotice, useNeedsTransactionPin } from "./TransactionPinSetup";
+import WalletPanel from "../Common/Payments/WalletPanel";
+import { TransactionPinNotice, useNeedsTransactionPin } from "../Common/Payments/TransactionPinSetup";
 import { isStaff, sendableWallets } from "@/Utils/Lib/roles";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
 

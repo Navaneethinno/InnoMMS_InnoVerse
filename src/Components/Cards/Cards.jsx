@@ -8,7 +8,7 @@ import { activateCard, cancelRequest, loadCard, loadCards, loadOffers } from "@/
 import { formatDateTime, formatMoney } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 import CardFace from "./CardFace";
-import { TransactionPinNotice } from "@/Components/Account/TransactionPinSetup";
+import { TransactionPinNotice } from "@/Components/Common/Payments/TransactionPinSetup";
 import { CardDetailsDialog, CardMoneyDialog, CardPinDialog, CardStatusDialog, GetCardDialog, PlasticDialog, ReissueDialog } from "./CardDialogs";
 import { PageHeading } from "@/Components/Common/PageTitle";
 

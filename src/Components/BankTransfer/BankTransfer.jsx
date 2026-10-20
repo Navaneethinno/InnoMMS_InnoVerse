@@ -5,7 +5,7 @@ import TextField from "@/Components/Common/TextField";
 import ExtFlow, {
   cleanAmount,
   useProviders,
-} from "@/Components/Account/ExtFlow";
+} from "@/Components/Common/Payments/ExtFlow";
 
 // Bank transfer (BANK_OUT). A NIB (21 digits) or an IBAN (MZ59…) finds its
 // bank by itself; an account number needs the bank picked.

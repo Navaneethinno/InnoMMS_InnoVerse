@@ -8,11 +8,11 @@ import ExtFlow, {
   cleanAmount,
   digitsOnly,
   useProviders,
-} from "@/Components/Account/ExtFlow";
+} from "@/Components/Common/Payments/ExtFlow";
 import SavedAccounts, {
   SaveAccount,
   useSavedAccounts,
-} from "@/Components/Account/SavedAccounts";
+} from "@/Components/Common/Payments/SavedAccounts";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { loadExtLast } from "@/Services/Account/account.api";
 import { formatMoney } from "@/Utils/Lib/format";

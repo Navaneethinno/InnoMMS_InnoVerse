@@ -10,7 +10,7 @@ import ExtFlow, {
   cleanAmount,
   digitsOnly,
   useProviders,
-} from "@/Components/Account/ExtFlow";
+} from "@/Components/Common/Payments/ExtFlow";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { formatMoney } from "@/Utils/Lib/format";
 

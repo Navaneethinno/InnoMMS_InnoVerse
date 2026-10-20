@@ -24,7 +24,7 @@ import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { formatMoney, newReference } from "@/Utils/Lib/format";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
-import PosReceipt from "../Account/PosReceipt";
+import PosReceipt from "../Common/Payments/PosReceipt";
 import { balanceText, useBalancesShown } from "@/Components/Common/Balance";
 
 // The card dialogs. Each makes its one call; `onDone` refreshes the page.

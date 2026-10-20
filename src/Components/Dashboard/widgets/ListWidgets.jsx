@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Activity, ArrowRight, ArrowRightLeft, History, Landmark, ShieldCheck } from "lucide-react";
 import { useSelector } from "react-redux";
-import { TransactionLine } from "@/Components/Account/History";
+import { TransactionLine } from "@/Components/History/History";
 import FitText from "@/Components/Common/FitText";
 import { useAccountData } from "../layout/accountData";
 import { WidgetCard } from "./WidgetCard";

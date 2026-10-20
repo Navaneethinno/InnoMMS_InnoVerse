@@ -17,7 +17,7 @@
     "@reduxjs/toolkit": "^2.2.7",
     "axios": "^1.7.9",
     "clsx": "2.1.1",
-    "dompurify": "3.2.6",
+    "dompurify": "^3.4.17",
     "i18next": "^26.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "0.487.0",

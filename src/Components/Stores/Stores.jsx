@@ -31,7 +31,7 @@ import {
 } from "@/Components/Common/ListControls";
 import { useListControls } from "@/Hooks/Common/useListControls";
 import Modal from "@/Components/Common/Modal";
-import PosReceipt from "@/Components/Account/PosReceipt";
+import PosReceipt from "@/Components/Common/Payments/PosReceipt";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import PhoneField from "@/Components/Common/PhoneField";
 import SegmentedTabs from "@/Components/Common/SegmentedTabs";

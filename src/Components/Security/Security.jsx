@@ -9,7 +9,7 @@ import ErrorState from "@/Components/Common/ErrorState";
 import IconCard from "@/Components/Common/IconCard";
 import OtpInput from "@/Components/Common/OtpInput";
 import TextField from "@/Components/Common/TextField";
-import { TransactionPinForm, useNeedsTransactionPin } from "./TransactionPinSetup";
+import { TransactionPinForm, useNeedsTransactionPin } from "../Common/Payments/TransactionPinSetup";
 import { useMeRefresh } from "@/Hooks/Auth/useMeRefresh";
 import { changePassword, changePin, changeSigninPin, endSession, listSessions, resetPin, startPinReset } from "@/Services/Auth/auth.api";
 import { useSignOut } from "@/Hooks/Auth/useSignOut";

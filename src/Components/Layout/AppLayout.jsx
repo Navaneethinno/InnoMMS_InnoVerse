@@ -10,7 +10,7 @@ import SessionEndWarning from "./SessionEndWarning";
 import {
   TransactionPinDialog,
   useNeedsTransactionPin,
-} from "@/Components/Account/TransactionPinSetup";
+} from "@/Components/Common/Payments/TransactionPinSetup";
 import { loadMenu } from "@/Services/Menu/menu.api";
 import { loadUnreadCount } from "@/Services/Inbox/inbox.api";
 import { countCases } from "@/Services/Cases/cases.api";

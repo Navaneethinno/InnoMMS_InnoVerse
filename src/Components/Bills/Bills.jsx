@@ -9,7 +9,7 @@ import ExtFlow, {
   Line,
   cleanAmount,
   useProviders,
-} from "@/Components/Account/ExtFlow";
+} from "@/Components/Common/Payments/ExtFlow";
 import { lookupBill } from "@/Services/Account/account.api";
 import { formatMoney } from "@/Utils/Lib/format";
 
