@@ -1183,7 +1183,6 @@ export default {
   "auth.previewAirtime": "Airtime sold",
   "auth.previewSupplier": "Supplier paid",
   "auth.mobilePlaceholder": "Your mobile number",
-  "auth.remember": "Remember my number",
   "auth.capsLock": "Caps Lock is on",
   "auth.mobileError": "Enter your mobile number.",
 

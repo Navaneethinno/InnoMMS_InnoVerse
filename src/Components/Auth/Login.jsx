@@ -33,25 +33,6 @@ import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import { useBrandingLinks } from "@/Hooks/Branding/useBrandingLinks";
 import { useBrandingLoginBackground } from "@/Hooks/Branding/useBrandingLoginBackground";
 
-// The mobile number is remembered on this device only when the merchant asks;
-// never the PIN or password.
-const REMEMBER_KEY = "merchant.login.username";
-const readRemembered = () => {
-  try {
-    return window.localStorage.getItem(REMEMBER_KEY) || "";
-  } catch {
-    return "";
-  }
-};
-const writeRemembered = (value) => {
-  try {
-    if (value) window.localStorage.setItem(REMEMBER_KEY, value);
-    else window.localStorage.removeItem(REMEMBER_KEY);
-  } catch {
-    // Storage is blocked; the number is simply not remembered.
-  }
-};
-
 const FEATURES = [
   [
     ArrowDownLeft,
@@ -88,11 +69,10 @@ export default function Login() {
     chosen ?? (canPin && policy.login.method === "PIN" ? "PIN" : "PASSWORD");
   const byPin = signInWith === "PIN" && canPin;
   const [values, setValues] = useState(() => ({
-    username: readRemembered(),
+    username: "",
     password: "",
     pin: "",
   }));
-  const [remember, setRemember] = useState(() => Boolean(readRemembered()));
   const [capsLock, setCapsLock] = useState(false);
   const watchCaps = (event) =>
     setCapsLock(Boolean(event.getModifierState?.("CapsLock")));
@@ -125,7 +105,6 @@ export default function Login() {
       setSubmitting(false);
       return;
     }
-    writeRemembered(remember ? values.username.trim() : "");
     // Let the success state show briefly, then carry on as before.
     setSignedIn(true);
     window.setTimeout(() => navigate("/dashboard", { replace: true }), 700);
@@ -308,6 +287,7 @@ export default function Login() {
                       label={t("onb.mobile")}
                       countries={policy.phone.countries}
                       allowOther
+                      autoComplete="off"
                       placeholder={t("auth.mobilePlaceholder", {
                         defaultValue: "Your mobile number",
                       })}
@@ -332,7 +312,7 @@ export default function Login() {
                       type="text"
                       icon={UserRound}
                       className="rounded-[11px]"
-                      autoComplete="username"
+                      autoComplete="off"
                       autoCapitalize="none"
                       spellCheck={false}
                       placeholder={
@@ -389,7 +369,7 @@ export default function Login() {
                       type="password"
                       icon={LockKeyhole}
                       className="rounded-[11px]"
-                      autoComplete="current-password"
+                      autoComplete="off"
                       placeholder={t("auth.passwordPlaceholder")}
                       value={values.password}
                       onKeyDown={watchCaps}
@@ -421,16 +401,7 @@ export default function Login() {
                   )}
                 </>
               )}
-              <div className="-mt-1 flex items-center justify-between gap-3">
-                <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-ink/75">
-                  <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(event) => setRemember(event.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 accent-forest dark:accent-lime"
-                  />
-                  {t("auth.remember", { defaultValue: "Remember my number" })}
-                </label>
+              <div className="-mt-1 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() =>

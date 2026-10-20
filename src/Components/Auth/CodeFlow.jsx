@@ -96,13 +96,13 @@ export default function CodeFlow({ askCode, submit, withPin = false, withPasswor
       {!sent ? (
         <form noValidate onSubmit={requestCode} className="space-y-4">
           {loginAsPhone && policy.phone.countries.length ? (
-            <PhoneField name="login_id" label={t("onb.mobile")} countries={policy.phone.countries} allowOther value={loginId} error={errors.loginId} onChange={(value) => { setLoginId(value); setErrors({}); }} />
+            <PhoneField name="login_id" label={t("onb.mobile")} countries={policy.phone.countries} allowOther autoComplete="off" value={loginId} error={errors.loginId} onChange={(value) => { setLoginId(value); setErrors({}); }} />
           ) : (
             <TextField
               name="login_id"
               label={loginAsPhone ? t("onb.mobile") : t("auth.username")}
               icon={UserRound}
-              autoComplete="username"
+              autoComplete="off"
               autoCapitalize="none"
               spellCheck={false}
               placeholder={loginAsPhone ? undefined : t("auth.usernamePlaceholder")}

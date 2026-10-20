@@ -11,7 +11,8 @@ const OTHER = "__other__";
 // country is accepted) it is one plain box where the merchant types the number.
 // `allowOther` adds an "Other" prefix for signing in with a number exactly as
 // it is stored (older records have no prefix): what is typed is sent as typed.
-export default function PhoneField({ label, value, onChange, countries = [], allowOther = false, error, disabled, name = "phone", placeholder }) {
+// `autoComplete="off"`: a sign-in number the browser must not fill.
+export default function PhoneField({ label, value, onChange, countries = [], allowOther = false, error, disabled, name = "phone", placeholder, autoComplete }) {
   const { t } = useTranslation();
   const primary = countries.find((country) => country.primary) ?? countries[0];
   // A whole number is split into its prefix and digits: the one already there
@@ -37,7 +38,7 @@ export default function PhoneField({ label, value, onChange, countries = [], all
   }
 
   if (!countries.length) {
-    return <TextField name={name} label={label} type="tel" inputMode="tel" autoComplete="tel" placeholder={placeholder} value={value ?? ""} disabled={disabled} error={error} onChange={(event) => onChange(event.target.value)} />;
+    return <TextField name={name} label={label} type="tel" inputMode="tel" autoComplete={autoComplete ?? "tel"} placeholder={placeholder} value={value ?? ""} disabled={disabled} error={error} onChange={(event) => onChange(event.target.value)} />;
   }
   const other = alpha2 === OTHER;
   const country = countries.find((item) => item.alpha2 === alpha2) ?? primary;
@@ -72,7 +73,7 @@ export default function PhoneField({ label, value, onChange, countries = [], all
             label={label}
             type="tel"
             inputMode={other ? "tel" : "numeric"}
-            autoComplete="tel-national"
+            autoComplete={autoComplete ?? "tel-national"}
             maxLength={other ? 20 : country.max}
             placeholder={placeholder}
             value={digits}

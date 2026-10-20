@@ -1188,7 +1188,6 @@ export default {
   "auth.previewAirtime": "Recarga vendida",
   "auth.previewSupplier": "Fornecedor pago",
   "auth.mobilePlaceholder": "O seu número de telemóvel",
-  "auth.remember": "Lembrar o meu número",
   "auth.capsLock": "O Caps Lock está ligado",
   "auth.mobileError": "Introduza o seu número de telemóvel.",
 
