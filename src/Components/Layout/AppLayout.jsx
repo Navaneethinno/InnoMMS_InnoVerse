@@ -13,10 +13,11 @@ import {
 } from "@/Components/Account/TransactionPinSetup";
 import { loadMenu } from "@/Services/Menu/menu.api";
 import { loadUnreadCount } from "@/Services/Inbox/inbox.api";
-import { listCases } from "@/Services/Cases/cases.api";
+import { countCases } from "@/Services/Cases/cases.api";
 import {
   connectLive,
   useNotificationReceived,
+  useCaseChanged,
 } from "@/Services/api/liveUpdates";
 import { useDispatch } from "react-redux";
 import { userUpdated } from "@/Redux/slices/authSlice";
@@ -71,15 +72,17 @@ export default function AppLayout() {
       .catch(() => {});
   }, [dispatch, i18n.language]);
   // The inbox's unread count, for the badge; live while the portal is open.
+  // Cases waiting for the user: the menu's badge (zeros for a store user).
+  const refreshCases = () =>
+    countCases()
+      .then((count) => dispatch(userUpdated({ casesAction: count.action_needed ?? 0 })))
+      .catch(() => {});
+  useCaseChanged(refreshCases);
   const refreshUnread = () => {
     loadUnreadCount()
       .then((unread) => dispatch(userUpdated({ unread })))
       .catch(() => {});
-    // Cases waiting for the merchant (the menu's badge) and whether any is
-    // open. A store user has no cases: the call fails and nothing shows.
-    listCases({ state: "OPEN", limit: 1 })
-      .then((reply) => dispatch(userUpdated({ casesAction: reply.action_needed ?? 0, hasCases: (reply.total ?? 0) > 0 })))
-      .catch(() => {});
+    refreshCases();
   };
   useEffect(() => {
     void refreshUnread();

@@ -1217,5 +1217,6 @@ export default {
   "cases.removeFile": "Remover ficheiro",
   "cases.openFile": "Abrir o ficheiro",
   "cases.file": "Ficheiro",
+  "cases.you": "Você",
   "cases.closedNote": "Este caso está fechado.",
 };

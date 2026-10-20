@@ -11,14 +11,18 @@ export const listCases = async ({ state = "", page = 1, limit = 20 } = {}) =>
 // The case and its posts, oldest first: { from: STAFF | ME, body, files: [{ path, name }], at }.
 export const getCase = async (id) => (await portalPost(CASE.GET, { id })).data;
 
-// One PDF, JPG or PNG (up to 5 MB) -> { path, name }; the path goes with the reply.
+// One PDF, JPG or PNG (up to 5 MB) -> { path, name } (the file's own name).
 export const uploadCaseFile = async (file) => {
   const form = new FormData();
   form.append("file", file);
   return (await portalPost(CASE.UPLOAD, form)).data;
 };
 
-// A message and/or up to 5 uploaded files; resolves to the case with its posts.
+// { open, action_needed }: the menu's badge (zeros for a store user).
+export const countCases = async () => (await portalPost(CASE.COUNT, {})).data ?? { open: 0, action_needed: 0 };
+
+// A message and/or up to 5 uploaded files ([{ path, name }], as the upload
+// answered, so the file keeps its name); resolves to the case with its posts.
 export const replyToCase = async ({ id, body, files }) => (await portalPost(CASE.REPLY, { id, body, files })).data;
 
 // A file of one of the merchant's own cases, as a Blob.

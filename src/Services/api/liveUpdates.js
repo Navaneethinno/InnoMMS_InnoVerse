@@ -53,6 +53,10 @@ export function connectLive() {
       } else if (message.action === "ext_order") {
         // A mobile-money order ended (SUCCESS / FAILED): { order_ref, rrn, status, ... }.
         window.dispatchEvent(new CustomEvent("merchant:ext-order", { detail: message.data ?? {} }));
+      } else if (message.type === "changed" && message.action === "case") {
+        // A post on one of the user's cases (staff's message, the closing
+        // message, their own reply): [{ event, case_id }].
+        window.dispatchEvent(new CustomEvent("merchant:case-changed", { detail: message.data ?? [] }));
       } else if (message.type === "changed" && message.action === "card") {
         window.dispatchEvent(new CustomEvent("merchant:card-changed", { detail: message.data ?? [] }));
       } else if (message.type === "changed" && (message.action === "store" || message.action === "terminal")) {
@@ -135,3 +139,15 @@ function useLiveEvent(name, callback) {
 export const useStoreChanged = (callback) => useLiveEvent("merchant:store-changed", callback);
 export const useTerminalChanged = (callback) => useLiveEvent("merchant:terminal-changed", callback);
 export const useExtOrder = (callback) => useLiveEvent("merchant:ext-order", callback);
+
+// Runs `callback` with [{ event, case_id }] when a post is added to one of
+// the user's cases.
+export function useCaseChanged(callback) {
+  const latest = useRef(callback);
+  latest.current = callback;
+  useEffect(() => {
+    const handler = (event) => latest.current(event.detail ?? []);
+    window.addEventListener("merchant:case-changed", handler);
+    return () => window.removeEventListener("merchant:case-changed", handler);
+  }, []);
+}

@@ -5,7 +5,7 @@ import { Layers, LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import BrandLogo from "@/Components/Common/BrandLogo";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import { useSignOut } from "@/Hooks/Auth/useSignOut";
-import { navFromMenu, navItems, navScreens } from "@/Utils/Config/routeConfig";
+import { navFromMenu, navItems } from "@/Utils/Config/routeConfig";
 import { cn } from "@/Utils/Lib/utils";
 
 // The portal's menu: the bank's logo and name on top, every page of the
@@ -27,12 +27,7 @@ export default function Sidebar({
   const menu = useSelector((state) => state.auth.user?.menu);
   const unread = useSelector((state) => state.auth.user?.unread) ?? 0;
   const casesAction = useSelector((state) => state.auth.user?.casesAction) ?? 0;
-  const hasCases = useSelector((state) => state.auth.user?.hasCases);
-  const listed = menu?.length ? navFromMenu(menu) : navItems;
-  // Cases: shown where the menu puts it; until the menu lists it, offered
-  // to a merchant who has an open case (after Notifications).
-  const after = listed.findIndex((item) => item.key === "notifications") + 1 || listed.length;
-  const items = hasCases && !listed.some((item) => item.key === "cases") ? [...listed.slice(0, after), { key: "cases", ...navScreens.cases }, ...listed.slice(after)] : listed;
+  const items = menu?.length ? navFromMenu(menu) : navItems;
   // Icons only while collapsed and not being pointed at.
   const slim = collapsed && !hovering;
 

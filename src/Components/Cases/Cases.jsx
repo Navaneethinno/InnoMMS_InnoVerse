@@ -9,7 +9,7 @@ import SegmentedTabs from "@/Components/Common/SegmentedTabs";
 import Spinner from "@/Components/Common/Spinner";
 import { useMediaQuery, WIDE_QUERY } from "@/Hooks/Layout/useMediaQuery";
 import { downloadCaseFile, getCase, listCases, replyToCase, uploadCaseFile } from "@/Services/Cases/cases.api";
-import { useNotificationReceived } from "@/Services/api/liveUpdates";
+import { useCaseChanged } from "@/Services/api/liveUpdates";
 import { userUpdated } from "@/Redux/slices/authSlice";
 import { formatDateTime, formatShortDate } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
@@ -91,7 +91,8 @@ function Thread({ id, onBack, onChanged }) {
     setFiles([]);
     void load();
   }, [load]);
-  useNotificationReceived(() => void load());
+  // A new post on this case (staff wrote, or the user's reply from another device).
+  useCaseChanged((changes) => changes.some((c) => String(c.case_id) === String(id)) && void load());
   useEffect(() => end.current?.scrollIntoView({ block: "end" }), [kase?.posts?.length]);
 
   const pick = async (list) => {
@@ -107,7 +108,7 @@ function Thread({ id, onBack, onChanged }) {
       setFiles((all) => [...all, { key, name: file.name, uploading: true }]);
       try {
         const stored = await uploadCaseFile(file);
-        setFiles((all) => all.map((f) => (f.key === key ? { ...f, uploading: false, path: stored.path } : f)));
+        setFiles((all) => all.map((f) => (f.key === key ? { ...f, uploading: false, path: stored.path, name: stored.name ?? f.name } : f)));
       } catch (failure) {
         setFiles((all) => all.map((f) => (f.key === key ? { ...f, uploading: false, error: failure.message } : f)));
       }
@@ -120,7 +121,7 @@ function Thread({ id, onBack, onChanged }) {
     if (!body.trim() && !ready.length) return;
     setSending(true);
     try {
-      const next = await replyToCase({ id, body: body.trim(), files: ready.map((f) => f.path) });
+      const next = await replyToCase({ id, body: body.trim(), files: ready.map(({ path, name }) => ({ path, name })) });
       setKase(next);
       setBody("");
       setFiles([]);
@@ -272,7 +273,7 @@ export default function Cases() {
   useEffect(() => {
     void load();
   }, [load]);
-  useNotificationReceived(() => void load(true));
+  useCaseChanged(() => void load(true));
 
   const thread = openId && <Thread key={openId} id={openId} onBack={wide ? undefined : () => setOpenId(null)} onChanged={() => void load(true)} />;
 
@@ -299,7 +300,10 @@ export default function Cases() {
                 <span dir="auto" className={cn("truncate text-sm text-ink", c.state === "ACTION_NEEDED" ? "font-bold" : "font-semibold")}>{c.title}</span>
                 <span className="shrink-0 text-[11px] text-slate-400">{formatShortDate(c.last_message_at ?? c.opened_at)}</span>
               </span>
-              <span dir="auto" className="mt-0.5 line-clamp-2 block text-xs text-slate-500">{c.last_message || "—"}</span>
+              <span dir="auto" className="mt-0.5 line-clamp-2 block text-xs text-slate-500">
+                {c.last_from === "ME" && c.last_message ? <span className="font-semibold">{t("cases.you")}: </span> : null}
+                {c.last_message || "—"}
+              </span>
               <span className="mt-1.5 flex items-center gap-2">
                 <StatePill state={c.state} />
                 <span className="text-[11px] text-slate-400">{c.case_number}</span>

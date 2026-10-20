@@ -1212,5 +1212,6 @@ export default {
   "cases.removeFile": "Remove file",
   "cases.openFile": "Open the file",
   "cases.file": "File",
+  "cases.you": "You",
   "cases.closedNote": "This case is closed.",
 };
