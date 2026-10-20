@@ -18,8 +18,19 @@ export const uploadCaseFile = async (file) => {
   return (await portalPost(CASE.UPLOAD, form)).data;
 };
 
-// { open, action_needed }: the menu's badge (zeros for a store user).
-export const countCases = async () => (await portalPost(CASE.COUNT, {})).data ?? { open: 0, action_needed: 0 };
+// { open, action_needed, support_open, support_limit }: the menu's badge,
+// and whether another support case may be opened (zeros for a store user).
+export const countCases = async () => (await portalPost(CASE.COUNT, {})).data ?? { open: 0, action_needed: 0, support_open: 0, support_limit: 5 };
+
+// [{ code, label }], the label in the portal's language.
+export const listCaseCategories = async () => (await portalPost(CASE.CATEGORIES, {})).rows;
+
+// A support case the merchant opens: { category, title (200), body (4000), files: [{ path, name }] }
+// -> the new case with its conversation.
+export const openCase = async ({ category, title, body, files }) => (await portalPost(CASE.OPEN, { category, title, body, files })).data;
+
+// Withdraw an open case the merchant opened; `reason` (optional) is for staff only.
+export const withdrawCase = async ({ id, reason }) => (await portalPost(CASE.WITHDRAW, { id, ...(reason ? { reason } : {}) })).data;
 
 // A message and/or up to 5 uploaded files ([{ path, name }], as the upload
 // answered, so the file keeps its name); resolves to the case with its posts.

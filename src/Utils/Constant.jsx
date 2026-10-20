@@ -143,7 +143,7 @@ export const API_ENDPOINTS = {
   MENU: "/merchant/web/menu",
   // The inbox of everything the institution sent the merchant.
   // Cases staff opened about this merchant: the thread, replies with files.
-  CASE: { LIST: casePath("list"), GET: casePath("get"), UPLOAD: casePath("upload"), REPLY: casePath("reply"), FILE: casePath("file"), COUNT: casePath("count") },
+  CASE: { LIST: casePath("list"), GET: casePath("get"), UPLOAD: casePath("upload"), REPLY: casePath("reply"), FILE: casePath("file"), COUNT: casePath("count"), CATEGORIES: casePath("categories"), OPEN: casePath("open"), WITHDRAW: casePath("withdraw") },
   INBOX: {
     LIST: inboxPath("list"),
     READ: inboxPath("read"),
