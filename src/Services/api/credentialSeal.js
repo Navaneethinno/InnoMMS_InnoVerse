@@ -72,13 +72,13 @@ async function walk(value) {
   return out;
 }
 
-// The request body with every secret sealed. When the key cannot be had (the
-// call failed, or the browser has no WebCrypto) the body goes as it is: the
-// server still accepts plain values until it makes sealing mandatory.
+// The request body with every secret sealed. The server refuses a secret in
+// plain text, so when the key cannot be had (the call failed, or the browser
+// has no WebCrypto: a page opened over plain http) the request stops here.
 export async function sealBody(body) {
   try {
     return await walk(body);
   } catch {
-    return body;
+    throw new Error(globalThis.crypto?.subtle ? "Couldn't secure your details. Check your connection and try again." : "This needs a secure connection. Open the portal over https.");
   }
 }

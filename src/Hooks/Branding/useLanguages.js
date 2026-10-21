@@ -8,9 +8,10 @@ const NATIVE = { en: "English", pt: "Português", fr: "Français", hi: "हि�
 
 let cached = null;
 
-// The languages to offer: every one the platform lists. A language the portal
-// has no texts for yet shows the portal in English, with the API's messages in
-// that language. If the list cannot be had, the portal's own languages.
+// The languages to offer: the institution's own. A language the portal has no
+// texts for yet shows the portal in English, with the API's messages in that
+// language. If the list cannot be had, the portal's own languages. A language
+// in use that the institution doesn't offer gives way to its first one.
 export function useLanguages() {
   const { i18n } = useTranslation();
   const [rows, setRows] = useState(cached);
@@ -21,12 +22,13 @@ export function useLanguages() {
       .then((list) => {
         cached = list.filter((row) => row?.code).map((row) => ({ code: row.code, name: row.name }));
         if (!cancelled) setRows(cached);
+        if (cached.length && !cached.some((row) => row.code === i18n.language)) void i18n.changeLanguage(cached[0].code);
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [i18n]);
   const own = Object.keys(i18n.options.resources ?? {}).map((code) => ({ code, name: code }));
   const list = rows?.length ? rows : own;
   return list.map(({ code, name }) => ({ value: code, label: NATIVE[code] ?? name }));
