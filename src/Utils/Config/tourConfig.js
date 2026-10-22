@@ -4,6 +4,8 @@ export const TOUR_PAGE_ROUTES = [
   "send",
   "history",
   "cards",
+  "deposits",
+  "loans",
   "statements",
   "notifications",
   "profile",

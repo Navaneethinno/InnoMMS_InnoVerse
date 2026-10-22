@@ -3,6 +3,8 @@ export default {
   "portalTour.page.send": "Escolha o destinatário e a carteira, introduza o montante e reveja os dados antes de autorizar o pagamento.",
   "portalTour.page.history": "Filtre as transações por carteira, tipo ou data. Abra uma transação para consultar o recibo e as ações disponíveis.",
   "portalTour.page.cards": "Consulte os seus cartões e as opções de gestão disponíveis para a sua conta.",
+  "portalTour.page.deposits": "Abra um depósito a prazo, acompanhe os juros, escolha o que acontece no vencimento ou peça o encerramento antecipado.",
+  "portalTour.page.loans": "Veja uma oferta exata de empréstimo e candidate-se, acompanhe as candidaturas e pague ou liquide os seus empréstimos.",
   "portalTour.page.statements": "Escolha uma carteira e um período para consultar ou descarregar um extrato.",
   "portalTour.page.notifications": "Leia as atualizações da conta e as notificações de pagamento. Abra uma mensagem para consultar os detalhes.",
   "portalTour.page.profile": "Reveja os seus dados pessoais e comerciais e utilize os controlos de edição disponíveis para os atualizar.",

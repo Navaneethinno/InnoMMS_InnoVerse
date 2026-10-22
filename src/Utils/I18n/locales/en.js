@@ -3,6 +3,8 @@ export default {
   "portalTour.page.send": "Choose a recipient and wallet, enter an amount, then review the details before authorizing a payment.",
   "portalTour.page.history": "Filter transactions by wallet, type or date. Open a transaction to inspect its receipt and available actions.",
   "portalTour.page.cards": "Review your cards and the management options available for your account.",
+  "portalTour.page.deposits": "Open a term deposit, follow its interest, choose what happens at maturity or ask to close it early.",
+  "portalTour.page.loans": "See an exact loan offer and apply, follow your applications, and pay or pay off your loans.",
   "portalTour.page.statements": "Choose a wallet and date range to view or download an account statement.",
   "portalTour.page.notifications": "Read account updates and payment notifications. Open a message for its details.",
   "portalTour.page.profile": "Review your personal and business information and use the available edit controls to keep it up to date.",
