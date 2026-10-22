@@ -5,6 +5,8 @@ const Send = lazy(() => import("@/Components/Send/Send"));
 const History = lazy(() => import("@/Components/History/History"));
 const Security = lazy(() => import("@/Components/Security/Security"));
 const Cards = lazy(() => import("@/Components/Cards/Cards"));
+const Deposits = lazy(() => import("@/Components/Deposits/Deposits"));
+const Loans = lazy(() => import("@/Components/Loans/Loans"));
 const Inbox = lazy(() => import("@/Components/Notifications/Inbox"));
 const Profile = lazy(() => import("@/Components/Profile/Profile"));
 const KycUpgrade = lazy(() => import("@/Components/Verification/KycUpgrade"));
@@ -27,6 +29,8 @@ export const dashboardRoutes = [
   { path: "send", element: pageElement(Send) },
   { path: "history", element: pageElement(History) },
   { path: "cards", element: pageElement(Cards) },
+  { path: "deposits", element: pageElement(Deposits) },
+  { path: "loans", element: pageElement(Loans) },
   { path: "statements", element: pageElement(Statements) },
   { path: "notifications", element: pageElement(Inbox) },
   { path: "cases", element: pageElement(Cases) },

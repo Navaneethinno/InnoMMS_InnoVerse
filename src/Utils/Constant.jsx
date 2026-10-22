@@ -67,6 +67,8 @@ const channelPath = (group) => (call) => `/merchant/web/${group}/${call}`;
 const authPath = channelPath("auth");
 const accountPath = channelPath("account");
 const cardPath = channelPath("card");
+const depositPath = channelPath("deposit");
+const loanPath = channelPath("loan");
 const inboxPath = channelPath("notification");
 const statementPath = channelPath("statement");
 const dashboardPath = channelPath("dashboard");
@@ -179,6 +181,11 @@ export const API_ENDPOINTS = {
     LAYOUT_GET: dashboardPath("layout_get"),
     LAYOUT_SAVE: dashboardPath("layout_save"),
   },
+  // Term deposits and loans (Merchant portal handoff, 22 Oct 2026).
+  DEPOSIT: Object.fromEntries(["offers", "quote", "open", "list", "get", "instruct", "preclose_quote", "preclose"].map((call) => [call, depositPath(call)])),
+  LOAN: Object.fromEntries(
+    ["offers", "quote", "apply", "applications", "application_get", "withdraw", "list", "get", "repay", "settlement_quote", "settle"].map((call) => [call, loanPath(call)]),
+  ),
   // Cards (Merchant portals: cards, 3 Oct 2026).
   CARD: Object.fromEntries(
     [

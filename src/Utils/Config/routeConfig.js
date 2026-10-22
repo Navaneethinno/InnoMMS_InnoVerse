@@ -1,6 +1,8 @@
 import {
   MessagesSquare,
   ArrowRightLeft,
+  BadgePercent,
+  Vault,
   Banknote,
   Landmark,
   Phone,
@@ -34,6 +36,9 @@ export const navScreens = {
   send: { to: "/send", labelKey: "nav.send", icon: ArrowRightLeft },
   history: { to: "/history", labelKey: "nav.history", icon: History },
   cards: { to: "/cards", labelKey: "nav.cards", icon: CreditCard },
+  // Term deposits and loans (the merchant's own; not for store users).
+  deposits: { to: "/deposits", labelKey: "nav.deposits", icon: Vault },
+  loans: { to: "/loans", labelKey: "nav.loans", icon: BadgePercent },
   statements: { to: "/statements", labelKey: "nav.statements", icon: FileText },
   notifications: {
     to: "/notifications",

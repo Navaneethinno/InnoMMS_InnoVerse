@@ -11,7 +11,7 @@ import { apiLanguageHeader } from "@/Utils/Lib/apiLanguage";
 
 const JOIN_MS = 300;
 const CACHE_MS = 60000;
-const READ = /\/(list|get|options|wallets|history|history_filters|transaction|receipt|limits|summary|txn_types|ext_providers|ext_last|saved_accounts|my_code|phone_transfers|menu|unread_count|profile|avatar_presets|status|layout_get|branding|language|pin_rules|policy|sessions|me|float|signups|agents)$/;
+const READ = /\/(list|get|options|wallets|history|history_filters|transaction|receipt|limits|summary|txn_types|ext_providers|ext_last|saved_accounts|my_code|phone_transfers|menu|unread_count|profile|avatar_presets|status|layout_get|branding|language|pin_rules|policy|sessions|me|float|signups|agents|offers|quote|applications|application_get|preclose_quote|settlement_quote)$/;
 const CACHED = /\/(options|history_filters|txn_types|ext_providers|menu|avatar_presets|branding|language|pin_rules|policy)$/;
 
 const inflight = new Map();
