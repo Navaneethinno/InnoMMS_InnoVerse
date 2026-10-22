@@ -79,6 +79,9 @@ export async function sealBody(body) {
   try {
     return await walk(body);
   } catch {
-    throw new Error(globalThis.crypto?.subtle ? "Couldn't secure your details. Check your connection and try again." : "This needs a secure connection. Open the portal over https.");
+    const error = new Error(globalThis.crypto?.subtle ? "Couldn't secure your details. Check your connection and try again." : "This needs a secure connection. Open the portal over https.");
+    // Named, so the screens show this reason instead of a generic failure.
+    error.name = "CredentialSealError";
+    throw error;
   }
 }

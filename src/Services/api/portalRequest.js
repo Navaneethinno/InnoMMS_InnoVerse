@@ -25,7 +25,7 @@ export async function portalDownload(endpoint, body = {}) {
     const named = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(response.headers?.["content-disposition"] ?? "");
     return { blob: response.data, filename: named ? decodeURIComponent(named[1]) : "" };
   } catch (error) {
-    if (error.name === "ApiRequestError") throw error;
+    if (error.name === "ApiRequestError" || error.name === "CredentialSealError") throw error;
     if (error.response) {
       const payload = await readBlobPayload(error.response.data);
       throw toApiRequestError(payload, error.response.status, i18n.t("common.requestFailed"));
@@ -49,7 +49,7 @@ export async function portalPost(endpoint, body = {}, { signedIn = true } = {}) 
     // Sign-in calls are never shared or kept.
     return await (signedIn ? cachedPost(endpoint, body, send) : send());
   } catch (error) {
-    if (error.name === "ApiRequestError") throw error;
+    if (error.name === "ApiRequestError" || error.name === "CredentialSealError") throw error;
     if (error.response) {
       const payload = await readBlobPayload(error.response.data);
       throw toApiRequestError(payload, error.response.status, i18n.t("common.requestFailed"));
