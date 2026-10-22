@@ -21,7 +21,6 @@ import { cn } from "@/Utils/Lib/utils";
 // follow the application; once paid out, see what is due, repay it, or pay
 // the loan off early.
 
-const PURPOSES = ["BUSINESS", "WORKING_CAPITAL", "EQUIPMENT", "EDUCATION", "MEDICAL", "HOME", "PERSONAL", "OTHER"];
 const OPEN_LOAN = ["DELINQUENT", "ACTIVE", "PENDING_DISBURSEMENT"];
 const amountInput = (value, decimals = 2) => {
   const clean = String(value).replace(/[^\d.]/g, "");
@@ -340,13 +339,15 @@ function ApplicationDetail({ application: a, onOpenLoan, onWithdraw }) {
 }
 
 // Product, term, amount and purpose -> the exact offer -> accept -> PIN.
+// An eligibility rule that isn't met refuses the quote (and apply) with a
+// message saying which; it shows in the dialog.
 function ApplyDialog({ onClose, onDone }) {
   const { t } = useTranslation();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
   const [offers, setOffers] = useState(null);
   const [loadProblem, setLoadProblem] = useState("");
-  const [form, setForm] = useState({ product: "", term: "", amount: "", purpose_code: "BUSINESS", purpose_description: "", monthly_income: "", operating_months: "", disbursement: "", repayment: "" });
+  const [form, setForm] = useState({ product: "", term: "", amount: "", purpose_code: "", purpose_description: "", monthly_income: "", operating_months: "", disbursement: "", repayment: "" });
   const [quote, setQuote] = useState(null);
   const [accepted, setAccepted] = useState(false);
   const [pin, setPin] = useState("");
@@ -365,8 +366,10 @@ function ApplyDialog({ onClose, onDone }) {
   const config = product?.config ?? {};
   const term = config.terms?.find((x) => String(x.id) === form.term);
   const rules = config.eligibility_rules ?? {};
-  const asksIncome = Boolean(rules.individual?.minimum_monthly_income || rules.maximum_debt_to_income_ratio);
-  const asksMonths = Boolean(rules.corporate);
+  // What this merchant must enter for the product (the server decides).
+  const asksIncome = Boolean(product?.asks?.monthly_income);
+  const asksMonths = Boolean(product?.asks?.operating_months);
+  const purposes = offers?.purposes ?? [];
   const wallets = (offers?.wallets ?? []).filter((w) => !product || w.currency_code === product.currency_code);
   const change = (patch) => {
     setForm((f) => ({ ...f, ...patch }));
@@ -374,7 +377,7 @@ function ApplyDialog({ onClose, onDone }) {
     setQuote(null);
     setAccepted(false);
   };
-  const body = product && term && Number(form.amount) > 0 && form.purpose_description.trim()
+  const body = product && term && Number(form.amount) > 0 && form.purpose_code && form.purpose_description.trim()
     ? {
         loan_product_id: product.loan_product_id,
         term_id: term.id,
@@ -387,7 +390,6 @@ function ApplyDialog({ onClose, onDone }) {
         ...(form.repayment ? { repayment_acct_id: Number(form.repayment) } : {}),
       }
     : null;
-  const unmet = quote?.eligibility?.unmet ?? quote?.eligibility?.problems ?? [];
 
   return (
     <Shell
@@ -398,7 +400,7 @@ function ApplyDialog({ onClose, onDone }) {
       onClose={onClose}
       pending={pending}
       confirm={quote ? t("loans.applyConfirm") : t("loans.seeOffer")}
-      disabled={!body || (quote && (!accepted || pin.length < pinMin || unmet.length > 0))}
+      disabled={!body || (quote && (!accepted || pin.length < pinMin))}
       onConfirm={() => run(async () => (quote ? onDone(await applyLoan({ ...body, accept_terms: true, pin })) : setQuote(await loanQuote(body))))}
     >
       {!offers ? (
@@ -425,7 +427,7 @@ function ApplyDialog({ onClose, onDone }) {
             {term && <p className="mt-1 text-xs text-slate-500">{t("loans.range", { from: formatMoney(term.minimum_amount, product.currency_code), to: Number(term.maximum_amount) > 0 ? formatMoney(term.maximum_amount, product.currency_code) : t("loans.noLimit") })}</p>}
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <FilterSelect label={t("loans.purpose")} value={form.purpose_code} onChange={(v) => change({ purpose_code: v })} options={PURPOSES.map((p) => ({ value: p, label: t(`loans.purposes.${p}`) }))} />
+            <FilterSelect label={t("loans.purpose")} value={form.purpose_code} onChange={(v) => change({ purpose_code: v })} placeholder={t("loans.choosePurpose")} options={purposes.map((p) => ({ value: p.code, label: p.label ?? p.code }))} />
             <TextField name="purpose_description" label={t("loans.purposeDetail")} maxLength={200} value={form.purpose_description} onChange={(e) => change({ purpose_description: e.target.value })} />
             {asksIncome && <TextField name="monthly_income" inputMode="decimal" label={t("loans.monthlyIncome")} value={form.monthly_income} onChange={(e) => change({ monthly_income: amountInput(e.target.value) })} />}
             {asksMonths && <TextField name="operating_months" inputMode="numeric" label={t("loans.operatingMonths")} value={form.operating_months} onChange={(e) => change({ operating_months: e.target.value.replace(/\D/g, "").slice(0, 4) })} />}
@@ -444,13 +446,6 @@ function ApplyDialog({ onClose, onDone }) {
             <>
               <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{t("loans.yourOffer")}</h3>
               <Disclosure d={quote.disclosure} />
-              {unmet.length > 0 && (
-                <ul className="list-disc rounded-xl bg-red-50 px-6 py-2 text-sm font-semibold text-red-700">
-                  {unmet.map((u) => (
-                    <li key={String(u)}>{typeof u === "string" ? u : (u.message ?? JSON.stringify(u))}</li>
-                  ))}
-                </ul>
-              )}
               <CheckboxPill label={t("loans.acceptTerms")} checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
               <PinInput label={t("cards.transactionPin")} value={pin} onChange={setPin} />
             </>
