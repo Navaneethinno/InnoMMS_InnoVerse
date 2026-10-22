@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
