@@ -42,6 +42,8 @@ for (const client of [api, refreshClient]) {
   );
 }
 let refreshPromise = null;
+// 403s that refuse one call to this user's role, not the session.
+const ROLE_REFUSALS = new Set(["store.staff_not_allowed", "portal.super_agent_required"]);
 
 // A new token pair from the refresh token. The refresh token changes every
 // time, so the new one is stored straight away; concurrent callers share one
@@ -131,9 +133,10 @@ api.interceptors.response.use(
     // point to the reset.
     if (error.response?.data?.error_code === "portal.pin_locked") window.dispatchEvent(new Event("merchant:pin-locked"));
     // The institution disabled this merchant's access: say so and sign out.
-    // `store.staff_not_allowed` only means this user's role can't make the
-    // call (a store user): the session is fine, so the screen just says so.
-    if (error.response?.status === 403 && request && !request.skipAuth && error.response.data?.error_code !== "store.staff_not_allowed") {
+    // A role refusal (ROLE_REFUSALS) only means this user can't make the call
+    // (a store user, an agent who isn't a super agent): the session is fine,
+    // so the screen just says so.
+    if (error.response?.status === 403 && request && !request.skipAuth && !ROLE_REFUSALS.has(error.response.data?.error_code)) {
       notifications.error(error.response.data?.message || "");
       clearAuthSession();
       window.dispatchEvent(new Event("merchant:session-expired"));

@@ -24,7 +24,7 @@ export default function TopBar({ onMenu }) {
         >
           <Menu size={19} />
         </button>
-        <p className="hidden truncate text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 sm:block">{t("brand.portal")}</p>
+        <p className="hidden truncate text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 lg:block">{t("brand.portal")}</p>
       </div>
       <div className="flex shrink-0 items-center gap-1.5 min-[360px]:gap-2 sm:gap-3">
         <TourButton />

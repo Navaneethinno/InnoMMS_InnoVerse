@@ -1,10 +1,11 @@
 import { cn } from "@/Utils/Lib/utils";
 
 // A small row of tabs on a tinted track: `items` [{ key, label }], `value` the
-// key shown, `onChange(key)` on a click.
+// key shown, `onChange(key)` on a click. Too many for a narrow screen, the
+// row scrolls sideways instead of wrapping.
 export default function SegmentedTabs({ items, value, onChange, className }) {
   return (
-    <div role="tablist" className={cn("inline-flex rounded-xl bg-ink/5 p-1", className)}>
+    <div role="tablist" className={cn("inline-flex max-w-full overflow-x-auto rounded-xl bg-ink/5 p-1", className)}>
       {items.map((item) => (
         <button
           key={item.key}
@@ -12,7 +13,7 @@ export default function SegmentedTabs({ items, value, onChange, className }) {
           role="tab"
           aria-selected={value === item.key}
           onClick={() => onChange(item.key)}
-          className={cn("rounded-lg px-4 py-1.5 text-xs font-bold transition duration-200 active:scale-95", value === item.key ? "bg-surface text-ink shadow-sm" : "text-slate-500 hover:text-ink")}
+          className={cn("shrink-0 whitespace-nowrap rounded-lg px-4 py-1.5 text-xs font-bold transition duration-200 active:scale-95", value === item.key ? "bg-surface text-ink shadow-sm" : "text-slate-500 hover:text-ink")}
         >
           {item.label}
         </button>

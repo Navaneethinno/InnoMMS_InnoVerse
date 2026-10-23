@@ -126,7 +126,7 @@ export default function Signups() {
         </div>
       </div>
       <SegmentedTabs
-        className="mb-4 flex-wrap"
+        className="mb-4"
         items={FILTERS.map((code) => ({
           key: code || "all",
           label: code

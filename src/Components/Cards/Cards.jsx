@@ -93,7 +93,7 @@ export default function Cards() {
           <section>
             <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{t("cards.yourCards")}</h2>
             {cards.length ? (
-              <div className="-m-1 grid auto-rows-max max-h-[70vh] gap-4 overflow-y-auto p-1 lg:max-h-[calc(100dvh-12rem)]">
+              <div className="-m-1 grid max-h-[70vh] max-w-sm auto-rows-max gap-4 overflow-y-auto p-1 lg:max-h-[calc(100dvh-12rem)]">
                 {cards.map((c) => (
                   <CardFace key={c.id} card={c} selected={selected?.id === c.id} onClick={() => setSelectedId(c.id)} />
                 ))}
