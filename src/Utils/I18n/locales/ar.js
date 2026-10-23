@@ -1242,6 +1242,8 @@ export default {
   "deposits.emptyHint": "افتح وديعة لتكسب فوائد على أموال لا تحتاجها الآن.",
   "deposits.noOffers": "لا يقدّم البنك ودائع حاليًا.",
   "deposits.needAccount": "تحتاج إلى حساب نشط قبل فتح وديعة.",
+  "deposits.tenorMonths": "{{count}} أشهر",
+  "deposits.tenorDays": "{{count}} يومًا",
   "deposits.maturesOn": "تستحق في {{date}}",
   "deposits.principal": "المبلغ المودَع",
   "deposits.rate": "سعر الفائدة",

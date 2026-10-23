@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 import { CalendarClock, Plus, Undo2, Vault } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import DetailRow from "@/Components/Common/DetailRow";
@@ -115,6 +116,16 @@ export default function Deposits() {
   );
 }
 
+
+// A tenor in the user's words: the product's own label in English (the
+// platform's stored text); in another language, built from tenor_days
+// ("3 meses", "90 dias"), since the label has no translations yet.
+function tenorText(t, label, days) {
+  const n = Number(days);
+  if (!n || String(i18next.language ?? "en").startsWith("en")) return label ?? (n ? t("deposits.tenorDays", { count: n }) : "—");
+  return n % 30 === 0 ? t("deposits.tenorMonths", { count: n / 30 }) : t("deposits.tenorDays", { count: n });
+}
+
 function StatusChip({ status }) {
   const { t } = useTranslation();
   const tone = status === "ACTIVE" ? "bg-emerald-50 text-emerald-700" : status === "MATURED" ? "bg-amber-50 text-amber-800" : "bg-slate-100 text-slate-600";
@@ -160,7 +171,7 @@ function DepositDetail({ deposit: d, onAction }) {
           {formatMoney(d.principal, d.currency_code)}
         </DetailRow>
         <DetailRow label={t("deposits.rate")}>{pct(d.annual_rate)}</DetailRow>
-        <DetailRow label={t("deposits.tenor")}>{d.tenor_label}</DetailRow>
+        <DetailRow label={t("deposits.tenor")}>{tenorText(t, d.tenor_label, d.tenor_days)}</DetailRow>
         <DetailRow label={t("deposits.start")}>{formatDate(d.start_date)}</DetailRow>
         <DetailRow label={t("deposits.maturity")}>{formatDate(d.maturity_date)}</DetailRow>
         <DetailRow label={t("deposits.payout")}>{t(`deposits.frequency.${d.interest_payout_frequency}`, { defaultValue: d.interest_payout_frequency })}</DetailRow>
@@ -278,7 +289,7 @@ function OpenDepositDialog({ onClose, onDone }) {
             }}
             options={offers.products.map((p) => ({ value: String(p.deposit_product_id), label: `${p.product_name} (${p.currency_code})` }))}
           />
-          <FilterSelect label={t("deposits.tenor")} value={form.tenor} onChange={set("tenor")} options={(config.tenors ?? []).map((x) => ({ value: String(x.id), label: x.label }))} />
+          <FilterSelect label={t("deposits.tenor")} value={form.tenor} onChange={set("tenor")} options={(config.tenors ?? []).map((x) => ({ value: String(x.id), label: tenorText(t, x.label, x.tenor_days) }))} />
           <div>
             <TextField name="principal" inputMode="decimal" label={t("deposits.amountIn", { currency: product?.currency_code ?? "" })} value={form.principal} onChange={(e) => set("principal")(amountInput(e.target.value, product?.amount_decimals ?? 2))} />
             {limits && <p className="mt-1 text-xs text-slate-500">{limits}</p>}
