@@ -4,7 +4,7 @@ How this codebase is structured and the conventions to follow when changing it. 
 
 ## Stack
 
-React 18 + Vite 6 (JS/JSX, no TypeScript) · React Router v6 (data router) · Redux Toolkit (session only) · axios · Tailwind 3 (CSS-variable colours) · i18next (en/pt) · Radix UI primitives · lucide-react icons · react-toastify · react-joyride (onboarding tour) · dotLottie (animations) · Playwright (e2e).
+React 18 + Vite 6 (JS/JSX, no TypeScript) · React Router v6 (data router) · Redux Toolkit (session only) · axios · Tailwind 3 (CSS-variable colours) · i18next (en/pt/ar) · Radix UI primitives · lucide-react icons · react-toastify · react-joyride (onboarding tour) · dotLottie (animations) · Playwright (e2e).
 
 Commands: `npm run dev` (port 5174) · `npm run lint` · `npm run build` · `npm run test:e2e`.
 
@@ -22,7 +22,7 @@ src/
   Redux/                 Cross-route state (auth session only)
   Utils/Constant.jsx     ALL endpoint paths, env vars, storage keys, config constants
   Utils/Config/          Route metadata
-  Utils/I18n/            i18n setup + flat locale maps (en.js, pt.js)
+  Utils/I18n/            i18n setup + flat locale maps (en.js, pt.js, ar.js)
   Utils/Lib/             Pure helpers (theme, branding, notifications, apiLanguage, cn utils)
   Pages/, assets/        Reserved
 ```
@@ -66,7 +66,8 @@ Empty feature folders (`Accounts`, `Profile`, `Support`, `Transactions`) hold `.
 
 ## i18n
 
-- All static UI copy uses `t("feature.key")`. Keys are flat dotted strings (`keySeparator: false`) — add every key to **both** `locales/en.js` and `locales/pt.js`.
+- All static UI copy uses `t("feature.key")`. Keys are flat dotted strings (`keySeparator: false`) — add every key to `locales/en.js`, `locales/pt.js` and `locales/ar.js`.
+- Arabic is right-to-left: `i18n.js` sets `<html dir>`. Use start/end utilities (`ms-`, `pe-`, `start-`, `text-end`, `rounded-s`, `border-e`), never left/right, except `left-1/2` centring; side-specific motion and icons are mirrored in the RTL block at the end of `styles.css`.
 - API-provided text (messages, field labels, sections) is rendered as received — don't translate it client-side.
 
 ## Storage
@@ -90,7 +91,7 @@ Empty feature folders (`Accounts`, `Profile`, `Support`, `Transactions`) hold `.
 3. `Hooks/<Feature>/use<Feature>.js` for state, cancellation, errors.
 4. `Components/<Feature>/<Feature>.jsx` built from `Components/Common`.
 5. `Router/<feature>Routes.jsx` (lazy + `pageElement`), re-export in `Router/index.js`, spread into public or authenticated group.
-6. i18n keys in `en.js` and `pt.js`.
+6. i18n keys in `en.js`, `pt.js` and `ar.js`.
 7. Lint + build.
 
 ## Known gaps / notes

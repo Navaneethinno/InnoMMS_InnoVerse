@@ -34,7 +34,7 @@ const itemText = (item) => (typeof item === "string" ? item : String(item?.label
 function GuardianCard({ guardian, t }) {
   const missing = (guardian.missing ?? []).map(itemText).filter(Boolean);
   return (
-    <div className="mt-5 rounded-2xl border border-slate-200 bg-paper/60 p-4 text-left">
+    <div className="mt-5 rounded-2xl border border-slate-200 bg-paper/60 p-4 text-start">
       <div className="flex items-center gap-3">
         <span className="brand-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lime">
           <UserCheck size={18} />

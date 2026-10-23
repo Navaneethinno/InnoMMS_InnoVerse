@@ -32,7 +32,7 @@ function Document({ item }) {
         type="button"
         disabled={!state.url}
         onClick={() => setOpen(true)}
-        className="block w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 text-left transition hover:border-ink/40 disabled:cursor-default"
+        className="block w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 text-start transition hover:border-ink/40 disabled:cursor-default"
       >
         <span className="flex aspect-[4/3] w-full items-center justify-center bg-slate-100">
           {state.url ? <img src={state.url} alt={item.label} className="h-full w-full object-cover" /> : state.failed ? <FileImage size={28} className="text-slate-400" aria-hidden="true" /> : <Spinner />}

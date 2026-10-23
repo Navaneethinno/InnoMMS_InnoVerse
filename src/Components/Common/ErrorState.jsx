@@ -13,7 +13,7 @@ export default function ErrorState({ message, problems, onRetry }) {
         <div>
           <p className="font-semibold">{message || t("common.requestFailed")}</p>
           {problems?.length > 0 && (
-            <ul className="mt-2 list-disc space-y-1 pl-5">
+            <ul className="mt-2 list-disc space-y-1 ps-5">
               {problems.map((problem, index) => (
                 <li key={index}>{problem}</li>
               ))}

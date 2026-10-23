@@ -70,7 +70,7 @@ export default function Button({
       <span
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute inset-y-0 -left-1/3 -z-10 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-0",
+          "pointer-events-none absolute inset-y-0 -start-1/3 -z-10 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-0",
           pending && "button-shine",
         )}
       />

@@ -72,7 +72,7 @@ export default function Sidebar({
 
       <nav
         aria-label={t("nav.main")}
-        className="sidebar-nav thin-scrollbar -mr-1 mt-4 grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overflow-x-hidden pr-1"
+        className="sidebar-nav thin-scrollbar -me-1 mt-4 grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overflow-x-hidden pe-1"
       >
         {items.map(({ key, to, labelKey, label, icon }) => {
           const Icon = icon;
@@ -98,14 +98,14 @@ export default function Sidebar({
                   {isActive && (
                     <span
                       aria-hidden="true"
-                      className="sidebar-bar absolute inset-y-2 left-0 w-1 rounded-r-full bg-lime"
+                      className="sidebar-bar absolute inset-y-2 start-0 w-1 rounded-e-full bg-lime"
                     />
                   )}
                   <Icon
                     size={18}
                     className={cn(
                       "shrink-0 transition-transform duration-200 group-hover:scale-110",
-                      !isActive && "group-hover:translate-x-0.5",
+                      !isActive && "group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5",
                       isActive && "text-lime",
                     )}
                   />
@@ -113,13 +113,13 @@ export default function Sidebar({
                     <span className="sidebar-label truncate">{name}</span>
                   )}
                   {key === "cases" && casesAction > 0 && (
-                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white", slim ? "absolute right-2 top-1.5" : "ml-auto")}>{casesAction > 99 ? "99+" : casesAction}</span>
+                    <span className={cn("flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white", slim ? "absolute end-2 top-1.5" : "ms-auto")}>{casesAction > 99 ? "99+" : casesAction}</span>
                   )}
                   {key === "notifications" && unread > 0 && (
                     <span
                       className={cn(
                         "flex h-5 min-w-5 items-center justify-center rounded-full bg-lime px-1.5 text-[10px] font-bold text-on-secondary",
-                        slim ? "absolute right-2 top-1.5" : "ml-auto",
+                        slim ? "absolute end-2 top-1.5" : "ms-auto",
                       )}
                     >
                       {unread > 99 ? "99+" : unread}
@@ -144,7 +144,7 @@ export default function Sidebar({
         >
           <LogOut
             size={17}
-            className="shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5"
+            className="shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5"
           />
           {!slim && (
             <span className="sidebar-label">{t("common.signOut")}</span>

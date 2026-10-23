@@ -39,7 +39,7 @@ export default function RecentPayees({ onPick, className }) {
             key={payee.phone}
             type="button"
             onClick={() => onPick(payee.phone)}
-            className="flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-surface px-3 py-1.5 text-left text-xs transition hover:bg-ink/5"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-surface px-3 py-1.5 text-start text-xs transition hover:bg-ink/5"
           >
             <UserRound size={14} className="shrink-0 text-slate-500" />
             <span className="font-semibold text-slate-800">{payee.name ?? payee.phone}</span>

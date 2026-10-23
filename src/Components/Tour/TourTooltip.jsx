@@ -13,7 +13,7 @@ export default function TourTooltip({ index, size, step, isLastStep, backProps, 
     <div className="mt-4 flex flex-wrap justify-center gap-1" aria-hidden="true">{Array.from({ length: size }, (_, i) => <span key={i} className={`h-1.5 rounded-full ${i === index ? 'w-4 bg-forest dark:bg-lime' : 'w-1.5 bg-ink/15'}`} />)}</div>
     <div className="mt-4 flex items-center gap-2">
       {!isLastStep && <button {...skipProps} className="text-xs font-semibold text-slate-500">{t('onboarding.tour.skip')}</button>}
-      <div className="ml-auto flex gap-2">
+      <div className="ms-auto flex gap-2">
         {index > 0 && <button {...backProps} className="rounded-xl border border-ink/15 px-3 py-2 text-xs font-bold">{t('onboarding.tour.back')}</button>}
         <button {...primaryProps} className="rounded-xl bg-forest px-4 py-2 text-xs font-bold text-white dark:bg-lime dark:text-on-secondary">{t(isLastStep ? 'onboarding.tour.last' : 'onboarding.tour.next')}</button>
       </div>

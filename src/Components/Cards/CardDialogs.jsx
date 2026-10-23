@@ -317,17 +317,17 @@ export function CardMoneyDialog({ card, txnType, onClose, onDone }) {
         <dl className="divide-y divide-slate-100 text-sm">
           <div className="flex justify-between gap-3 py-2">
             <dt className="text-slate-500">{t("cards.amount")}</dt>
-            <dd className="text-right font-semibold [overflow-wrap:anywhere]">{formatMoney(quote.amount, quote.currency_code)}</dd>
+            <dd className="text-end font-semibold [overflow-wrap:anywhere]">{formatMoney(quote.amount, quote.currency_code)}</dd>
           </div>
           {fee != null && Number(fee) !== 0 && (
             <div className="flex justify-between gap-3 py-2">
               <dt className="text-slate-500">{quote.fee?.fee_name ?? t("send.fee")}</dt>
-              <dd className="text-right [overflow-wrap:anywhere]">{formatMoney(fee, quote.currency_code)}</dd>
+              <dd className="text-end [overflow-wrap:anywhere]">{formatMoney(fee, quote.currency_code)}</dd>
             </div>
           )}
           <div className="flex justify-between gap-3 py-2 font-bold">
             <dt>{t("send.total")}</dt>
-            <dd className="text-right [overflow-wrap:anywhere]">{formatMoney(quote.total_debit, quote.currency_code)}</dd>
+            <dd className="text-end [overflow-wrap:anywhere]">{formatMoney(quote.total_debit, quote.currency_code)}</dd>
           </div>
         </dl>
         {quote.pin_required && <PinInput label={t("cards.transactionPin")} value={pin} onChange={setPin} />}

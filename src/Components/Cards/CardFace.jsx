@@ -23,17 +23,17 @@ export default function CardFace({ card, selected, onClick }) {
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "brand-gradient relative flex aspect-[1.586] min-h-[10.5rem] w-full min-w-0 flex-col justify-between overflow-hidden rounded-2xl p-5 text-left text-white shadow-lg transition duration-200 hover:-translate-y-0.5 hover:shadow-xl",
+        "brand-gradient relative flex aspect-[1.586] min-h-[10.5rem] w-full min-w-0 flex-col justify-between overflow-hidden rounded-2xl p-5 text-start text-white shadow-lg transition duration-200 hover:-translate-y-0.5 hover:shadow-xl",
         selected ? "ring-4 ring-lime/70" : "hover:ring-2 hover:ring-lime/40",
         stopped && "opacity-60 grayscale",
       )}
     >
       <span
-        className="pointer-events-none absolute -right-10 -top-12 h-44 w-44 rounded-full bg-white/10"
+        className="pointer-events-none absolute -end-10 -top-12 h-44 w-44 rounded-full bg-white/10"
         aria-hidden="true"
       />
       <span
-        className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-white/[0.06]"
+        className="pointer-events-none absolute -bottom-16 -start-10 h-40 w-40 rounded-full bg-white/[0.06]"
         aria-hidden="true"
       />
       <span className="flex items-start justify-between gap-2">

@@ -215,7 +215,7 @@ export default function CameraCapture({ open, onOpenChange, onCapture }) {
             </div>
             <Dialog.Close
               aria-label={t("common.close")}
-              className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#A1A1AA] transition hover:bg-white/10 hover:text-white"
+              className="-me-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#A1A1AA] transition hover:bg-white/10 hover:text-white"
             >
               <X size={22} />
             </Dialog.Close>
@@ -272,7 +272,7 @@ export default function CameraCapture({ open, onOpenChange, onCapture }) {
                     />
                   )}
                 </svg>
-                <span className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold backdrop-blur">
+                <span className="absolute start-3 top-3 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold backdrop-blur">
                   <span className="h-2 w-2 rounded-full bg-red-500" />
                   {t("cam.live")}
                 </span>

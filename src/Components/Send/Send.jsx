@@ -306,11 +306,11 @@ export default function Send() {
           <dl className="mt-5 divide-y divide-slate-100 text-sm">
             <div className="flex justify-between py-2">
               <dt className="text-slate-500">{t("send.from")}</dt>
-              <dd className="text-right text-slate-800">{quote.from?.name} · {quote.from?.acct_num}</dd>
+              <dd className="text-end text-slate-800">{quote.from?.name} · {quote.from?.acct_num}</dd>
             </div>
             <div className="flex justify-between py-2">
               <dt className="text-slate-500">{toPhone ? t("onb.mobile") : t("send.to")}</dt>
-              <dd className="text-right text-slate-800">{toPhone ? quote.to_phone : quote.to?.acct_num ?? quote.to?.name ?? picked?.counterparty_name}</dd>
+              <dd className="text-end text-slate-800">{toPhone ? quote.to_phone : quote.to?.acct_num ?? quote.to?.name ?? picked?.counterparty_name}</dd>
             </div>
             {/* A fee the other party pays is not the merchant's. */}
             {fee.total_charge != null && Number(fee.total_charge) !== 0 && fee.pay_from !== "RECEIVER" && (
@@ -375,7 +375,7 @@ export default function Send() {
             <>
               {balanceAfter != null && (
                 <div className="mt-4 rounded-2xl bg-ink/5 p-4">
-                  <p className="flex items-center justify-between gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.balanceAfter", { defaultValue: "Balance after this payment" })}<BalanceEye className="-my-2 -mr-1" /></p>
+                  <p className="flex items-center justify-between gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.balanceAfter", { defaultValue: "Balance after this payment" })}<BalanceEye className="-my-2 -me-1" /></p>
                   <FitText className="mt-1 font-black tracking-tight text-slate-800"><Balance value={balanceAfter} currency={quote.currency_code} /></FitText>
                 </div>
               )}
@@ -437,7 +437,7 @@ export default function Send() {
                 <p className="mt-2 flex items-center gap-2 rounded-xl bg-ink/5 px-3 py-2 text-sm font-semibold text-ink">
                   {payeeIsMerchant ? <Store size={15} /> : <UserRound size={15} />}
                   {payee.name}
-                  <span className="ml-auto text-xs font-normal text-slate-500">{payeeIsMerchant ? t("send.merchant") : payee.currency_code}</span>
+                  <span className="ms-auto text-xs font-normal text-slate-500">{payeeIsMerchant ? t("send.merchant") : payee.currency_code}</span>
                 </p>
               )}
               {payeeIsMerchant && <p className="mt-2 text-sm text-red-600">{t("send.peopleOnly", { defaultValue: "Merchants can send money to people only." })}</p>}

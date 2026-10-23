@@ -261,7 +261,7 @@ export default function AgentCash() {
       </div>
       <p className="mt-5 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
         {t("send.available")}
-        <BalanceEye className="-my-2 -mr-1" />
+        <BalanceEye className="-my-2 -me-1" />
       </p>
       {float ? (
         <FitText
@@ -391,7 +391,7 @@ export default function AgentCash() {
                 })}
               </p>
             )}
-            <div className="mt-5 text-left">
+            <div className="mt-5 text-start">
               <TextField
                 name="customer_pin"
                 type="password"
@@ -466,7 +466,7 @@ export default function AgentCash() {
             <dl className="mt-5 divide-y divide-slate-100 text-sm">
               <div className="flex justify-between gap-3 py-2">
                 <dt className="text-slate-500">{t("send.from")}</dt>
-                <dd className="text-right text-slate-800">
+                <dd className="text-end text-slate-800">
                   {[quote.from?.name, quote.from?.acct_num]
                     .filter(Boolean)
                     .join(" · ")}
@@ -474,7 +474,7 @@ export default function AgentCash() {
               </div>
               <div className="flex justify-between gap-3 py-2">
                 <dt className="text-slate-500">{t("send.to")}</dt>
-                <dd className="text-right text-slate-800">
+                <dd className="text-end text-slate-800">
                   {[quote.to?.name, quote.to?.acct_num]
                     .filter(Boolean)
                     .join(" · ")}

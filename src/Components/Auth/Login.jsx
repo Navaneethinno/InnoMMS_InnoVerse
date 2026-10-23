@@ -127,15 +127,15 @@ export default function Login() {
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-48 top-1/2 -z-10 h-[620px] w-[620px] -translate-y-1/2 rounded-full border border-white/[0.08]"
+          className="pointer-events-none absolute -end-48 top-1/2 -z-10 h-[620px] w-[620px] -translate-y-1/2 rounded-full border border-white/[0.08]"
         />
         <div
           aria-hidden="true"
-          className="login-glow pointer-events-none absolute -bottom-40 -left-24 -z-10 h-[460px] w-[460px] rounded-full bg-lime/25 blur-3xl dark:bg-lime/15"
+          className="login-glow pointer-events-none absolute -bottom-40 -start-24 -z-10 h-[460px] w-[460px] rounded-full bg-lime/25 blur-3xl dark:bg-lime/15"
         />
         <div
           aria-hidden="true"
-          className="login-glow pointer-events-none absolute -top-32 right-10 -z-10 h-[320px] w-[320px] rounded-full bg-white/10 blur-3xl [animation-delay:-6s]"
+          className="login-glow pointer-events-none absolute -top-32 end-10 -z-10 h-[320px] w-[320px] rounded-full bg-white/10 blur-3xl [animation-delay:-6s]"
         />
         <div>
           <div className="flex items-center gap-3">

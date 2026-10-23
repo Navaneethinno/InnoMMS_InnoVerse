@@ -38,7 +38,7 @@ function PickedPayment({ payment, onChange }) {
             {formatDate(payment.tran_date_time)} · {formatClock(payment.tran_date_time)} · {t("refund.ref", { defaultValue: "Ref" })} {payment.rrn}
           </span>
         </span>
-        <span className="shrink-0 text-right">
+        <span className="shrink-0 text-end">
           <span className="block text-sm font-black text-slate-800">{formatMoney(payment.amount, payment.currency_code)}</span>
           <button type="button" onClick={onChange} className="text-xs font-bold text-ink underline-offset-2 hover:underline">
             {t("refund.change", { defaultValue: "Change" })}
@@ -145,7 +145,7 @@ export default function RefundPicker({ picked, onPick, preselectRrn }) {
                     <button
                       type="button"
                       onClick={() => onPick(payment)}
-                      className={cn("flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-ink/5")}
+                      className={cn("flex w-full items-center gap-3 px-4 py-3 text-start transition hover:bg-ink/5")}
                     >
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/5 text-sm font-bold uppercase text-ink">
                         {String(payment.counterparty_name || "?").trim().charAt(0)}

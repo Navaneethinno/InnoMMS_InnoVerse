@@ -220,7 +220,7 @@ function SessionsCard() {
         {state.loading ? (
           <div className="h-16 animate-pulse rounded-xl bg-slate-200/60" />
         ) : (
-          <ul className="max-h-96 divide-y divide-slate-100 overflow-y-auto pr-1">
+          <ul className="max-h-96 divide-y divide-slate-100 overflow-y-auto pe-1">
             {state.items.map((session) => (
               <li key={session.id} className="flex flex-wrap items-center gap-3 py-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink">

@@ -131,7 +131,7 @@ export default function MyAgents() {
                     {t("wallet.purpose.AGENT_FLOAT", {
                       defaultValue: "Agent wallet",
                     })}
-                    <BalanceEye className="-my-2 -mr-1" />
+                    <BalanceEye className="-my-2 -me-1" />
                   </p>
                   <p
                     className={cn(

@@ -17,7 +17,7 @@ function Row({ label, children }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-1.5 text-xs">
       <dt className="shrink-0 text-slate-500">{label}</dt>
-      <dd className="min-w-0 break-words text-right font-semibold text-slate-700">{children}</dd>
+      <dd className="min-w-0 break-words text-end font-semibold text-slate-700">{children}</dd>
     </div>
   );
 }
@@ -39,7 +39,7 @@ export default function WalletPanel({ wallets, selected, onSelect, footer, class
               <Wrapper
                 {...(several ? { type: "button", onClick: () => onSelect(wallet.acct_num), "aria-pressed": active } : {})}
                 className={cn(
-                  "flex w-full flex-col rounded-2xl border bg-paper/60 p-5 text-left transition",
+                  "flex w-full flex-col rounded-2xl border bg-paper/60 p-5 text-start transition",
                   !several && "flex-1",
                   several && active ? "border-ink ring-2 ring-ink/20" : "border-slate-200",
                   several && !active && "hover:border-ink/40",
@@ -60,7 +60,7 @@ export default function WalletPanel({ wallets, selected, onSelect, footer, class
                     </span>
                   )}
                 </div>
-                <p className="mt-5 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">{t("send.available")}<BalanceEye className="-my-2 -mr-1" /></p>
+                <p className="mt-5 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">{t("send.available")}<BalanceEye className="-my-2 -me-1" /></p>
                 <FitText max={26} min={12} className="mt-1 font-black tracking-tight text-slate-800">
                   <Balance value={wallet.avail_bal} currency={wallet.currency_code} />
                 </FitText>

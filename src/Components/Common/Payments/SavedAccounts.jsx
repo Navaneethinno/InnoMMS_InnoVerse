@@ -108,11 +108,11 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
                 type="button"
                 disabled={editing}
                 onClick={() => onPick(value === item.id ? null : item)}
-                className="px-3.5 py-1.5 text-left"
+                className="px-3.5 py-1.5 text-start"
               >
                 {item.name || item.account}
                 {item.name && (
-                  <span className="ml-1.5 font-medium opacity-70">
+                  <span className="ms-1.5 font-medium opacity-70">
                     {item.account}
                   </span>
                 )}
@@ -133,7 +133,7 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
                     type="button"
                     aria-label={t("saved.delete", { defaultValue: "Remove" })}
                     onClick={() => run(deleteSavedAccount(item.id))}
-                    className="p-1.5 pr-2.5 text-red-600"
+                    className="p-1.5 pe-2.5 text-red-600"
                   >
                     <Trash2 size={13} />
                   </button>

@@ -11,20 +11,20 @@ export function ListSearch({ list, placeholder, min = 6, className }) {
     <div className={cn("mb-4 flex flex-wrap items-center gap-3", className)}>
       <label className="relative min-w-[14rem] flex-1 sm:max-w-sm">
         <span className="sr-only">{placeholder ?? t("list.search", { defaultValue: "Search" })}</span>
-        <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search size={15} className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="search"
           value={list.query}
           onChange={(event) => list.setQuery(event.target.value)}
           placeholder={placeholder ?? t("list.search", { defaultValue: "Search" })}
-          className="w-full rounded-xl border border-slate-200 bg-surface py-2.5 pl-9 pr-9 text-sm outline-none transition focus:border-ink/40 focus:ring-2 focus:ring-ink/10 [&::-webkit-search-cancel-button]:hidden"
+          className="w-full rounded-xl border border-slate-200 bg-surface py-2.5 ps-9 pe-9 text-sm outline-none transition focus:border-ink/40 focus:ring-2 focus:ring-ink/10 [&::-webkit-search-cancel-button]:hidden"
         />
         {list.query && (
           <button
             type="button"
             onClick={() => list.setQuery("")}
             aria-label={t("list.clear", { defaultValue: "Clear search" })}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 hover:bg-ink/5 hover:text-ink"
+            className="absolute end-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 hover:bg-ink/5 hover:text-ink"
           >
             <X size={14} />
           </button>

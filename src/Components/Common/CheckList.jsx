@@ -17,14 +17,14 @@ export default function CheckList({ options, value, onChange, layout = "wrap", s
       {options.length >= searchMin && (
         <div className="mb-3 flex items-center gap-2">
           <label className="relative flex-1">
-            <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={14} className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="search"
               value={list.query}
               onChange={(event) => list.setQuery(event.target.value)}
               placeholder={t("list.search", { defaultValue: "Search" })}
               aria-label={t("list.search", { defaultValue: "Search" })}
-              className="w-full rounded-lg border border-slate-200 bg-surface py-2 pl-8 pr-3 text-sm outline-none focus:border-ink/40"
+              className="w-full rounded-lg border border-slate-200 bg-surface py-2 ps-8 pe-3 text-sm outline-none focus:border-ink/40"
             />
           </label>
           <span className="shrink-0 text-xs font-semibold text-slate-500">
@@ -32,7 +32,7 @@ export default function CheckList({ options, value, onChange, layout = "wrap", s
           </span>
         </div>
       )}
-      <div className={cn("max-h-56 overflow-y-auto pr-1", layout === "wrap" ? "flex flex-wrap gap-x-5 gap-y-2" : "flex flex-col gap-2")}>
+      <div className={cn("max-h-56 overflow-y-auto pe-1", layout === "wrap" ? "flex flex-wrap gap-x-5 gap-y-2" : "flex flex-col gap-2")}>
         {list.filtered.map((option) => (
           <CheckboxPill key={option.value} label={option.label} checked={value.includes(option.value)} onChange={() => toggle(option.value)} />
         ))}

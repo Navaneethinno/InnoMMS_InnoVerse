@@ -11,11 +11,11 @@ export default function NotificationRow({ title, summary, amount, direction, whe
       onClick={onOpen}
       aria-current={selected ? "true" : undefined}
       className={cn(
-        "notif-focus relative flex w-full items-center gap-3 px-4 py-3.5 text-left transition sm:px-5",
+        "notif-focus relative flex w-full items-center gap-3 px-4 py-3.5 text-start transition sm:px-5",
         selected ? "bg-ink/[0.06]" : "hover:bg-ink/[0.03]",
       )}
     >
-      {selected && <span aria-hidden="true" className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-forest dark:bg-lime" />}
+      {selected && <span aria-hidden="true" className="absolute inset-y-2 start-0 w-1 rounded-e-full bg-forest dark:bg-lime" />}
       <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-full", `notif-tile-${type}`)} aria-hidden="true">
         <Icon size={17} strokeWidth={2} />
       </span>

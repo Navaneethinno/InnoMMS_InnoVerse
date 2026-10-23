@@ -145,7 +145,7 @@ export default function Statements() {
                     {statement.acct_num} · {t("statements.lines", { count: statement.txn_count ?? 0 })}
                   </span>
                 </span>
-                <span className="text-right text-xs text-slate-500">
+                <span className="text-end text-xs text-slate-500">
                   <span className="block">{t("statements.closing")}</span>
                   <span className="block text-sm font-bold text-slate-800"><Balance value={statement.closing_balance} currency={currency} /></span>
                 </span>
@@ -219,7 +219,7 @@ function StatementDetail({ detail, currency }) {
                 <span className="block font-semibold text-slate-800 [overflow-wrap:anywhere]">{line.description}</span>
                 <span className="block text-xs text-slate-500">{formatDate(line.date)}</span>
               </span>
-              <span className="text-right">
+              <span className="text-end">
                 <span className={`block font-bold ${Number(line.amount) < 0 ? "text-slate-800" : "text-emerald-600 dark:text-emerald-400"}`}>{formatMoney(line.amount, currency, { signed: true })}</span>
                 <span className="block text-xs text-slate-500"><Balance value={line.balance} currency={currency} /></span>
               </span>

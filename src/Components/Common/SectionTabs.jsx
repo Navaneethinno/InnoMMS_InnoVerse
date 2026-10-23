@@ -30,7 +30,7 @@ export default function SectionTabs({ items, value, onChange, className }) {
           >
             {item.label}
             {item.count != null && (
-              <span className="ml-2 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-semibold text-slate-500">
+              <span className="ms-2 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-semibold text-slate-500">
                 {item.count}
               </span>
             )}

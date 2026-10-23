@@ -20,7 +20,7 @@ export default function DetailRow({ label, children, strong }) {
       </dt>
       <dd
         className={cn(
-          "min-w-0 text-right text-sm text-slate-800 [overflow-wrap:anywhere]",
+          "min-w-0 text-end text-sm text-slate-800 [overflow-wrap:anywhere]",
           strong ? "font-black" : "font-semibold",
         )}
       >

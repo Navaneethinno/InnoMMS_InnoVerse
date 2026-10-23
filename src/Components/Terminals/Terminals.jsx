@@ -443,7 +443,7 @@ export default function Terminals() {
                           className="flex justify-between gap-3 py-1.5"
                         >
                           <dt className="text-slate-500">{label}</dt>
-                          <dd className="text-right font-semibold text-slate-700">
+                          <dd className="text-end font-semibold text-slate-700">
                             {value}
                           </dd>
                         </div>

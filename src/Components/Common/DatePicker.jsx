@@ -115,7 +115,7 @@ export default function DatePicker({ value, onChange, min, max, disabled, classN
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => (open ? setOpen(false) : show())}
-        className={cn("field-control flex items-center justify-between gap-2 text-left", className, open && "border-ink ring-2 ring-ink/10")}
+        className={cn("field-control flex items-center justify-between gap-2 text-start", className, open && "border-ink ring-2 ring-ink/10")}
       >
         <span className={cn("truncate", !label && "text-slate-400")}>{label || placeholder || t("datePicker.select")}</span>
         <CalendarDays size={16} className={cn("shrink-0", open ? "text-ink" : "text-slate-500")} />

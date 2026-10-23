@@ -97,7 +97,7 @@ export const isCommission = (item) =>
 function CommissionTag() {
   const { t } = useTranslation();
   return (
-    <span className="ml-2 rounded-full bg-lime/30 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-ink">
+    <span className="ms-2 rounded-full bg-lime/30 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-ink">
       {t("history.commission", { defaultValue: "Commission" })}
     </span>
   );
@@ -112,7 +112,7 @@ function WalletTag({ item }) {
   )
     return null;
   return (
-    <span className="ml-2 rounded-full bg-ink/10 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-ink">
+    <span className="ms-2 rounded-full bg-ink/10 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-ink">
       {t(`wallet.purpose.${item.wallet_purpose}`, {
         defaultValue:
           item.wallet_purpose === "STORE" ? "Store wallet" : "Agent wallet",
@@ -133,7 +133,7 @@ export function TransactionLine({ item, onOpen }) {
         type="button"
         onClick={() => onOpen?.(item)}
         disabled={!onOpen}
-        className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 px-1 py-3 text-left transition enabled:hover:bg-ink/5 sm:px-2"
+        className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 px-1 py-3 text-start transition enabled:hover:bg-ink/5 sm:px-2"
       >
         <span
           className={cn(
@@ -156,13 +156,13 @@ export function TransactionLine({ item, onOpen }) {
               .filter(Boolean)
               .join(" · ")}
             {item.status === "REVERSED" && (
-              <span className="ml-2 font-semibold text-amber-600">
+              <span className="ms-2 font-semibold text-amber-600">
                 {t("history.reversed")}
               </span>
             )}
           </span>
         </span>
-        <span className="ml-auto max-w-full text-right">
+        <span className="ms-auto max-w-full text-end">
           <span
             className={cn(
               "block truncate text-sm font-bold",
@@ -207,14 +207,14 @@ function HistoryTable({ items, onOpen }) {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[44rem] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-slate-200 bg-paper/70 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <tr className="border-b border-slate-200 bg-paper/70 text-start text-[11px] font-bold uppercase tracking-wider text-slate-500">
               {columns.map((column) => (
                 <th
                   key={column.key}
                   scope="col"
                   className={cn(
                     "whitespace-nowrap px-4 py-3",
-                    column.right && "text-right",
+                    column.right && "text-end",
                     column.className,
                   )}
                 >
@@ -270,7 +270,7 @@ function HistoryTable({ items, onOpen }) {
                         event.stopPropagation();
                         onOpen(item);
                       }}
-                      className="flex items-center gap-3 text-left"
+                      className="flex items-center gap-3 text-start"
                     >
                       <span
                         className={cn(
@@ -324,7 +324,7 @@ function HistoryTable({ items, onOpen }) {
                   </td>
                   <td
                     className={cn(
-                      "whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums",
+                      "whitespace-nowrap px-4 py-3 text-end font-bold tabular-nums",
                       out
                         ? "text-slate-800"
                         : "text-emerald-600 dark:text-emerald-400",
@@ -337,11 +337,11 @@ function HistoryTable({ items, onOpen }) {
                     )}
                   </td>
                   {showFee && (
-                    <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-slate-500">
+                    <td className="whitespace-nowrap px-4 py-3 text-end tabular-nums text-slate-500">
                       {fee > 0 ? formatMoney(fee, item.currency_code) : "—"}
                     </td>
                   )}
-                  <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-slate-600">
+                  <td className="whitespace-nowrap px-4 py-3 text-end tabular-nums text-slate-600">
                     {item.balance_after != null
                       ? <Balance value={item.balance_after} currency={item.currency_code} />
                       : "—"}

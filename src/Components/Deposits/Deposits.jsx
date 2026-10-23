@@ -124,7 +124,7 @@ function StatusChip({ status }) {
 function DepositCard({ deposit: d, selected, onClick }) {
   const { t } = useTranslation();
   return (
-    <button type="button" onClick={onClick} className={cn("rounded-2xl border bg-surface p-4 text-left transition hover:-translate-y-px", selected ? "border-ink shadow-md" : "border-slate-200")}>
+    <button type="button" onClick={onClick} className={cn("rounded-2xl border bg-surface p-4 text-start transition hover:-translate-y-px", selected ? "border-ink shadow-md" : "border-slate-200")}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-bold text-slate-800">{d.deposit_product_name ?? d.product_name}</p>

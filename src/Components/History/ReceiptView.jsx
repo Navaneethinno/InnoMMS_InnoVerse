@@ -13,7 +13,7 @@ function Line({ label, children, strong }) {
   return (
     <div className="flex items-start justify-between gap-4 py-2 text-sm">
       <dt className="shrink-0 text-slate-500">{label}</dt>
-      <dd className={cn("min-w-0 break-words text-right text-slate-800", strong && "font-bold")}>{children}</dd>
+      <dd className={cn("min-w-0 break-words text-end text-slate-800", strong && "font-bold")}>{children}</dd>
     </div>
   );
 }

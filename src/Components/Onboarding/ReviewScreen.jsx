@@ -159,7 +159,7 @@ function RequestCard({ request, flow }) {
   const ready = kind === "QUESTION" ? answer.trim() : kind === "DOCUMENT" ? files.length > 0 : Boolean(sections);
 
   return (
-    <li className="rounded-2xl border border-slate-200 bg-surface p-5 text-left shadow-sm">
+    <li className="rounded-2xl border border-slate-200 bg-surface p-5 text-start shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold text-ink">{request.message}</p>
         {open && request.due_at && (
@@ -254,13 +254,13 @@ export default function ReviewScreen({ flow, onSubmitted }) {
       <h1 className="mt-6 text-3xl font-semibold tracking-tight text-ink">{t(`onb.outcome.${review?.status in OUTCOMES ? review.status : "APPROVED"}.title`)}</h1>
       {body && <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">{body}</p>}
       {review?.status === "UNDER_REVIEW" && (
-        <p className="mx-auto mt-5 flex max-w-sm items-start gap-2.5 rounded-2xl border border-ink/15 bg-surface p-4 text-left text-sm leading-6 text-slate-600">
+        <p className="mx-auto mt-5 flex max-w-sm items-start gap-2.5 rounded-2xl border border-ink/15 bg-surface p-4 text-start text-sm leading-6 text-slate-600">
           <BellRing size={18} className="mt-0.5 shrink-0 text-ink" />
           <span>{t("onb.reviewNote")}</span>
         </p>
       )}
       {problemInfo && (
-        <div className="mt-6 text-left">
+        <div className="mt-6 text-start">
           <ErrorState message={problemInfo.message} problems={problemInfo.problems} />
         </div>
       )}

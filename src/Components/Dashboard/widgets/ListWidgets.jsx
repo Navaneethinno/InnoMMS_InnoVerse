@@ -44,7 +44,7 @@ export function WalletsWidget() {
                 <p className="break-all text-[11px] text-slate-500">{wallet.acct_num}</p>
                 <WalletBadges wallet={wallet} className="mt-1" />
               </div>
-              <FitText max={13} min={9} className="w-full text-right font-bold text-slate-800"><Balance value={wallet.avail_bal} currency={wallet.currency_code} /></FitText>
+              <FitText max={13} min={9} className="w-full text-end font-bold text-slate-800"><Balance value={wallet.avail_bal} currency={wallet.currency_code} /></FitText>
               {wallet.wallet_purpose === "AGENT_FLOAT" && (
                 <Link to="/agent" className="text-[11px] font-bold text-ink hover:underline">
                   {t("agent.title", { defaultValue: "Cash in / out" })} →

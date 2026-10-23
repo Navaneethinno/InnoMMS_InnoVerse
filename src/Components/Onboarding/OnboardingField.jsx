@@ -62,7 +62,7 @@ export default function OnboardingField({ field, value, onChange, error, choices
         const step = integer ? "1" : options.decimals != null ? String(10 ** -Number(options.decimals)) : "any";
         return (
           <div className="relative">
-            {options.currency && currency && <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-semibold text-slate-500">{currency}</span>}
+            {options.currency && currency && <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-sm font-semibold text-slate-500">{currency}</span>}
             <input
               type="number"
               step={step}
@@ -173,7 +173,7 @@ export default function OnboardingField({ field, value, onChange, error, choices
             className="inline-flex items-center gap-3 rounded-full text-sm font-medium text-slate-600 disabled:opacity-60"
           >
             <span className={cn("relative h-6 w-11 rounded-full transition", on ? "bg-forest dark:bg-lime" : "bg-slate-300")}>
-              <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all", on ? "left-[22px]" : "left-0.5")} />
+              <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all", on ? "start-[22px]" : "start-0.5")} />
             </span>
             {on ? options.yes_label || t("onb.yes") : options.no_label || t("onb.no")}
           </button>

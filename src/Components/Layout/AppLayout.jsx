@@ -154,7 +154,7 @@ export default function AppLayout() {
               onClick={() => setDrawer(false)}
               className="drawer-backdrop absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
             />
-            <div className="drawer-panel absolute inset-y-3 left-3 w-[min(272px,calc(100%-1.5rem))]">
+            <div className="drawer-panel absolute inset-y-3 start-3 w-[min(272px,calc(100%-1.5rem))]">
               <Sidebar onNavigate={() => setDrawer(false)} className="w-full" />
             </div>
           </div>

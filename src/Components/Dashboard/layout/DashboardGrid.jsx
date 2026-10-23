@@ -25,7 +25,10 @@ const minHeight = (rows) => rows * ROW_HEIGHT + (rows - 1) * 16;
 //
 // `layout`: every widget's saved place; `visibleIds`: the ones to draw.
 export function DashboardGrid({ layout, visibleIds, setLayout, editing }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // The grid places cards from the left: it is laid out left to right, and each
+  // card reads in the page's own direction.
+  const dir = i18n.dir();
   const [breakpoint, setBreakpoint] = useState("lg");
   const desktop = breakpoint === "lg";
   const canEdit = editing && desktop;
@@ -59,6 +62,7 @@ export function DashboardGrid({ layout, visibleIds, setLayout, editing }) {
   }
 
   return (
+    <div dir="ltr">
     <ResponsiveGrid
       className={cn("dashboard-grid -mx-2", canEdit && "is-editing")}
       layouts={{ lg: items, sm: stacked }}
@@ -78,7 +82,7 @@ export function DashboardGrid({ layout, visibleIds, setLayout, editing }) {
         const widget = WIDGET_REGISTRY[it.i];
         const Widget = widget.component;
         return (
-          <div key={it.i} className="dashboard-cell">
+          <div key={it.i} className="dashboard-cell" dir={dir}>
             <Widget />
             {canEdit && (
               <span className="dashboard-move-hint" aria-hidden>
@@ -89,5 +93,6 @@ export function DashboardGrid({ layout, visibleIds, setLayout, editing }) {
         );
       })}
     </ResponsiveGrid>
+    </div>
   );
 }

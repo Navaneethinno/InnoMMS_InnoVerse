@@ -746,13 +746,13 @@ function SweepDialog({ storeWallet, mainWallets, onClose, onDone }) {
           <dl className="divide-y divide-slate-100 text-sm">
             <div className="flex justify-between py-2">
               <dt className="text-slate-500">{t("send.from")}</dt>
-              <dd className="text-right">
+              <dd className="text-end">
                 {quote.from?.acct_num ?? ends.fromAcctNum}
               </dd>
             </div>
             <div className="flex justify-between py-2">
               <dt className="text-slate-500">{t("send.to")}</dt>
-              <dd className="text-right">
+              <dd className="text-end">
                 {quote.to?.acct_num ?? ends.toAcctNum}
               </dd>
             </div>

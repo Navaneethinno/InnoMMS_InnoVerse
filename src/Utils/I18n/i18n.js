@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en";
 import pt from "./locales/pt";
+import ar from "./locales/ar";
 import { setApiLanguage } from "@/Utils/Lib/apiLanguage";
 let language = "en";
 try {
@@ -12,7 +13,7 @@ try {
 i18n
   .use(initReactI18next)
   .init({
-    resources: { en: { translation: en }, pt: { translation: pt } },
+    resources: { en: { translation: en }, pt: { translation: pt }, ar: { translation: ar } },
     lng: language,
     fallbackLng: "en",
     keySeparator: false,
@@ -22,12 +23,17 @@ i18n
   });
 // {{brand, uppercase}} for the eyebrows that are written in capitals.
 i18n.services.formatter?.add("uppercase", (value) => String(value).toUpperCase());
-document.documentElement.lang = i18n.language || "en";
+// Arabic (and any other right-to-left language) mirrors the whole layout.
+const applyDirection = (lng) => {
+  document.documentElement.lang = lng;
+  document.documentElement.dir = i18n.dir(lng);
+};
+applyDirection(i18n.language || "en");
 // The API translates its messages by the x-api-lang header, so it always
 // follows the app language.
 setApiLanguage(i18n.language || "en");
 i18n.on("languageChanged", (lng) => {
-  document.documentElement.lang = lng;
+  applyDirection(lng);
   setApiLanguage(lng);
   try {
     localStorage.setItem("innoverse-merchant:language", lng);

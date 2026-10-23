@@ -35,7 +35,7 @@ export default function TextField({
         {Icon && (
           <Icon
             aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400"
+            className="pointer-events-none absolute start-4 top-4 h-4 w-4 text-slate-400"
           />
         )}
         <input
@@ -46,10 +46,10 @@ export default function TextField({
           type={type === "password" && visible ? "text" : type}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={cn("field-control", Icon && "pl-11", type === "password" && "pr-12", className)}
+          className={cn("field-control", Icon && "ps-11", type === "password" && "pe-12", className)}
         />
         {endAdornment && (
-          <div className="absolute inset-y-0 right-3 flex items-center">{endAdornment}</div>
+          <div className="absolute inset-y-0 end-3 flex items-center">{endAdornment}</div>
         )}
         {type === "password" && (
           <button
@@ -59,7 +59,7 @@ export default function TextField({
             )}
             aria-pressed={visible}
             onClick={() => setVisible(!visible)}
-            className="absolute right-3 top-3 rounded-md p-1 text-slate-400 hover:text-ink"
+            className="absolute end-3 top-3 rounded-md p-1 text-slate-400 hover:text-ink"
           >
             {visible ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>

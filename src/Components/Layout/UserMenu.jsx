@@ -46,7 +46,7 @@ export default function UserMenu({ user }) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t("nav.account")}
-        className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2 text-left transition hover:bg-ink/5 sm:pr-3"
+        className="flex items-center gap-2.5 rounded-full py-1 ps-1 pe-2 text-start transition hover:bg-ink/5 sm:pe-3"
       >
         <Avatar name={name} className="h-9 w-9" />
         <span className="hidden min-w-0 leading-tight sm:block">
@@ -61,7 +61,7 @@ export default function UserMenu({ user }) {
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 top-full z-40 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-surface p-1.5 shadow-xl">
+        <div role="menu" className="absolute end-0 top-full z-40 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-surface p-1.5 shadow-xl">
           <div className="px-2.5 pb-2 pt-1.5">
             <p className="truncate text-[13px] font-bold text-slate-800">{name}</p>
             {role && <p className="truncate text-[11px] font-semibold text-ink">{role}</p>}

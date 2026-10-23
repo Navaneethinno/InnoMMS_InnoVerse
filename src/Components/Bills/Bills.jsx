@@ -218,7 +218,7 @@ export default function Bills() {
             <label className="relative block">
               <Search
                 size={15}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
                 type="search"
@@ -230,17 +230,17 @@ export default function Bills() {
                 aria-label={t("bills.search", {
                   defaultValue: "Search billers",
                 })}
-                className="w-full rounded-xl border border-slate-200 bg-surface py-2.5 pl-9 pr-3 text-sm outline-none focus:border-ink/40 focus:ring-2 focus:ring-ink/10"
+                className="w-full rounded-xl border border-slate-200 bg-surface py-2.5 ps-9 pe-3 text-sm outline-none focus:border-ink/40 focus:ring-2 focus:ring-ink/10"
               />
             </label>
           )}
-          <div className="grid max-h-[26rem] grid-cols-1 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+          <div className="grid max-h-[26rem] grid-cols-1 gap-2 overflow-y-auto pe-1 sm:grid-cols-2">
             {shown.map((b) => (
               <button
                 key={b.code}
                 type="button"
                 onClick={() => pickBiller(b.code)}
-                className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-left transition hover:border-ink/40 hover:bg-ink/5"
+                className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-start transition hover:border-ink/40 hover:bg-ink/5"
               >
                 <span className="brand-gradient flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black text-lime">
                   {nameOf(b).slice(0, 2).toUpperCase()}

@@ -79,7 +79,7 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
   const neededFor = (field) => {
     const name = field.kyc_level_no != null ? levelName(field.kyc_level_no) : null;
     return name ? (
-      <span className="ml-2 rounded-full bg-ink/10 px-2 py-0.5 text-[10px] font-semibold text-ink">{t("onb.neededFor", { name })}</span>
+      <span className="ms-2 rounded-full bg-ink/10 px-2 py-0.5 text-[10px] font-semibold text-ink">{t("onb.neededFor", { name })}</span>
     ) : null;
   };
 
@@ -256,7 +256,7 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
       {/* Step list: where you are, what's done. */}
       <aside className="hidden self-start lg:sticky lg:top-[7.5rem] lg:block">
         <div data-tour="progress" className="isolate relative flex max-h-[calc(100dvh-8.5rem)] flex-col overflow-hidden rounded-3xl brand-gradient p-6 text-white shadow-xl shadow-forest/10 dark:ring-1 dark:ring-white/10">
-          <div aria-hidden="true" className="orbit -bottom-40 -right-32 h-[360px] w-[360px]" />
+          <div aria-hidden="true" className="orbit -bottom-40 -end-32 h-[360px] w-[360px]" />
           <p className="shrink-0 text-[11px] font-medium uppercase tracking-[0.2em] text-lime">{t("onb.progress")}</p>
           <div className="mt-3 flex shrink-0 items-end justify-between">
             <span className="text-3xl font-semibold tracking-tight">{percent}%</span>
@@ -267,12 +267,12 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
           <div className="mt-3 h-1.5 shrink-0 overflow-hidden rounded-full bg-white/15">
             <div className="h-full rounded-full bg-lime transition-all" style={{ width: `${percent}%` }} />
           </div>
-          <ol className="relative mt-6 grid min-h-0 gap-0.5 overflow-y-auto overscroll-contain brand-scrollbar pr-1">
+          <ol className="relative mt-6 grid min-h-0 gap-0.5 overflow-y-auto overscroll-contain brand-scrollbar pe-1">
             {menu.map((item) => (
               <li
                 key={item.key}
                 aria-current={item.current ? "step" : undefined}
-                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm ${
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start text-sm ${
                   item.current ? "bg-white/10 text-white" : "text-white/65"
                 }`}
               >

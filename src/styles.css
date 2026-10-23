@@ -299,3 +299,24 @@ html.dark:root {
 @media (prefers-reduced-motion: reduce) {
   .sidebar-nav > *, .sidebar-label, .sidebar-active, .sidebar-bar, .drawer-backdrop, .drawer-panel { animation: none; }
 }
+
+/* Right-to-left (Arabic). Layout spacing uses start/end utilities and mirrors
+   by itself; what is left here is motion that names a side, icons that point
+   a way, and numbers, which are still typed left to right. */
+@keyframes slide-in-x-rtl {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes drawer-in-rtl {
+  from { transform: translateX(calc(100% + 1rem)); }
+  to { transform: none; }
+}
+[dir="rtl"] .sidebar-nav > * { animation-name: slide-in-x-rtl; }
+[dir="rtl"] .drawer-panel { animation-name: drawer-in-rtl; }
+[dir="rtl"] :is(.lucide-arrow-right, .lucide-arrow-left, .lucide-chevron-right, .lucide-chevron-left, .lucide-chevrons-right, .lucide-chevrons-left, .lucide-arrow-right-left, .lucide-undo-2, .lucide-log-out, .lucide-log-in) {
+  transform: scaleX(-1);
+}
+[dir="rtl"] :is(input[type="tel"], input[inputmode="numeric"], input[inputmode="decimal"], input[type="password"][inputmode="numeric"]) {
+  direction: ltr;
+  text-align: right;
+}

@@ -36,7 +36,7 @@ export default function FilterSelect({
         }} disabled={disabled}>
         <Select.Trigger
           id={id}
-          className={cn("field-control flex items-center justify-between gap-3 text-left data-[placeholder]:font-normal data-[placeholder]:text-slate-400", className)}
+          className={cn("field-control flex items-center justify-between gap-3 text-start data-[placeholder]:font-normal data-[placeholder]:text-slate-400", className)}
         >
           <span className="min-w-0 flex-1 truncate">
             <Select.Value placeholder={placeholder} />
@@ -60,14 +60,14 @@ export default function FilterSelect({
                   key={option.value}
                   value={option.value}
                   disabled={option.disabled}
-                  className="relative cursor-pointer rounded-lg py-2 pl-8 pr-4 text-sm outline-none data-[highlighted]:bg-ink/10 data-[disabled]:opacity-40"
+                  className="relative cursor-pointer rounded-lg py-2 ps-8 pe-4 text-sm outline-none data-[highlighted]:bg-ink/10 data-[disabled]:opacity-40"
                 >
-                  <Select.ItemIndicator className="absolute left-2">
+                  <Select.ItemIndicator className="absolute start-2">
                     <Check size={14} />
                   </Select.ItemIndicator>
                   <Select.ItemText>
                     {option.image && (
-                      <img src={option.image} alt="" className="mr-2 inline-block h-3.5 w-5 rounded-sm object-cover align-[-2px]" />
+                      <img src={option.image} alt="" className="me-2 inline-block h-3.5 w-5 rounded-sm object-cover align-[-2px]" />
                     )}
                     {option.label}
                   </Select.ItemText>

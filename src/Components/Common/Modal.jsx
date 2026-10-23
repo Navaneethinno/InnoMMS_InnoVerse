@@ -38,7 +38,7 @@ export default function Modal({
             size === "lg" ? "max-w-3xl" : "max-w-md",
           )}
         >
-          <Dialog.Title className="pr-8 text-xl font-semibold text-ink">
+          <Dialog.Title className="pe-8 text-xl font-semibold text-ink">
             {title}
           </Dialog.Title>
           {description && (
@@ -50,7 +50,7 @@ export default function Modal({
           <Dialog.Close
             disabled={pending}
             aria-label={t("common.close")}
-            className="absolute right-4 top-4 rounded-lg p-1 text-slate-500 disabled:opacity-40"
+            className="absolute end-4 top-4 rounded-lg p-1 text-slate-500 disabled:opacity-40"
           >
             <X size={20} />
           </Dialog.Close>

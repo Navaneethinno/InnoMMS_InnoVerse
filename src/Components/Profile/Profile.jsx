@@ -42,14 +42,14 @@ export default function Profile() {
   return (
     <div className="space-y-5">
       {error && <ErrorState message={error} />}
-      <section className="flex flex-col items-center gap-5 rounded-3xl border border-slate-200 bg-surface p-6 text-center shadow-sm sm:flex-row sm:text-left">
+      <section className="flex flex-col items-center gap-5 rounded-3xl border border-slate-200 bg-surface p-6 text-center shadow-sm sm:flex-row sm:text-start">
         <div className="relative shrink-0">
           <AvatarPreview name={header.name} onChange={() => setPhotoOpen(true)} />
           <button
             type="button"
             onClick={() => setPhotoOpen(true)}
             aria-label={t("profile.changePhoto", { defaultValue: "Change photo" })}
-            className="brand-gradient absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-surface text-lime shadow-md transition hover:scale-105"
+            className="brand-gradient absolute -bottom-1 -end-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-surface text-lime shadow-md transition hover:scale-105"
           >
             <Camera size={16} />
           </button>

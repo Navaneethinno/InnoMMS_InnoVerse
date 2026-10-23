@@ -248,7 +248,7 @@ function CardPanel({ card, offer, onDialog, onDone }) {
       {card.history?.length > 0 && (
         <div className="mt-6 border-t border-slate-100 pt-6">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500">{t("cards.history")}</p>
-          <ol className="max-h-64 space-y-2 overflow-y-auto pr-1 text-sm">
+          <ol className="max-h-64 space-y-2 overflow-y-auto pe-1 text-sm">
             {card.history.map((h, i) => (
               <li key={`${h.at}-${i}`} className="flex flex-wrap justify-between gap-x-3">
                 <span className="font-semibold text-slate-700">

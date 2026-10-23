@@ -38,7 +38,7 @@ export default function ModeSwitch({
             aria-checked={on}
             onClick={() => onChange(item.key)}
             className={cn(
-              "group relative flex items-start gap-3.5 rounded-2xl border bg-surface p-4 text-left shadow-sm transition duration-200 active:scale-[0.99] sm:p-5",
+              "group relative flex items-start gap-3.5 rounded-2xl border bg-surface p-4 text-start shadow-sm transition duration-200 active:scale-[0.99] sm:p-5",
               on
                 ? "border-forest ring-2 ring-forest/20 dark:border-lime dark:ring-lime/25"
                 : "border-slate-200 hover:-translate-y-0.5 hover:border-ink/30 hover:shadow-md",
@@ -54,7 +54,7 @@ export default function ModeSwitch({
             >
               {item.icon && createElement(item.icon, { size: 20 })}
             </span>
-            <span className="min-w-0 flex-1 pr-6">
+            <span className="min-w-0 flex-1 pe-6">
               <span
                 className={cn(
                   "block text-base font-black tracking-tight",
@@ -71,7 +71,7 @@ export default function ModeSwitch({
             </span>
             <span
               className={cn(
-                "absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-full border-2 transition duration-200",
+                "absolute end-4 top-4 flex h-5 w-5 items-center justify-center rounded-full border-2 transition duration-200",
                 on
                   ? "scale-100 border-forest bg-forest text-white dark:border-lime dark:bg-lime dark:text-on-secondary"
                   : "scale-90 border-slate-300",
