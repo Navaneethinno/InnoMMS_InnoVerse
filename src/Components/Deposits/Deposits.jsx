@@ -263,8 +263,10 @@ function OpenDepositDialog({ onClose, onDone }) {
     >
       {!offers ? (
         !loadProblem && <p className="text-sm text-slate-500">{t("deposits.loading")}</p>
-      ) : !offers.products?.length ? (
-        <p className="text-sm text-slate-500">{t("deposits.noOffers")}</p>
+      ) : offers.limit?.can_open === false || !offers.products?.length ? (
+        // limit.reason: NO_PRODUCT (nothing on offer) or NO_ACCOUNT (no
+        // active account to pay from or into).
+        <p className="text-sm text-slate-500">{t(offers.limit?.reason === "NO_ACCOUNT" ? "deposits.needAccount" : "deposits.noOffers")}</p>
       ) : (
         <>
           <FilterSelect

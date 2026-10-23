@@ -405,8 +405,10 @@ function ApplyDialog({ onClose, onDone }) {
     >
       {!offers ? (
         !loadProblem && <p className="text-sm text-slate-500">{t("loans.loading")}</p>
-      ) : !offers.products?.length ? (
-        <p className="text-sm text-slate-500">{t("loans.noOffers")}</p>
+      ) : offers.limit?.can_open === false || !offers.products?.length ? (
+        // limit.reason: NO_PRODUCT (nothing on offer) or NO_ACCOUNT (no
+        // active account to pay from or into).
+        <p className="text-sm text-slate-500">{t(offers.limit?.reason === "NO_ACCOUNT" ? "loans.needAccount" : "loans.noOffers")}</p>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2">
