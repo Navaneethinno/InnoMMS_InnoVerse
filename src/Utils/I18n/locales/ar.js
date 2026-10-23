@@ -1479,4 +1479,5 @@ export default {
   "send.balanceAfter": "الرصيد بعد هذه الدفعة",
   "kyc.backToProfile": "العودة إلى ملفي الشخصي",
   "auth.sessionEnded": "انتهت جلستك. سجّل الدخول مجددًا للمتابعة.",
+  "environment.uat": "UAT: بيئة اختبار",
 };
