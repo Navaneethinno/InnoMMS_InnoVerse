@@ -14,6 +14,7 @@ import { authContract } from "./authContract";
 import { deviceInfoHeader } from "./deviceInfo";
 import { notifications } from "@/Utils/Lib/notifications";
 import { portalHeaders } from "./portalHeaders";
+import { noteEnvironment } from "./environment";
 import { forgetCredentialKey, sealBody, syncClock } from "./credentialSeal";
 import { apiLanguageHeader } from "@/Utils/Lib/apiLanguage";
 export function requireEndpoint(endpoint) {
@@ -27,6 +28,19 @@ export const lastApiActivity = () => lastApiAt;
 
 export const api = axios.create({ baseURL: API_BASE_URL, timeout: 30000 });
 const refreshClient = axios.create({ baseURL: API_BASE_URL, timeout: 30000 });
+// Every reply, refused ones included, says which environment the API runs as.
+for (const client of [api, refreshClient]) {
+  client.interceptors.response.use(
+    (response) => {
+      noteEnvironment(response.headers);
+      return response;
+    },
+    (error) => {
+      noteEnvironment(error.response?.headers);
+      return Promise.reject(error);
+    },
+  );
+}
 let refreshPromise = null;
 
 // A new token pair from the refresh token. The refresh token changes every

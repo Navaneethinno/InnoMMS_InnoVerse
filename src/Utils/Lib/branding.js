@@ -1,5 +1,6 @@
 import { STORAGE_KEYS } from "@/Utils/Constant";
 import i18n from "@/Utils/I18n/i18n";
+import { setTabTitle } from "@/Services/api/environment";
 
 // Applies the bank's theme to the portal. Every `forest` / `lime` Tailwind
 // colour reads the CSS variables --color-primary / --color-secondary (RGB
@@ -82,7 +83,7 @@ const DEFAULT_BRAND_NAME = "InnoVerse";
 // nothing else, on every page.
 function setBrandName(name) {
   const brand = String(name ?? "").trim() || DEFAULT_BRAND_NAME;
-  document.title = brand;
+  setTabTitle(brand);
   if (i18n.options.interpolation.defaultVariables?.brand === brand) return;
   i18n.options.interpolation.defaultVariables = { ...i18n.options.interpolation.defaultVariables, brand };
   // Re-render everything that already drew a text.

@@ -1395,4 +1395,5 @@ export default {
   "loans.appStatus.DECLINED": "Declined",
   "loans.appStatus.WITHDRAWN": "Withdrawn",
   "loans.appStatus.CONVERTED": "Loan set up",
+  "environment.uat": "UAT: test environment",
 };

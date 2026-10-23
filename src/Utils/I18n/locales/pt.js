@@ -1400,4 +1400,5 @@ export default {
   "loans.appStatus.DECLINED": "Recusado",
   "loans.appStatus.WITHDRAWN": "Retirado",
   "loans.appStatus.CONVERTED": "Empréstimo criado",
+  "environment.uat": "UAT: ambiente de teste",
 };

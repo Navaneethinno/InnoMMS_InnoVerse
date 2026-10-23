@@ -1,3 +1,4 @@
+import { noteEnvironment } from "./environment";
 import { API_BASE_URL, API_ENDPOINTS } from "@/Utils/Constant";
 
 // Passwords, PINs and one-time codes never travel as readable text: each is
@@ -39,6 +40,7 @@ const toBase64Url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g
 
 async function importKey() {
   const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CREDENTIAL_KEY}`);
+  noteEnvironment(response.headers);
   const payload = await response.json();
   const entry = payload?.data?.[0];
   if (!entry?.spki) throw new Error("No credential key");

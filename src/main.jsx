@@ -5,6 +5,7 @@ import { RouterProvider } from "react-router-dom";
 import { store } from "@/Redux/store";
 import { router } from "@/Router/Router";
 import Toast from "@/Components/Common/Toast";
+import EnvironmentBanner from "@/Components/Common/EnvironmentBanner";
 import BrandingLoader from "@/Components/Common/BrandingLoader";
 import "@/Utils/I18n/i18n";
 import "@/styles.css";
@@ -14,6 +15,7 @@ initTheme();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
+      <EnvironmentBanner />
       <BrandingLoader />
       <RouterProvider router={router} />
       <Toast />
