@@ -159,7 +159,11 @@ api.interceptors.response.use(
       const token = stored && stored !== sent && !isTokenExpired(stored) ? stored : await refreshSession();
       request.headers.Authorization = `Bearer ${token}`;
       return api(request);
-    } catch {
+    } catch (refreshError) {
+      // Signed in again on another device: that sign-in replaced this
+      // session, and the API's own message says so.
+      const refused = refreshError?.response?.data;
+      if (refused?.error_code === "auth.signed_in_elsewhere" && refused.message) notifications.error(refused.message);
       clearAuthSession();
       window.dispatchEvent(new Event("merchant:session-expired"));
       return Promise.reject(error);

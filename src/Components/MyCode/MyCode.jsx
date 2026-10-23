@@ -22,6 +22,8 @@ export default function MyCode() {
   const { t } = useTranslation();
   const user = useSelector((state) => state.auth.user);
   const [code, setCode] = useState(null);
+  // What the QR holds, as the API gives it (the code itself until it does).
+  const [payload, setPayload] = useState("");
   const [problem, setProblem] = useState("");
   const qrRef = useRef(null);
   const staff = isStaff(user);
@@ -29,9 +31,10 @@ export default function MyCode() {
   useEffect(() => {
     if (staff) return;
     loadMyCode()
-      .then((result) =>
-        setCode(result?.merchant_code ? String(result.merchant_code) : ""),
-      )
+      .then((result) => {
+        setCode(result?.merchant_code ? String(result.merchant_code) : "");
+        setPayload(result?.qr_payload ? String(result.qr_payload) : "");
+      })
       .catch((error) => {
         setCode("");
         setProblem(error.message);
@@ -143,7 +146,7 @@ export default function MyCode() {
             className="mt-6 rounded-3xl bg-white p-5 shadow-inner ring-1 ring-slate-200"
           >
             <QRCodeCanvas
-              value={code}
+              value={payload || code}
               size={480}
               level="M"
               marginSize={0}
