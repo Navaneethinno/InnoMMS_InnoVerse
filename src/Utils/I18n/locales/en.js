@@ -1457,7 +1457,7 @@ export default {
   "pos.shiftSaved": "Shift saved. It applies at once.",
   "pos.editShift": "Edit shift",
   "pos.shiftHours": "Working hours",
-  "pos.shiftHoursBad": "Choose at least one day; each needs a start and an end time, and they can't be the same.",
+  "pos.shiftHoursBad": "Each time needs at least one day, and a start and an end time that aren't the same.",
   "pos.shiftChangeHint": "A change applies at once: a user outside their new shift is signed out on their next action.",
   "pos.noShifts": "No shifts yet",
   "pos.noShiftsHint": "A shift limits when a store user may sign in on a terminal. A user without one may sign in any time.",
@@ -1490,4 +1490,6 @@ export default {
   "terminals.idleMinutes": "Sign terminal users out after (minutes idle)",
   "terminals.idleRange": "{{least}} to {{most}} minutes.",
   "terminals.idleNow": "Now: signed out after {{minutes}} minutes of inactivity.",
+  "pos.removeWindow": "Remove this time",
+  "pos.addWindow": "Add another time (e.g. after a break)",
 };

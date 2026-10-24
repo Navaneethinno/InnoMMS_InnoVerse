@@ -1462,7 +1462,7 @@ export default {
   "pos.shiftSaved": "Turno guardado. Aplica-se de imediato.",
   "pos.editShift": "Editar turno",
   "pos.shiftHours": "Horário de trabalho",
-  "pos.shiftHoursBad": "Escolha pelo menos um dia; cada um precisa de hora de início e de fim, que não podem ser iguais.",
+  "pos.shiftHoursBad": "Cada horário precisa de pelo menos um dia e de horas de início e fim diferentes.",
   "pos.shiftChangeHint": "Uma alteração aplica-se de imediato: um utilizador fora do novo turno sai na próxima ação.",
   "pos.noShifts": "Ainda sem turnos",
   "pos.noShiftsHint": "Um turno limita quando um utilizador da loja pode entrar num terminal. Sem turno, pode entrar a qualquer hora.",
@@ -1495,4 +1495,6 @@ export default {
   "terminals.idleMinutes": "Terminar a sessão após (minutos sem atividade)",
   "terminals.idleRange": "{{least}} a {{most}} minutos.",
   "terminals.idleNow": "Agora: a sessão termina após {{minutes}} minutos sem atividade.",
+  "pos.removeWindow": "Remover este horário",
+  "pos.addWindow": "Adicionar outro horário (ex.: após uma pausa)",
 };

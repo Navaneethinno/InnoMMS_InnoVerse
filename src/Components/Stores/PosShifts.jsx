@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Clock, Pencil } from "lucide-react";
+import { Clock, Pencil, Plus, Trash2 } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import EmptyState from "@/Components/Common/EmptyState";
 import ErrorState from "@/Components/Common/ErrorState";
@@ -11,22 +11,70 @@ import { ListSearch, NoMatches, ShowMore } from "@/Components/Common/ListControl
 import { useListControls } from "@/Hooks/Common/useListControls";
 import { savePosShift, setPosShiftActive } from "@/Services/Pos/pos.api";
 import { notifications } from "@/Utils/Lib/notifications";
-import StoreHoursEditor, { hoursText, rulesToWeek, weekToRules, weekValid } from "./StoreHours";
+import { dayName, hoursText } from "./StoreHours";
+import { cn } from "@/Utils/Lib/utils";
 import { ActiveToggle, Pill, StatusPill } from "./posShared";
 
 // Shifts (owner): when a store user may sign in and work on a terminal, as
-// windows like a store's opening hours. A user outside their shift is signed
-// out on their next action.
+// windows [{ days: [1..7], opens, closes }] like a store's opening hours, but
+// a day may have several (a split shift: 08:00–12:00 and 14:00–18:00). A
+// window that closes before it opens runs past midnight. A user outside their
+// shift is signed out on their next action.
+const DAYS = [1, 2, 3, 4, 5, 6, 7];
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+const windowValid = (w) => w.days.length > 0 && TIME.test(w.opens) && TIME.test(w.closes) && w.opens !== w.closes;
+
+function ShiftWindows({ windows, onChange }) {
+  const { t, i18n } = useTranslation();
+  const set = (i, patch) => onChange(windows.map((w, j) => (j === i ? { ...w, ...patch } : w)));
+  const toggleDay = (i, d) => set(i, { days: windows[i].days.includes(d) ? windows[i].days.filter((x) => x !== d) : [...windows[i].days, d].sort() });
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-semibold text-slate-700">{t("pos.shiftHours", { defaultValue: "Working hours" })}</p>
+      {windows.map((w, i) => (
+        <div key={i} className={cn("space-y-2 rounded-2xl border p-3", windowValid(w) ? "border-slate-200" : "border-red-300")}>
+          <div className="flex flex-wrap gap-1.5">
+            {DAYS.map((d) => (
+              <button
+                key={d}
+                type="button"
+                aria-pressed={w.days.includes(d)}
+                onClick={() => toggleDay(i, d)}
+                className={cn("rounded-lg px-2.5 py-1 text-xs font-semibold", w.days.includes(d) ? "bg-ink text-white" : "bg-ink/5 text-slate-600 hover:bg-ink/10")}
+              >
+                {dayName(d, i18n.language)}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <input type="time" aria-label={t("stores.opens", { defaultValue: "Opens" })} className="field-control w-28 py-1.5" value={w.opens} onChange={(e) => set(i, { opens: e.target.value })} />
+            <span className="text-slate-400">–</span>
+            <input type="time" aria-label={t("stores.closes", { defaultValue: "Closes" })} className={cn("field-control w-28 py-1.5", w.opens === w.closes && "border-red-400")} value={w.closes} onChange={(e) => set(i, { closes: e.target.value })} />
+            {TIME.test(w.opens) && TIME.test(w.closes) && w.closes < w.opens && <span className="text-xs text-slate-500">{t("pos.nextDay", { defaultValue: "(next day)" })}</span>}
+            {windows.length > 1 && (
+              <button type="button" aria-label={t("pos.removeWindow", { defaultValue: "Remove this time" })} onClick={() => onChange(windows.filter((_, j) => j !== i))} className="ms-auto rounded-lg p-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-600">
+                <Trash2 size={15} />
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+      <button type="button" onClick={() => onChange([...windows, { days: [], opens: "14:00", closes: "18:00" }])} className="flex items-center gap-1 text-xs font-semibold text-ink hover:underline">
+        <Plus size={13} /> {t("pos.addWindow", { defaultValue: "Add another time (e.g. after a break)" })}
+      </button>
+    </div>
+  );
+}
+
 export function ShiftDialog({ shift, onClose, onSaved }) {
   const { t } = useTranslation();
   const editing = Boolean(shift?.id);
   const [name, setName] = useState(shift?.name ?? "");
   // A new shift starts on weekdays, 08:00–17:00.
-  const [week, setWeek] = useState(() => (shift ? rulesToWeek(shift.windows) : Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map((d) => [d, { open: d <= 5, opens: "08:00", closes: "17:00" }]))));
+  const [windows, setWindows] = useState(() => (shift?.windows?.length ? shift.windows.map((w) => ({ days: [...(w.days ?? [])], opens: w.opens, closes: w.closes })) : [{ days: [1, 2, 3, 4, 5], opens: "08:00", closes: "17:00" }]));
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
-  const windows = weekToRules(week);
-  const bad = !weekValid(week) || !windows.length;
+  const bad = !windows.length || !windows.every(windowValid);
   const submit = async (event) => {
     event.preventDefault();
     setPending(true);
@@ -47,8 +95,8 @@ export function ShiftDialog({ shift, onClose, onSaved }) {
         {problem && <ErrorState message={problem} />}
         <TextField name="name" maxLength={64} label={t("pos.name", { defaultValue: "Name" })} value={name} onChange={(event) => setName(event.target.value)} />
         <div>
-          <StoreHoursEditor week={week} onChange={setWeek} label={t("pos.shiftHours", { defaultValue: "Working hours" })} />
-          {bad && <p className="mt-2 text-xs text-red-600">{t("pos.shiftHoursBad", { defaultValue: "Choose at least one day; each needs a start and an end time, and they can't be the same." })}</p>}
+          <ShiftWindows windows={windows} onChange={setWindows} />
+          {bad && <p className="mt-2 text-xs text-red-600">{t("pos.shiftHoursBad", { defaultValue: "Each time needs at least one day, and a start and an end time that aren't the same." })}</p>}
         </div>
         {editing && <p className="text-xs text-slate-500">{t("pos.shiftChangeHint", { defaultValue: "A change applies at once: a user outside their new shift is signed out on their next action." })}</p>}
         <div className="flex justify-end gap-3 pt-2">

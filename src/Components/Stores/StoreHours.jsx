@@ -7,7 +7,7 @@ import { cn } from "@/Utils/Lib/utils";
 const DAYS = [1, 2, 3, 4, 5, 6, 7];
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-const dayName = (n, locale, style = "short") => new Date(Date.UTC(2024, 0, n)).toLocaleDateString(locale, { timeZone: "UTC", weekday: style });
+export const dayName = (n, locale, style = "short") => new Date(Date.UTC(2024, 0, n)).toLocaleDateString(locale, { timeZone: "UTC", weekday: style });
 
 // Rules -> { 1: { open, opens, closes }, ... 7 }.
 export function rulesToWeek(rules) {
@@ -43,8 +43,7 @@ export function hoursText(rules, locale, nextDay) {
   return rules.map((r) => `${runs(r.days ?? [])} ${r.opens}–${r.closes}${nextDay && r.closes < r.opens ? ` ${nextDay}` : ""}`).join(" · ");
 }
 
-// `label`: the heading (a store's opening hours unless given).
-export default function StoreHoursEditor({ week, onChange, label }) {
+export default function StoreHoursEditor({ week, onChange }) {
   const { t, i18n } = useTranslation();
   const setDay = (d, patch) => onChange({ ...week, [d]: { ...week[d], ...patch } });
   // Monday's hours on every weekday, the usual starting point.
@@ -52,7 +51,7 @@ export default function StoreHoursEditor({ week, onChange, label }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-slate-700">{label ?? t("stores.hours", { defaultValue: "Opening hours (optional)" })}</p>
+        <p className="text-sm font-semibold text-slate-700">{t("stores.hours", { defaultValue: "Opening hours (optional)" })}</p>
         <button type="button" onClick={copyMonday} disabled={!week[1].open} className="text-xs font-semibold text-ink hover:underline disabled:opacity-40">
           {t("stores.hoursCopyMonday", { defaultValue: "Use Monday's hours Tue–Fri" })}
         </button>
