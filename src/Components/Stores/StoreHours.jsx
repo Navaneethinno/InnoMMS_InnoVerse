@@ -32,17 +32,19 @@ export function weekToRules(week) {
 export const weekValid = (week) => DAYS.every((d) => !week[d]?.open || (TIME.test(week[d].opens) && TIME.test(week[d].closes) && week[d].opens !== week[d].closes));
 
 // "Mon–Fri 08:00–18:00 · Sat 09:00–13:00", or null when no hours are given.
-export function hoursText(rules, locale) {
+// `nextDay` (e.g. "(next day)") follows a window that runs past midnight.
+export function hoursText(rules, locale, nextDay) {
   if (!Array.isArray(rules) || !rules.length) return null;
   const runs = (days) => {
     const out = [];
     [...new Set(days.map(Number))].sort((a, b) => a - b).forEach((d) => (out.length && out.at(-1)[1] === d - 1 ? (out.at(-1)[1] = d) : out.push([d, d])));
     return out.map(([a, b]) => (a === b ? dayName(a, locale) : `${dayName(a, locale)}–${dayName(b, locale)}`)).join(", ");
   };
-  return rules.map((r) => `${runs(r.days ?? [])} ${r.opens}–${r.closes}`).join(" · ");
+  return rules.map((r) => `${runs(r.days ?? [])} ${r.opens}–${r.closes}${nextDay && r.closes < r.opens ? ` ${nextDay}` : ""}`).join(" · ");
 }
 
-export default function StoreHoursEditor({ week, onChange }) {
+// `label`: the heading (a store's opening hours unless given).
+export default function StoreHoursEditor({ week, onChange, label }) {
   const { t, i18n } = useTranslation();
   const setDay = (d, patch) => onChange({ ...week, [d]: { ...week[d], ...patch } });
   // Monday's hours on every weekday, the usual starting point.
@@ -50,7 +52,7 @@ export default function StoreHoursEditor({ week, onChange }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-slate-700">{t("stores.hours", { defaultValue: "Opening hours (optional)" })}</p>
+        <p className="text-sm font-semibold text-slate-700">{label ?? t("stores.hours", { defaultValue: "Opening hours (optional)" })}</p>
         <button type="button" onClick={copyMonday} disabled={!week[1].open} className="text-xs font-semibold text-ink hover:underline disabled:opacity-40">
           {t("stores.hoursCopyMonday", { defaultValue: "Use Monday's hours Tue–Fri" })}
         </button>

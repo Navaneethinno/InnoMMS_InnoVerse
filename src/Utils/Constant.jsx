@@ -78,6 +78,8 @@ const contactsPath = channelPath("contacts");
 const agentPath = channelPath("agent");
 const storePath = channelPath("store");
 const terminalPath = channelPath("terminal");
+const posProfilePath = channelPath("pos_profile");
+const posShiftPath = channelPath("pos_shift");
 const casePath = channelPath("case");
 export const API_ENDPOINTS = {
   // WebSocket path (the host is API_BASE_URL with ws/wss).
@@ -252,7 +254,12 @@ export const API_ENDPOINTS = {
     LIST: terminalPath("list"),
     SETUP: terminalPath("setup"),
     BLOCK_REQUEST: terminalPath("block_request"),
+    SETTINGS: terminalPath("settings"),
+    SETTINGS_SET: terminalPath("settings_set"),
   },
+  // What a store user may do on a terminal (profiles) and when (shifts).
+  POS_PROFILE: Object.fromEntries(["txn_types", "list", "add", "edit", "status"].map((call) => [call, posProfilePath(call)])),
+  POS_SHIFT: Object.fromEntries(["list", "add", "edit", "status"].map((call) => [call, posShiftPath(call)])),
 };
 // Until the API says otherwise (the `session` block of sign-in and refresh): a
 // web session unused for this long ends on the server, and the portal signs the

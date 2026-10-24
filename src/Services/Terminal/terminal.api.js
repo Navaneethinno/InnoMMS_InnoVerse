@@ -26,3 +26,11 @@ export const setupTerminal = ({ id, storeId, name, userIds = [] }) =>
 // Owner only: ask the bank to block it (lost, stolen, broken).
 export const requestTerminalBlock = (id, reason) =>
   portalPost(TERMINAL.BLOCK_REQUEST, { id, reason });
+// How long a terminal session may stay idle: { idle_seconds (the merchant's
+// own, or null), institution_idle_seconds (the bank's, the most allowed),
+// effective_idle_seconds, min_idle_seconds }.
+export const loadTerminalSettings = async () =>
+  (await portalPost(TERMINAL.SETTINGS)).data;
+// Owner only: seconds, or null for the bank's setting.
+export const saveTerminalSettings = async (idleSeconds) =>
+  (await portalPost(TERMINAL.SETTINGS_SET, { idle_seconds: idleSeconds })).data;

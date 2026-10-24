@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle, MonitorSmartphone, Settings2 } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import CheckList from "@/Components/Common/CheckList";
+import CheckboxPill from "@/Components/Common/CheckboxPill";
 import EmptyState from "@/Components/Common/EmptyState";
 import ErrorState from "@/Components/Common/ErrorState";
 import FilterSelect from "@/Components/Common/FilterSelect";
@@ -18,7 +19,9 @@ import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
 import { loadStores, loadStoreUsers } from "@/Services/Store/store.api";
 import {
+  loadTerminalSettings,
   loadTerminals,
+  saveTerminalSettings,
   requestTerminalBlock,
   setupTerminal,
 } from "@/Services/Terminal/terminal.api";
@@ -173,6 +176,9 @@ function SetupDialog({ terminal, stores, users, onClose, onSaved }) {
             {t("terminals.whoHint", {
               defaultValue:
                 "Tick none to let every user of the store sign in. You can always sign in.",
+            })}{" "}
+            {t("terminals.whoSignOut", {
+              defaultValue: "Anyone signed in who is no longer allowed is signed out at once.",
             })}
           </p>
           <CheckList
@@ -265,9 +271,76 @@ function BlockDialog({ terminal, onClose, onSaved }) {
   );
 }
 
+// Owner only: how long a terminal session may stay idle, up to the bank's
+// setting (or the bank's own, `null`).
+function IdleSettings() {
+  const { t } = useTranslation();
+  const [settings, setSettings] = useState(null);
+  const [minutes, setMinutes] = useState("");
+  const [useBank, setUseBank] = useState(true);
+  const [pending, setPending] = useState(false);
+  const show = (value) => {
+    setSettings(value);
+    setUseBank(value?.idle_seconds == null);
+    setMinutes(String(Math.round((value?.effective_idle_seconds ?? 0) / 60)));
+  };
+  useEffect(() => {
+    loadTerminalSettings()
+      .then(show)
+      .catch(() => setSettings(false));
+  }, []);
+  if (!settings) return null;
+  const least = Math.ceil(settings.min_idle_seconds / 60);
+  const most = Math.floor(settings.institution_idle_seconds / 60);
+  const value = Number(minutes);
+  const bad = !useBank && !(Number.isInteger(value) && value >= least && value <= most);
+  const save = async () => {
+    setPending(true);
+    try {
+      show(await saveTerminalSettings(useBank ? null : value * 60));
+      notifications.success(t("terminals.idleSaved", { defaultValue: "Saved." }));
+    } catch (error) {
+      notifications.error(error.message);
+    } finally {
+      setPending(false);
+    }
+  };
+  return (
+    <section className="mb-6 rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm">
+      <p className="text-sm font-bold text-slate-800">{t("terminals.settings", { defaultValue: "Terminal settings" })}</p>
+      <div className="mt-3 flex flex-wrap items-end gap-4">
+        <CheckboxPill
+          label={t("terminals.useBank", { minutes: Math.round(settings.institution_idle_seconds / 60), defaultValue: "Use the bank's setting ({{minutes}} min)" })}
+          checked={useBank}
+          onChange={(event) => setUseBank(event.target.checked)}
+        />
+        {!useBank && (
+          <div className="w-64">
+            <TextField
+              name="idle_minutes"
+              inputMode="numeric"
+              label={t("terminals.idleMinutes", { defaultValue: "Sign terminal users out after (minutes idle)" })}
+              value={minutes}
+              error={bad ? t("terminals.idleRange", { least, most, defaultValue: "{{least}} to {{most}} minutes." }) : undefined}
+              onChange={(event) => setMinutes(event.target.value.replace(/\D/g, ""))}
+            />
+          </div>
+        )}
+        <Button pending={pending} disabled={bad} onClick={save} className="px-4 py-2.5">
+          {t("common.save", { defaultValue: "Save" })}
+        </Button>
+      </div>
+      <p className="mt-2 text-xs text-slate-500">
+        {t("terminals.idleNow", { minutes: Math.round(settings.effective_idle_seconds / 60), defaultValue: "Now: signed out after {{minutes}} minutes of inactivity." })}
+      </p>
+    </section>
+  );
+}
+
 export default function Terminals() {
   const { t } = useTranslation();
-  const owner = isOwner(useSelector((state) => state.auth.user));
+  const user = useSelector((state) => state.auth.user);
+  const owner = isOwner(user);
   const [terminals, setTerminals] = useState(null);
   const [stores, setStores] = useState([]);
   const [users, setUsers] = useState([]);
@@ -324,6 +397,7 @@ export default function Terminals() {
           })}
         </p>
       </div>
+      {user?.features?.terminal_profiles === true && <IdleSettings />}
       {problem && (
         <div className="mb-4">
           <ErrorState message={problem} onRetry={load} />

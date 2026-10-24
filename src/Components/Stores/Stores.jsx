@@ -60,6 +60,9 @@ import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { isOwner, isOwnMoney, roleName, staffRole } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
 import StoreMap, { UseMyLocation, validPoint } from "./StoreMap";
+import { loadPosProfiles, loadPosShifts, loadTxnTypes } from "@/Services/Pos/pos.api";
+import PosProfiles, { ProfileDialog } from "./PosProfiles";
+import PosShifts, { ShiftDialog } from "./PosShifts";
 import StoreHoursEditor, { hoursText, rulesToWeek, weekToRules, weekValid } from "./StoreHours";
 import { PageHeading } from "@/Components/Common/PageTitle";
 import SectionTabs from "@/Components/Common/SectionTabs";
@@ -69,8 +72,10 @@ import { Balance, balanceText, useBalancesShown } from "@/Components/Common/Bala
 // (phase 6). The owner (the merchant) adds stores, which wait for the bank; adds
 // store managers and cashiers who sign in to this portal with their own phone
 // and PIN and work only in their stores; and moves money between the main
-// wallet and a store's own wallet. A store manager sees its stores and their
-// users, read-only; a cashier its stores.
+// wallet and a store's own wallet. The owner also sets terminal profiles (what
+// a user may do on a terminal) and shifts (when). A store manager sees its
+// stores and their users, and manages their cashiers when the owner allows it
+// (features.manage_store_users); a cashier sees its stores.
 const STORE_STATUS = {
   PENDING: [
     "stores.status.PENDING",
@@ -113,7 +118,13 @@ const EMPTY_USER = {
   pin: "",
   refund_limit: "",
   status: "ACTIVE",
+  operator_id: "",
+  pos_profile_id: "0",
+  pos_shift_id: "0",
+  can_manage_cashiers: false,
 };
+// Operator IDs: 2-8 digits, for signing in on a terminal instead of the phone.
+const OPERATOR_ID = /^\d{2,8}$/;
 
 // The rule for store users' PINs (auth/me staff_pin_rules), not the owner's own.
 function useStaffPinRules() {
@@ -346,7 +357,11 @@ function StoreDialog({ store, onClose, onSaved }) {
   );
 }
 
-function UserDialog({ user, stores, onClose, onSaved }) {
+// `managerMode`: a store manager the owner lets manage its stores' cashiers
+// (cashiers only; no refund limit or "manages cashiers" of their own).
+// `profiles` / `shifts`: what may be given (Active; for a manager, the
+// profiles the owner made assignable).
+function UserDialog({ user, stores, profiles, shifts, managerMode, onClose, onSaved }) {
   const { t } = useTranslation();
   const portalPolicy = usePortalPolicy();
   const pinRules = useStaffPinRules();
@@ -360,9 +375,24 @@ function UserDialog({ user, stores, onClose, onSaved }) {
           refund_limit:
             user.refund_limit != null ? String(Number(user.refund_limit)) : "",
           pin: "",
+          operator_id: user.operator_id ?? "",
+          pos_profile_id: String(user.pos_profile?.id ?? 0),
+          pos_shift_id: String(user.pos_shift?.id ?? 0),
+          can_manage_cashiers: Boolean(user.can_manage_cashiers),
         }
       : EMPTY_USER,
   );
+  // What the user had: a field left as it was isn't sent, so an inactive
+  // profile or shift they still hold stays.
+  const [initial] = useState(form);
+  const changed = (key) => !editing || form[key] !== initial[key];
+  const operatorBad = form.operator_id !== "" && !OPERATOR_ID.test(form.operator_id);
+  const choices = (items, current, none) => [
+    { value: "0", label: none },
+    ...items.filter((item) => item.status === "ACTIVE").map((item) => ({ value: String(item.id), label: item.name })),
+    // Still shown when it can't be given any more (inactive, not assignable).
+    ...(current && !items.some((item) => item.id === current.id && item.status === "ACTIVE") ? [{ value: String(current.id), label: current.name }] : []),
+  ];
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
   const manager = form.role === "STORE_MANAGER";
@@ -383,6 +413,11 @@ function UserDialog({ user, stores, onClose, onSaved }) {
         ...(manager && form.refund_limit !== ""
           ? { refund_limit: form.refund_limit }
           : {}),
+        // Only what changed: "" clears the operator ID; 0 is no profile / any time.
+        ...(changed("operator_id") && (editing || form.operator_id) ? { operator_id: form.operator_id } : {}),
+        ...(changed("pos_profile_id") ? { pos_profile_id: Number(form.pos_profile_id) } : {}),
+        ...(changed("pos_shift_id") ? { pos_shift_id: Number(form.pos_shift_id) } : {}),
+        ...(!managerMode && manager && changed("can_manage_cashiers") ? { can_manage_cashiers: form.can_manage_cashiers } : {}),
       };
       await saveStoreUser(body);
       notifications.success(
@@ -414,14 +449,16 @@ function UserDialog({ user, stores, onClose, onSaved }) {
     >
       <form noValidate onSubmit={submit} className="space-y-4">
         {problem && <ErrorState message={problem} />}
-        <SegmentedTabs
-          items={[
-            { key: "CASHIER", label: roleName("CASHIER", t) },
-            { key: "STORE_MANAGER", label: roleName("STORE_MANAGER", t) },
-          ]}
-          value={form.role}
-          onChange={(role) => setForm((previous) => ({ ...previous, role }))}
-        />
+        {!managerMode && (
+          <SegmentedTabs
+            items={[
+              { key: "CASHIER", label: roleName("CASHIER", t) },
+              { key: "STORE_MANAGER", label: roleName("STORE_MANAGER", t) },
+            ]}
+            value={form.role}
+            onChange={(role) => setForm((previous) => ({ ...previous, role }))}
+          />
+        )}
         <p className="text-xs text-slate-500">
           {manager
             ? t("storeUsers.managerHint", {
@@ -476,7 +513,7 @@ function UserDialog({ user, stores, onClose, onSaved }) {
               }
             />
           )}
-          {manager && (
+          {manager && !managerMode && (
             <TextField
               name="refund_limit"
               inputMode="decimal"
@@ -492,7 +529,43 @@ function UserDialog({ user, stores, onClose, onSaved }) {
               }
             />
           )}
+          <TextField
+            name="operator_id"
+            inputMode="numeric"
+            maxLength={8}
+            autoComplete="off"
+            label={t("storeUsers.operatorId", { defaultValue: "Operator ID (optional)" })}
+            value={form.operator_id}
+            error={operatorBad ? t("storeUsers.operatorIdRule", { defaultValue: "2 to 8 digits." }) : undefined}
+            onChange={(event) =>
+              setForm((previous) => ({ ...previous, operator_id: event.target.value.replace(/\D/g, "") }))
+            }
+          />
+          <FilterSelect
+            label={t("storeUsers.posProfile", { defaultValue: "Terminal profile" })}
+            value={form.pos_profile_id}
+            onChange={(id) => setForm((previous) => ({ ...previous, pos_profile_id: id }))}
+            options={choices(profiles, user?.pos_profile, t("storeUsers.noProfile", { defaultValue: "None" }))}
+          />
+          <FilterSelect
+            label={t("storeUsers.posShift", { defaultValue: "Shift" })}
+            value={form.pos_shift_id}
+            onChange={(id) => setForm((previous) => ({ ...previous, pos_shift_id: id }))}
+            options={choices(shifts, user?.pos_shift, t("storeUsers.anyTime", { defaultValue: "Any time" }))}
+          />
         </div>
+        <p className="text-xs text-slate-500">
+          {t("storeUsers.operatorIdHint", { defaultValue: "With an operator ID they can sign in on a terminal with it instead of their phone." })}
+        </p>
+        {manager && !managerMode && (
+          <CheckboxPill
+            label={t("storeUsers.canManageCashiers", { defaultValue: "May manage cashiers of their stores (add, edit, new PIN)" })}
+            checked={form.can_manage_cashiers}
+            onChange={(event) =>
+              setForm((previous) => ({ ...previous, can_manage_cashiers: event.target.checked }))
+            }
+          />
+        )}
         <div>
           <p className="mb-2 text-sm font-semibold text-slate-700">
             {t("storeUsers.stores", { defaultValue: "Works in" })}
@@ -522,6 +595,13 @@ function UserDialog({ user, stores, onClose, onSaved }) {
             }
           />
         )}
+        {editing && (
+          <ul className="list-disc space-y-1 ps-5 text-xs text-slate-500">
+            <li>{t("storeUsers.storeOffHint", { defaultValue: "Taking them off a store signs them out of that store's terminals at once." })}</li>
+            <li>{t("storeUsers.shiftHint", { defaultValue: "A shift change applies at once: outside their new shift they are signed out on their next action." })}</li>
+            <li>{t("storeUsers.profileHint", { defaultValue: "A profile change applies from their next transaction." })}</li>
+          </ul>
+        )}
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="secondary" disabled={pending} onClick={onClose}>
             {t("common.cancel")}
@@ -532,6 +612,7 @@ function UserDialog({ user, stores, onClose, onSaved }) {
             disabled={
               !form.name.trim() ||
               !form.store_ids.length ||
+              operatorBad ||
               (!editing &&
                 (form.phone_number.replace(/\D/g, "").length < 7 || pinShort))
             }
@@ -839,18 +920,25 @@ export default function Stores() {
   const owner = isOwner(user);
   // A cashier may list stores only; a manager also sees users and wallets.
   const canSeeUsers = owner || staffRole(user) === "STORE_MANAGER";
+  // The owner manages terminal profiles and shifts; the owner, or a manager
+  // the owner allowed, adds and edits users (a manager: its cashiers only).
+  const managesProfiles = user?.features?.terminal_profiles === true;
+  const managesUsers = user?.features?.manage_store_users === true;
+  const managerMode = managesUsers && !owner;
+  const mayEdit = (person) => managesUsers && (!managerMode || person.role === "CASHIER");
   // ?tab=wallets&move=<acct_num>: the dashboard's "Move money" on a store wallet.
   const [params, setParams] = useSearchParams();
-  const [tab, setTab] = useState(
-    params.get("tab") === "wallets"
-      ? "wallets"
-      : params.get("tab") === "users"
-        ? "users"
-        : "stores",
+  const [tab, setTab] = useState(() =>
+    ["wallets", "users", "profiles", "shifts"].includes(params.get("tab"))
+      ? params.get("tab")
+      : "stores",
   );
   const [stores, setStores] = useState(null);
   const [users, setUsers] = useState(null);
   const [wallets, setWallets] = useState(null);
+  const [profiles, setProfiles] = useState(null);
+  const [shifts, setShifts] = useState(null);
+  const [txnTypes, setTxnTypes] = useState([]);
   const [problem, setProblem] = useState("");
   const [dialog, setDialog] = useState(null);
   const [busy, setBusy] = useState(null);
@@ -873,7 +961,20 @@ export default function Stores() {
       loadWallets()
         .then(setWallets)
         .catch(() => setWallets([]));
-  }, [canSeeUsers]);
+    // For the tabs, and the user form's choices.
+    if (managesProfiles || managesUsers) {
+      loadPosProfiles()
+        .then(setProfiles)
+        .catch(() => setProfiles([]));
+      loadPosShifts()
+        .then(setShifts)
+        .catch(() => setShifts([]));
+    }
+    if (managesProfiles)
+      loadTxnTypes()
+        .then(setTxnTypes)
+        .catch(() => setTxnTypes([]));
+  }, [canSeeUsers, managesProfiles, managesUsers]);
   useEffect(loadAll, [loadAll]);
   // The bank's decision on a store (or a close / reopen elsewhere) and money
   // moving in a store wallet refresh the page.
@@ -951,6 +1052,12 @@ export default function Stores() {
           },
         ]
       : []),
+    ...(managesProfiles
+      ? [
+          { key: "profiles", label: t("pos.profilesTab", { defaultValue: "Terminal profiles" }) },
+          { key: "shifts", label: t("pos.shiftsTab", { defaultValue: "Shifts" }) },
+        ]
+      : []),
     ...(canSeeUsers && storeWallets.length
       ? [
           {
@@ -989,7 +1096,17 @@ export default function Stores() {
               {t("stores.add", { defaultValue: "Add a store" })}
             </Button>
           )}
-          {owner && tab === "users" && (
+          {managesProfiles && tab === "profiles" && (
+            <Button onClick={() => setDialog({ kind: "profile", profile: null })} className="px-4 py-2.5">
+              <Plus size={16} /> {t("pos.addProfile", { defaultValue: "Add a terminal profile" })}
+            </Button>
+          )}
+          {managesProfiles && tab === "shifts" && (
+            <Button onClick={() => setDialog({ kind: "shift", shift: null })} className="px-4 py-2.5">
+              <Plus size={16} /> {t("pos.addShift", { defaultValue: "Add a shift" })}
+            </Button>
+          )}
+          {managesUsers && tab === "users" && (
             <Button
               onClick={() => setDialog({ kind: "user", user: null })}
               disabled={!stores?.length}
@@ -1182,6 +1299,9 @@ export default function Stores() {
                                 defaultValue: "Refunds up to {{amount}}",
                               })
                             : null,
+                          person.operator_id
+                            ? t("storeUsers.operatorShort", { id: person.operator_id, defaultValue: "Operator {{id}}" })
+                            : null,
                           person.last_sign_in_at
                             ? t("storeUsers.lastSeen", {
                                 at: formatDateTime(person.last_sign_in_at),
@@ -1192,6 +1312,24 @@ export default function Stores() {
                           .filter(Boolean)
                           .join(" · ")}
                       </span>
+                      {(person.pos_profile || person.pos_shift || person.can_manage_cashiers) && (
+                        <span className="mt-1.5 flex flex-wrap gap-1.5">
+                          {[
+                            [person.pos_profile, t("storeUsers.profileChip", { name: person.pos_profile?.name, defaultValue: "Profile: {{name}}" })],
+                            [person.pos_shift, t("storeUsers.shiftChip", { name: person.pos_shift?.name, defaultValue: "Shift: {{name}}" })],
+                          ]
+                            .filter(([item]) => item)
+                            .map(([item, label]) => (
+                              <Badge key={label} tone={item.status === "ACTIVE" ? "bg-ink/5 text-ink" : "bg-amber-500/15 text-amber-700 dark:text-amber-300"}>
+                                {label}
+                                {item.status !== "ACTIVE" && ` · ${t("myAgents.inactive", { defaultValue: "Inactive" })}`}
+                              </Badge>
+                            ))}
+                          {person.role === "STORE_MANAGER" && person.can_manage_cashiers && (
+                            <Badge tone="bg-ink/5 text-ink">{t("storeUsers.managesCashiers", { defaultValue: "Manages cashiers" })}</Badge>
+                          )}
+                        </span>
+                      )}
                     </span>
                     <Badge
                       tone={
@@ -1204,7 +1342,7 @@ export default function Stores() {
                         ? t("myAgents.active", { defaultValue: "Active" })
                         : t("myAgents.inactive", { defaultValue: "Inactive" })}
                     </Badge>
-                    {owner && (
+                    {mayEdit(person) && (
                       <>
                         <Button
                           variant="secondary"
@@ -1237,6 +1375,13 @@ export default function Stores() {
             <ShowMore list={userList} />
           </>
         ))}
+
+      {tab === "profiles" && (
+        <PosProfiles profiles={profiles} onEdit={(profile) => setDialog({ kind: "profile", profile })} onChanged={loadAll} />
+      )}
+      {tab === "shifts" && (
+        <PosShifts shifts={shifts} onEdit={(shift) => setDialog({ kind: "shift", shift })} onChanged={loadAll} />
+      )}
 
       {tab === "wallets" && (
         <>
@@ -1311,6 +1456,31 @@ export default function Stores() {
         <UserDialog
           user={dialog.user}
           stores={(stores ?? []).filter((s) => s.status !== "REJECTED")}
+          profiles={profiles ?? []}
+          shifts={shifts ?? []}
+          managerMode={managerMode}
+          onClose={() => setDialog(null)}
+          onSaved={() => {
+            setDialog(null);
+            loadAll();
+          }}
+        />
+      )}
+      {dialog?.kind === "profile" && (
+        <ProfileDialog
+          profile={dialog.profile}
+          txnTypes={txnTypes}
+          currencies={[...new Set(mainWallets.map((w) => w.currency_code).filter(Boolean))]}
+          onClose={() => setDialog(null)}
+          onSaved={() => {
+            setDialog(null);
+            loadAll();
+          }}
+        />
+      )}
+      {dialog?.kind === "shift" && (
+        <ShiftDialog
+          shift={dialog.shift}
           onClose={() => setDialog(null)}
           onSaved={() => {
             setDialog(null);
