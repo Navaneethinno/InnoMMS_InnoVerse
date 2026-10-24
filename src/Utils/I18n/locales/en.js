@@ -1479,6 +1479,7 @@ export default {
   "pos.txn.AGENT_CASH_IN": "Cash in",
   "pos.txn.AGENT_CASH_OUT": "Cash out",
   "pos.txn.CARD_PURCHASE_CP": "Card payment",
+  "pos.txn.CARD_CASH_WITHDRAWAL": "Card cash withdrawal",
   "pos.txn.CARD_VOID": "Card void",
   "pos.txn.CARD_REFUND": "Card refund",
   "pos.txn.CARD_BALANCE_INQUIRY": "Card balance check",

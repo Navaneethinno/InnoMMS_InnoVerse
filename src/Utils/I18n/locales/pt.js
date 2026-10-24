@@ -1484,6 +1484,7 @@ export default {
   "pos.txn.AGENT_CASH_IN": "Depósito em numerário",
   "pos.txn.AGENT_CASH_OUT": "Levantamento em numerário",
   "pos.txn.CARD_PURCHASE_CP": "Pagamento com cartão",
+  "pos.txn.CARD_CASH_WITHDRAWAL": "Levantamento com cartão",
   "pos.txn.CARD_VOID": "Anulação de cartão",
   "pos.txn.CARD_REFUND": "Reembolso de cartão",
   "pos.txn.CARD_BALANCE_INQUIRY": "Consulta de saldo do cartão",

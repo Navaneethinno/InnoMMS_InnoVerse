@@ -1565,6 +1565,7 @@ export default {
   "pos.txn.AGENT_CASH_IN": "إيداع نقدي",
   "pos.txn.AGENT_CASH_OUT": "سحب نقدي",
   "pos.txn.CARD_PURCHASE_CP": "دفع بالبطاقة",
+  "pos.txn.CARD_CASH_WITHDRAWAL": "سحب نقدي بالبطاقة",
   "pos.txn.CARD_VOID": "إلغاء عملية بطاقة",
   "pos.txn.CARD_REFUND": "استرداد بطاقة",
   "pos.txn.CARD_BALANCE_INQUIRY": "استعلام رصيد البطاقة",
