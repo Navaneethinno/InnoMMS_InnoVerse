@@ -11,10 +11,10 @@ import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
 import { ListSearch, NoMatches, ShowMore } from "@/Components/Common/ListControls";
 import { useListControls } from "@/Hooks/Common/useListControls";
-import { savePosProfile, setPosProfileActive } from "@/Services/Pos/pos.api";
+import { deletePosProfile, savePosProfile, setPosProfileActive } from "@/Services/Pos/pos.api";
 import { formatMoney } from "@/Utils/Lib/format";
 import { notifications } from "@/Utils/Lib/notifications";
-import { ActiveToggle, Pill, StatusPill } from "./posShared";
+import { ActiveToggle, DeleteButton, Pill, StatusPill } from "./posShared";
 
 // Terminal profiles (owner): the transactions a store user may make on a
 // terminal, each with optional limits, and daily totals per direction. A
@@ -228,6 +228,7 @@ export default function PosProfiles({ profiles, onEdit, onChanged }) {
                 <Pencil size={14} /> {t("stores.editShort", { defaultValue: "Edit" })}
               </Button>
               <ActiveToggle item={profile} onToggle={setPosProfileActive} onDone={onChanged} warning={t("pos.profileOffWarning", { defaultValue: "Users with this profile can't make transactions until you activate it or give them another profile." })} />
+              <DeleteButton item={profile} onDelete={deletePosProfile} onDone={onChanged} />
             </div>
           </li>
         ))}

@@ -258,8 +258,8 @@ export const API_ENDPOINTS = {
     SETTINGS_SET: terminalPath("settings_set"),
   },
   // What a store user may do on a terminal (profiles) and when (shifts).
-  POS_PROFILE: Object.fromEntries(["txn_types", "list", "add", "edit", "status"].map((call) => [call, posProfilePath(call)])),
-  POS_SHIFT: Object.fromEntries(["list", "add", "edit", "status"].map((call) => [call, posShiftPath(call)])),
+  POS_PROFILE: Object.fromEntries(["txn_types", "list", "add", "edit", "status", "delete"].map((call) => [call, posProfilePath(call)])),
+  POS_SHIFT: Object.fromEntries(["list", "add", "edit", "status", "delete"].map((call) => [call, posShiftPath(call)])),
 };
 // Until the API says otherwise (the `session` block of sign-in and refresh): a
 // web session unused for this long ends on the server, and the portal signs the

@@ -19,6 +19,8 @@ export const savePosProfile = async (profile) =>
   (await portalPost(profile.id ? POS_PROFILE.edit : POS_PROFILE.add, profile)).data;
 export const setPosProfileActive = (id, active) =>
   portalPost(POS_PROFILE.status, { id, active });
+// Only one no user holds (user_count 0); otherwise pos.profile_in_use.
+export const deletePosProfile = (id) => portalPost(POS_PROFILE.delete, { id });
 
 // Shifts: [{ id, name, status, open_now, user_count, windows: [{ days,
 // opens, closes }] }], the same rules as a store's opening hours.
@@ -27,3 +29,5 @@ export const savePosShift = async (shift) =>
   (await portalPost(shift.id ? POS_SHIFT.edit : POS_SHIFT.add, shift)).data;
 export const setPosShiftActive = (id, active) =>
   portalPost(POS_SHIFT.status, { id, active });
+// Only one no user holds (user_count 0); otherwise pos.shift_in_use.
+export const deletePosShift = (id) => portalPost(POS_SHIFT.delete, { id });

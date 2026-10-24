@@ -9,11 +9,11 @@ import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
 import { ListSearch, NoMatches, ShowMore } from "@/Components/Common/ListControls";
 import { useListControls } from "@/Hooks/Common/useListControls";
-import { savePosShift, setPosShiftActive } from "@/Services/Pos/pos.api";
+import { deletePosShift, savePosShift, setPosShiftActive } from "@/Services/Pos/pos.api";
 import { notifications } from "@/Utils/Lib/notifications";
 import { dayName, hoursText } from "./StoreHours";
 import { cn } from "@/Utils/Lib/utils";
-import { ActiveToggle, Pill, StatusPill } from "./posShared";
+import { ActiveToggle, DeleteButton, Pill, StatusPill } from "./posShared";
 
 // Shifts (owner): when a store user may sign in and work on a terminal, as
 // windows [{ days: [1..7], opens, closes }] like a store's opening hours, but
@@ -147,6 +147,7 @@ export default function PosShifts({ shifts, onEdit, onChanged }) {
                 <Pencil size={14} /> {t("stores.editShort", { defaultValue: "Edit" })}
               </Button>
               <ActiveToggle item={shift} onToggle={setPosShiftActive} onDone={onChanged} warning={t("pos.shiftOffWarning", { defaultValue: "Users with this shift can't sign in until you activate it or give them another shift." })} />
+              <DeleteButton item={shift} onDelete={deletePosShift} onDone={onChanged} />
             </div>
           </li>
         ))}

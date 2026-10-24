@@ -1492,4 +1492,8 @@ export default {
   "terminals.idleNow": "Now: signed out after {{minutes}} minutes of inactivity.",
   "pos.removeWindow": "Remove this time",
   "pos.addWindow": "Add another time (e.g. after a break)",
+  "pos.deleted": "Deleted.",
+  "pos.delete": "Delete",
+  "pos.deleteTitle": "Delete {{name}}?",
+  "pos.deleteHint": "This can't be undone.",
 };

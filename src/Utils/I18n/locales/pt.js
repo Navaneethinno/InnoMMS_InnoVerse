@@ -1497,4 +1497,8 @@ export default {
   "terminals.idleNow": "Agora: a sessão termina após {{minutes}} minutos sem atividade.",
   "pos.removeWindow": "Remover este horário",
   "pos.addWindow": "Adicionar outro horário (ex.: após uma pausa)",
+  "pos.deleted": "Eliminado.",
+  "pos.delete": "Eliminar",
+  "pos.deleteTitle": "Eliminar {{name}}?",
+  "pos.deleteHint": "Esta ação não pode ser anulada.",
 };

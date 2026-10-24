@@ -1578,4 +1578,8 @@ export default {
   "terminals.idleNow": "حاليًا: تنتهي الجلسة بعد {{minutes}} دقيقة دون نشاط.",
   "pos.removeWindow": "إزالة هذا الوقت",
   "pos.addWindow": "إضافة وقت آخر (مثلًا بعد استراحة)",
+  "pos.deleted": "تم الحذف.",
+  "pos.delete": "حذف",
+  "pos.deleteTitle": "حذف {{name}}؟",
+  "pos.deleteHint": "لا يمكن التراجع عن ذلك.",
 };

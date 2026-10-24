@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Power, PowerOff } from "lucide-react";
+import { Power, PowerOff, Trash2 } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import ConfirmDialog from "@/Components/Common/ConfirmDialog";
 import { notifications } from "@/Utils/Lib/notifications";
@@ -21,6 +21,35 @@ export function StatusPill({ status }) {
     <Pill tone={ACTIVE_TONE}>{t("myAgents.active", { defaultValue: "Active" })}</Pill>
   ) : (
     <Pill tone={INACTIVE_TONE}>{t("myAgents.inactive", { defaultValue: "Inactive" })}</Pill>
+  );
+}
+
+// Delete, offered only while no user holds it.
+export function DeleteButton({ item, onDelete, onDone }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  if (item.user_count) return null;
+  const run = async () => {
+    setPending(true);
+    try {
+      await onDelete(item.id);
+      notifications.success(t("pos.deleted", { defaultValue: "Deleted." }));
+      setOpen(false);
+      onDone();
+    } catch (error) {
+      notifications.error(error.message);
+    } finally {
+      setPending(false);
+    }
+  };
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)} className="px-3 py-2 text-red-600">
+        <Trash2 size={14} /> {t("pos.delete", { defaultValue: "Delete" })}
+      </Button>
+      <ConfirmDialog open={open} onOpenChange={setOpen} pending={pending} title={t("pos.deleteTitle", { name: item.name, defaultValue: "Delete {{name}}?" })} description={t("pos.deleteHint", { defaultValue: "This can't be undone." })} onConfirm={run} />
+    </>
   );
 }
 
