@@ -1,7 +1,14 @@
 import WalletBadges from "@/Components/Common/WalletBadges";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Activity, ArrowRight, ArrowRightLeft, History, Landmark, ShieldCheck } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  ArrowRightLeft,
+  History,
+  Landmark,
+  ShieldCheck,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { TransactionLine } from "@/Components/History/History";
 import FitText from "@/Components/Common/FitText";
@@ -11,47 +18,102 @@ import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 const Status = ({ loading, error, empty, children }) => {
   const { t } = useTranslation();
-  if (loading) return <div className="min-h-24 flex-1 animate-pulse rounded-xl bg-slate-200/60" />;
-  if (error) return <p className="flex min-h-24 flex-1 items-center justify-center px-2 text-center text-xs text-red-600 dark:text-red-300">{typeof error === "string" ? error : t("dash.couldNotLoad")}</p>;
-  if (empty) return <p className="flex min-h-24 flex-1 items-center justify-center text-xs text-slate-500">{empty}</p>;
+  if (loading)
+    return (
+      <div className="min-h-24 flex-1 animate-pulse rounded-xl bg-slate-200/60" />
+    );
+  if (error)
+    return (
+      <p className="flex min-h-24 flex-1 items-center justify-center px-2 text-center text-xs text-red-600 dark:text-red-300">
+        {typeof error === "string" ? error : t("dash.couldNotLoad")}
+      </p>
+    );
+  if (empty)
+    return (
+      <p className="flex min-h-24 flex-1 items-center justify-center text-xs text-slate-500">
+        {empty}
+      </p>
+    );
   return children;
 };
 
 // A wallet's title on the dashboard: an agent's money is split into "My money"
 // and "Agent wallet" (handoff, phase 2); a store wallet carries its store.
 function walletTitle(wallet, t, hasSpecial) {
-  if (wallet.wallet_purpose === "AGENT_FLOAT") return t("wallet.purpose.AGENT_FLOAT", { defaultValue: "Agent wallet" });
-  if (wallet.wallet_purpose === "STORE") return wallet.store_name ?? t("wallet.purpose.STORE", { defaultValue: "Store wallet" });
+  if (wallet.wallet_purpose === "AGENT_FLOAT")
+    return t("wallet.purpose.AGENT_FLOAT", { defaultValue: "Agent wallet" });
+  if (wallet.wallet_purpose === "STORE")
+    return (
+      wallet.store_name ??
+      t("wallet.purpose.STORE", { defaultValue: "Store wallet" })
+    );
   if (hasSpecial) return t("wallet.myMoney", { defaultValue: "My money" });
-  return wallet.acct_product_name ?? wallet.digital_product_name ?? wallet.acct_num;
+  return (
+    wallet.acct_product_name ?? wallet.digital_product_name ?? wallet.acct_num
+  );
 }
 
 export function WalletsWidget() {
   const { t } = useTranslation();
   const { wallets, loading, walletsError: error } = useAccountData();
   const owner = !useSelector((state) => state.auth.user?.staff);
-  const hasSpecial = (wallets ?? []).some((w) => w.wallet_purpose === "AGENT_FLOAT" || w.wallet_purpose === "STORE");
+  const hasSpecial = (wallets ?? []).some(
+    (w) => w.wallet_purpose === "AGENT_FLOAT" || w.wallet_purpose === "STORE",
+  );
   return (
-    <WidgetCard title={t("dash.accounts")} icon={Landmark} action={<BalanceEye />}>
-      <Status loading={loading && !wallets} error={!wallets && error} empty={wallets?.length === 0 && t("dash.noWallets")}>
+    <WidgetCard
+      title={t("dash.accounts")}
+      icon={Landmark}
+      action={<BalanceEye />}
+    >
+      <Status
+        loading={loading && !wallets}
+        error={!wallets && error}
+        empty={wallets?.length === 0 && t("dash.noWallets")}
+      >
         <ul className="grid grid-cols-1 gap-3">
           {(wallets ?? []).map((wallet) => (
-            <li key={wallet.acct_num} className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl bg-slate-100/70 px-3 py-2.5">
+            <li
+              key={wallet.acct_num}
+              className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl bg-slate-100/70 px-3 py-2.5"
+            >
               <div className="min-w-[7rem] flex-1">
-                <p title={wallet.acct_product_name ?? wallet.digital_product_name} className="line-clamp-2 break-words text-xs font-bold text-slate-800">
+                <p
+                  title={
+                    wallet.acct_product_name ?? wallet.digital_product_name
+                  }
+                  className="line-clamp-2 break-words text-xs font-bold text-slate-800"
+                >
                   {walletTitle(wallet, t, hasSpecial)}
                 </p>
-                <p className="break-all text-[11px] text-slate-500">{wallet.acct_num}</p>
+                <p className="break-all text-[11px] text-slate-500">
+                  {wallet.acct_num}
+                </p>
                 <WalletBadges wallet={wallet} className="mt-1" />
               </div>
-              <FitText max={13} min={9} className="w-full text-end font-bold text-slate-800"><Balance value={wallet.avail_bal} currency={wallet.currency_code} /></FitText>
+              <FitText
+                max={13}
+                min={9}
+                className="w-full text-end font-bold text-slate-800"
+              >
+                <Balance
+                  value={wallet.avail_bal}
+                  currency={wallet.currency_code}
+                />
+              </FitText>
               {wallet.wallet_purpose === "AGENT_FLOAT" && (
-                <Link to="/agent" className="text-[11px] font-bold text-ink hover:underline">
+                <Link
+                  to="/agent"
+                  className="text-[11px] font-bold text-ink hover:underline"
+                >
                   {t("agent.title", { defaultValue: "Cash in / out" })} →
                 </Link>
               )}
               {wallet.wallet_purpose === "STORE" && owner && (
-                <Link to={`/stores?tab=wallets&move=${encodeURIComponent(wallet.acct_num)}`} className="text-[11px] font-bold text-ink hover:underline">
+                <Link
+                  to={`/stores?tab=wallets&move=${encodeURIComponent(wallet.acct_num)}`}
+                  className="text-[11px] font-bold text-ink hover:underline"
+                >
                   {t("storeWallets.move", { defaultValue: "Move money" })} →
                 </Link>
               )}
@@ -72,9 +134,15 @@ function oneLinePerMove(items) {
   for (const item of items) {
     if (!OWN_MOVES.has(item.txn_type)) continue;
     const current = chosen.get(item.rrn);
-    if (!current || (item.leg_role === "PRIMARY" && current.leg_role !== "PRIMARY")) chosen.set(item.rrn, item);
+    if (
+      !current ||
+      (item.leg_role === "PRIMARY" && current.leg_role !== "PRIMARY")
+    )
+      chosen.set(item.rrn, item);
   }
-  return items.filter((item) => !OWN_MOVES.has(item.txn_type) || chosen.get(item.rrn) === item);
+  return items.filter(
+    (item) => !OWN_MOVES.has(item.txn_type) || chosen.get(item.rrn) === item,
+  );
 }
 
 export function RecentTransactionsWidget() {
@@ -86,12 +154,22 @@ export function RecentTransactionsWidget() {
       title={t("dash.recentTransactions")}
       icon={Activity}
       action={
-        <Link to="/history" className="flex shrink-0 items-center gap-1 text-xs font-bold text-ink hover:underline">
-          {t("nav.history")} <ArrowRight size={12} />
-        </Link>
+        <span className="flex shrink-0 items-center gap-1">
+          <BalanceEye size={14} className="h-7 w-7" />
+          <Link
+            to="/history"
+            className="flex shrink-0 items-center gap-1 text-xs font-bold text-ink hover:underline"
+          >
+            {t("nav.history")} <ArrowRight size={12} />
+          </Link>
+        </span>
       }
     >
-      <Status loading={loading && items.length === 0} error={items.length === 0 && error} empty={!loading && items.length === 0 && t("history.empty")}>
+      <Status
+        loading={loading && items.length === 0}
+        error={items.length === 0 && error}
+        empty={!loading && items.length === 0 && t("history.empty")}
+      >
         <ul className="divide-y divide-slate-100">
           {items.slice(0, 6).map((item, index) => (
             <TransactionLine key={`${item.rrn}-${index}`} item={item} />
@@ -112,7 +190,9 @@ export function QuickActionsWidget() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const features = useSelector((state) => state.auth.user?.features);
-  const actions = ACTIONS.filter((action) => features?.[action.feature] !== false);
+  const actions = ACTIONS.filter(
+    (action) => features?.[action.feature] !== false,
+  );
   return (
     <WidgetCard title={t("dash.quickActions")} icon={ArrowRightLeft}>
       <div className="grid grid-cols-3 gap-2">
