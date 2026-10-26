@@ -14,7 +14,7 @@ import { useListControls } from "@/Hooks/Common/useListControls";
 import { loadAgents } from "@/Services/Agent/agent.api";
 import { cn } from "@/Utils/Lib/utils";
 import { PageHeading } from "@/Components/Common/PageTitle";
-import { Balance, BalanceEye } from "@/Components/Common/Balance";
+import { Balance, BalanceEye, BalanceGroup } from "@/Components/Common/Balance";
 
 // A super agent's agents (agent/agents) with their agent-wallet balance, lowest
 // first so whoever needs float stands out; "Send float" opens Cash In / Out on
@@ -105,54 +105,61 @@ export default function MyAgents() {
                   key={agent.entity_id ?? agent.phone_number}
                   className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-slate-800">
-                        {agent.name}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {agent.phone_number}
-                      </p>
+                  <BalanceGroup>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-slate-800">
+                          {agent.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {agent.phone_number}
+                        </p>
+                      </div>
+                      <span
+                        className={cn(
+                          "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                          active
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                            : "bg-amber-500/15 text-amber-700",
+                        )}
+                      >
+                        {active
+                          ? t("myAgents.active", { defaultValue: "Active" })
+                          : t("myAgents.inactive", {
+                              defaultValue: "Inactive",
+                            })}
+                      </span>
                     </div>
-                    <span
+                    <p className="mt-4 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                      {t("wallet.purpose.AGENT_FLOAT", {
+                        defaultValue: "Agent wallet",
+                      })}
+                      <BalanceEye className="-my-2 -me-1" />
+                    </p>
+                    <p
                       className={cn(
-                        "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                        active
-                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                          : "bg-amber-500/15 text-amber-700",
+                        "mt-1 text-xl font-black tracking-tight",
+                        empty ? "text-amber-600" : "text-slate-800",
                       )}
                     >
-                      {active
-                        ? t("myAgents.active", { defaultValue: "Active" })
-                        : t("myAgents.inactive", { defaultValue: "Inactive" })}
-                    </span>
-                  </div>
-                  <p className="mt-4 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
-                    {t("wallet.purpose.AGENT_FLOAT", {
-                      defaultValue: "Agent wallet",
-                    })}
-                    <BalanceEye className="-my-2 -me-1" />
-                  </p>
-                  <p
-                    className={cn(
-                      "mt-1 text-xl font-black tracking-tight",
-                      empty ? "text-amber-600" : "text-slate-800",
-                    )}
-                  >
-                    <Balance value={agent.float_balance ?? 0} currency={agent.currency_code} />
-                  </p>
-                  {agent.float_acct_num && (
-                    <p className="break-all text-xs text-slate-400">
-                      {agent.float_acct_num}
+                      <Balance
+                        value={agent.float_balance ?? 0}
+                        currency={agent.currency_code}
+                      />
                     </p>
-                  )}
-                  <Link
-                    to={`/agent?tab=float&to=${encodeURIComponent(agent.phone_number ?? "")}`}
-                    className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-ink hover:bg-slate-50"
-                  >
-                    <Send size={15} />{" "}
-                    {t("agent.sendFloat", { defaultValue: "Send float" })}
-                  </Link>
+                    {agent.float_acct_num && (
+                      <p className="break-all text-xs text-slate-400">
+                        {agent.float_acct_num}
+                      </p>
+                    )}
+                    <Link
+                      to={`/agent?tab=float&to=${encodeURIComponent(agent.phone_number ?? "")}`}
+                      className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-ink hover:bg-slate-50"
+                    >
+                      <Send size={15} />{" "}
+                      {t("agent.sendFloat", { defaultValue: "Send float" })}
+                    </Link>
+                  </BalanceGroup>
                 </li>
               );
             })}

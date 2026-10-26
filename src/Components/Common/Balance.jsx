@@ -1,35 +1,67 @@
-import { useEffect, useSyncExternalStore } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useSyncExternalStore,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
 import { formatMoney } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 
-// Balances are hidden until asked for: an eye next to them shows every balance
-// on the screen for 10 seconds, then they hide again by themselves (or at once,
-// on the eye again). One switch for the whole portal, so a page with several
-// balances needs one tap, and moving to another page doesn't leave them shown.
+// Balances are hidden until asked for: an eye next to them shows them for 10
+// seconds, then they hide again by themselves (or at once, on the eye again).
+// An eye shows only the balances of its own group (a dashboard card, an
+// agent's card: <BalanceGroup>); outside any group, the page's balances share
+// one eye. Moving to another page doesn't leave them shown.
 const SHOW_MS = 10_000;
-let shownUntil = 0;
-let timer = null;
+const PAGE = "page";
+const shownUntil = new Map();
+const timers = new Map();
 const listeners = new Set();
 const notify = () => listeners.forEach((l) => l());
 const subscribe = (listener) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
-const isShown = () => shownUntil > Date.now();
-function showBalances() {
-  window.clearTimeout(timer);
-  shownUntil = Date.now() + SHOW_MS;
-  timer = window.setTimeout(hideBalances, SHOW_MS);
+function showBalances(group) {
+  window.clearTimeout(timers.get(group));
+  shownUntil.set(group, Date.now() + SHOW_MS);
+  timers.set(
+    group,
+    window.setTimeout(() => hideGroup(group), SHOW_MS),
+  );
+  notify();
+}
+function hideGroup(group) {
+  window.clearTimeout(timers.get(group));
+  shownUntil.delete(group);
   notify();
 }
 export function hideBalances() {
-  window.clearTimeout(timer);
-  shownUntil = 0;
+  timers.forEach((timer) => window.clearTimeout(timer));
+  timers.clear();
+  shownUntil.clear();
   notify();
 }
-export const useBalancesShown = () => useSyncExternalStore(subscribe, isShown);
+
+const GroupContext = createContext(PAGE);
+// Balances and the eye inside it show and hide together, apart from the rest.
+export function BalanceGroup({ children }) {
+  return (
+    <GroupContext.Provider value={useId()}>{children}</GroupContext.Provider>
+  );
+}
+export function useBalancesShown() {
+  const group = useContext(GroupContext);
+  const isShown = useCallback(
+    () => (shownUntil.get(group) ?? 0) > Date.now(),
+    [group],
+  );
+  return useSyncExternalStore(subscribe, isShown);
+}
 
 // Hidden when the person leaves the page or the tab: never left showing.
 export function useHideBalancesOnLeave() {
@@ -59,6 +91,7 @@ export const balanceText = (shown, value, currency) =>
 // The eye: shows the balances, with a ring running down the 10 seconds.
 export function BalanceEye({ size = 16, className }) {
   const { t } = useTranslation();
+  const group = useContext(GroupContext);
   const shown = useBalancesShown();
   const label = shown
     ? t("balance.hide", { defaultValue: "Hide balance" })
@@ -68,8 +101,8 @@ export function BalanceEye({ size = 16, className }) {
       type="button"
       onClick={(event) => {
         event.stopPropagation();
-        if (shown) hideBalances();
-        else showBalances();
+        if (shown) hideGroup(group);
+        else showBalances(group);
       }}
       aria-label={label}
       title={label}
@@ -95,7 +128,7 @@ export function BalanceEye({ size = 16, className }) {
             strokeWidth="2"
           />
           <circle
-            key={shownUntil}
+            key={shownUntil.get(group)}
             cx="16"
             cy="16"
             r="14"
