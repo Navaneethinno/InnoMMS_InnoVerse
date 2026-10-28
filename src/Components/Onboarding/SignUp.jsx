@@ -98,10 +98,10 @@ export default function SignUp() {
                     type="button"
                     onClick={() => setTourRequest((n) => n + 1)}
                     aria-label={t("signup.takeTour")}
-                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-forest px-3 py-2 text-sm font-bold text-white transition hover:bg-forest/90 sm:px-5 sm:py-2.5 dark:bg-lime dark:text-on-secondary dark:hover:bg-lime/90"
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-forest px-3 py-2 text-sm font-bold text-white transition hover:bg-forest/90 lg:px-5 lg:py-2.5 dark:bg-lime dark:text-on-secondary dark:hover:bg-lime/90"
                   >
                     <Compass size={15} />
-                    <span className="hidden sm:inline">
+                    <span className="hidden lg:inline">
                       {t("signup.takeTour")}
                     </span>
                   </button>
@@ -112,10 +112,10 @@ export default function SignUp() {
                   aria-label={
                     formActive ? t("signup.exit") : t("signup.backToSignIn")
                   }
-                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] border-forest px-3 py-2 text-sm font-bold text-forest transition hover:bg-forest/5 sm:px-5 sm:py-2.5 dark:border-lime dark:text-lime dark:hover:bg-lime/10"
+                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] border-forest px-3 py-2 text-sm font-bold text-forest transition hover:bg-forest/5 lg:px-5 lg:py-2.5 dark:border-lime dark:text-lime dark:hover:bg-lime/10"
                 >
                   {formActive ? <X size={15} /> : <ArrowLeft size={15} />}
-                  <span className="hidden sm:inline">
+                  <span className="hidden lg:inline">
                     {formActive ? t("signup.exit") : t("signup.backToSignIn")}
                   </span>
                 </button>

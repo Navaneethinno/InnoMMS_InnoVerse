@@ -22,8 +22,8 @@ export default function AppHeader({ action }) {
           </span>
         )}
         <span className="hidden truncate text-[19px] font-semibold min-[440px]:inline tracking-[-0.02em] text-ink">{t("brand.name")}</span>
-        <span aria-hidden="true" className="ms-1.5 hidden h-5 w-px bg-ink/15 sm:block" />
-        <span className="hidden text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 sm:block">
+        <span aria-hidden="true" className="ms-1.5 hidden h-5 w-px bg-ink/15 lg:block" />
+        <span className="hidden text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 lg:block">
           {t("brand.portal")}
         </span>
       </div>
