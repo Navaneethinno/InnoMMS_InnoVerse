@@ -20,6 +20,7 @@ class ApiRequestError extends Error {
       remark = "",
       retryAfterSeconds = null,
       lockedUntil = null,
+      problemKeys = [],
     } = {},
   ) {
     super(message);
@@ -34,11 +35,14 @@ class ApiRequestError extends Error {
     // A locked sign-in says when it opens again: seconds from now, and the UTC time.
     this.retryAfterSeconds = retryAfterSeconds;
     this.lockedUntil = lockedUntil;
+    // Where each problem is (`problem_keys`: key, section, field, params).
+    this.problemKeys = problemKeys;
   }
 }
 
 export function toApiRequestError(payload, status, fallbackMessage) {
   const problems = payload?.data?.[0]?.problems ?? payload?.data?.problems;
+  const problemKeys = payload?.data?.[0]?.problem_keys ?? payload?.data?.problem_keys;
   return new ApiRequestError(payload?.message || fallbackMessage, {
     status,
     problems: Array.isArray(problems) ? problems : [],
@@ -46,6 +50,7 @@ export function toApiRequestError(payload, status, fallbackMessage) {
     remark: payload?.remark ?? "",
     retryAfterSeconds: payload?.data?.[0]?.retry_after_seconds ?? null,
     lockedUntil: payload?.data?.[0]?.locked_until ?? null,
+    problemKeys: Array.isArray(problemKeys) ? problemKeys : [],
   });
 }
 

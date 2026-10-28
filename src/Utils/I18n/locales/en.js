@@ -382,6 +382,7 @@ export default {
   "onb.mobile": "Mobile number",
   "onb.email": "Email address",
   "onb.contactHint": "Enter an email address or a mobile number; at least one is required. We will send a code to confirm it. If you already have an application in progress, the code lets you continue it.",
+  "onb.contactHintEmail": "Enter your email address. We will send a code to confirm it. If you already have an application in progress, the code lets you continue it.",
   "onb.start": "Start application",
   "onb.readyTitle": "Ready to submit",
   "onb.readyBody": "All required information has been provided. Submit your application to open your account.",

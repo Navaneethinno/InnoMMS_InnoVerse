@@ -143,7 +143,12 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
     const hasCategoryChoice = flow.categories.length > 1;
     // The API verifies the contact itself: it sends a code when the
     // application starts, so the mobile number is all that is needed here.
-    const canStart = Boolean(pick.phone_number.trim());
+    // The contacts this sign-up starts with (both when an older server
+    // sends none); either one starts it.
+    const contacts = Array.isArray(options.contacts) && options.contacts.length ? options.contacts : ["PHONE", "EMAIL"];
+    const askPhone = contacts.includes("PHONE");
+    const askEmail = contacts.includes("EMAIL");
+    const canStart = Boolean((askPhone && pick.phone_number.trim()) || (askEmail && pick.email.trim()));
     return (
       <div className="grid grid-cols-1 gap-6">
         {problemInfo && <ErrorState message={problemInfo.message} problems={problemInfo.problems} />}
@@ -164,15 +169,23 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
             {t("onb.contactDetails")}
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:max-w-md">
-            <PhoneField
-              name="phone_number"
-              label={t("onb.mobile")}
-              countries={portalPolicy.phone.countries}
-              value={pick.phone_number}
-              onChange={(value) => setPick({ ...pick, phone_number: value })}
-            />
+            {askPhone && (
+              <PhoneField
+                name="phone_number"
+                label={t("onb.mobile")}
+                countries={portalPolicy.phone.countries}
+                value={pick.phone_number}
+                onChange={(value) => setPick({ ...pick, phone_number: value })}
+              />
+            )}
+            {askEmail && (
+              <label className="block text-sm font-semibold text-slate-700">
+                {t("onb.email")}
+                <input type="email" name="email" autoComplete="email" className="field-control mt-1.5 border-ink/25 focus:border-ink" value={pick.email} onChange={(e) => setPick({ ...pick, email: e.target.value })} />
+              </label>
+            )}
           </div>
-          <p className="mt-3 text-[11px] leading-5 text-slate-400">{t("onb.contactHintPhone", { defaultValue: "Enter your mobile number. We will send a code to confirm it. If you already have an application in progress, the code lets you continue it." })}</p>
+          <p className="mt-3 text-[11px] leading-5 text-slate-400">{askEmail && askPhone ? t("onb.contactHint") : askEmail ? t("onb.contactHintEmail") : t("onb.contactHintPhone", { defaultValue: "Enter your mobile number. We will send a code to confirm it. If you already have an application in progress, the code lets you continue it." })}</p>
         </div>
         <Button
           type="button"

@@ -222,7 +222,7 @@ export function useOnboardingWizard({ flowApi, kind, onLeave, partyType }) {
     notifications.error(error.message);
     // Always in red at the top of the page (where it scrolls to), with the
     // reasons when there are some: e.g. an ID check that failed.
-    setProblemInfo({ message: error.message, problems: error.problems ?? [] });
+    setProblemInfo({ message: error.message, problems: error.problems ?? [], keys: error.problemKeys ?? [] });
   };
 
   useEffect(() => {
@@ -453,10 +453,19 @@ export function useOnboardingWizard({ flowApi, kind, onLeave, partyType }) {
       const keys = previous.seed === seedKey ? previous.keys : [];
       return keys.includes(key) ? previous : { seed: seedKey, keys: [...keys, key] };
     });
+  // The last refusal's problem on a field of this section (problem_keys),
+  // e.g. an ID number that can't be used.
+  const refusedFor = (fieldKey) => {
+    const keys = problemInfo?.keys ?? [];
+    const at = keys.findIndex((k) => k?.field === fieldKey && (!k.section || k.section === section?.key));
+    if (at < 0) return undefined;
+    const p = problemInfo.problems[at];
+    return (typeof p === "string" ? p : p?.message) ?? problemInfo.message;
+  };
   const issueFor = (fieldKey, rowIndex) =>
     editedKeys.includes(`${rowIndex ?? ""}:${fieldKey}`)
       ? undefined
-      : section?.issues?.find((i) => i.field === fieldKey && (rowIndex === undefined || i.row === rowIndex))?.message;
+      : refusedFor(fieldKey) ?? section?.issues?.find((i) => i.field === fieldKey && (rowIndex === undefined || i.row === rowIndex))?.message;
 
   // Redraw from the latest saved state after someone else changed it.
   const refresh = async () => {
