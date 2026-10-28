@@ -37,6 +37,30 @@ const PIN_MASK = "********";
 
 const sameValue = (a, b) => String(a) === String(b);
 
+// A text field's `pattern` option (and its `pattern_message`), checked as
+// the user types; the server checks it again on `next`.
+const patternOf = (pattern) => {
+  if (!pattern) return null;
+  try {
+    return new RegExp(pattern, "u");
+  } catch {
+    try {
+      return new RegExp(pattern);
+    } catch {
+      return null;
+    }
+  }
+};
+// A pattern that allows digits only (e.g. ^[0-9]{9}$): typing keeps just
+// the digits, up to the pattern's longest length.
+const DIGITS_ONLY = /^\^?(?:\\d|\[0-9\])(?:\{(\d+)(?:,(\d*))?\}|[+*])?\$?$/;
+function digitsRule(pattern) {
+  const m = DIGITS_ONLY.exec(pattern ?? "");
+  if (!m) return null;
+  const max = m[2] !== undefined ? m[2] : m[1];
+  return { max: max ? Number(max) : undefined };
+}
+
 export default function OnboardingField({ field, value, onChange, error, choices, badge, file }) {
   const { t } = useTranslation();
   // An amount (`currency: true`) shows the institution's main currency in front.
@@ -44,7 +68,10 @@ export default function OnboardingField({ field, value, onChange, error, choices
   const type = String(field.field_type ?? "TEXT").toUpperCase();
   const options = field.options ?? {};
   const disabled = Boolean(field.read_only);
-  const commonInput = cn("field-control border-ink/25 focus:border-ink", error && "!border-red-400 focus:!border-red-400 focus:ring-red-100");
+  const pattern = type === "TEXT" ? patternOf(options.pattern) : null;
+  const digits = type === "TEXT" ? digitsRule(options.pattern) : null;
+  const patternError = pattern && value && !pattern.test(String(value)) ? options.pattern_message || t("onb.wrongFormat") : null;
+  const commonInput = cn("field-control border-ink/25 focus:border-ink", (error || patternError) && "!border-red-400 focus:!border-red-400 focus:ring-red-100");
   const list = choices ?? field.choices ?? [];
   // Radix lists carry text values: hand back the choice's own value.
   const choiceValue = (text) => list.find((c) => sameValue(c.value, text))?.value ?? text;
@@ -259,14 +286,15 @@ export default function OnboardingField({ field, value, onChange, error, choices
         return (
           <input
             type="text"
+            inputMode={digits ? "numeric" : undefined}
             placeholder={field.hint}
             minLength={options.min_length}
-            maxLength={options.max_length}
+            maxLength={digits?.max ?? options.max_length}
             className={cn(commonInput, options.case === "upper" && "uppercase", options.case === "lower" && "lowercase")}
             value={value ?? ""}
             disabled={disabled}
             onChange={(e) => {
-              const text = e.target.value;
+              const text = digits ? e.target.value.replace(/\D/g, "").slice(0, digits.max) : e.target.value;
               onChange(options.case === "upper" ? text.toUpperCase() : options.case === "lower" ? text.toLowerCase() : text);
             }}
           />
@@ -288,7 +316,7 @@ export default function OnboardingField({ field, value, onChange, error, choices
   const notes = (
     <>
       {field.help_text && <p className="mt-1 text-[11px] font-normal text-slate-400">{field.help_text}</p>}
-      <FieldError>{error}</FieldError>
+      <FieldError>{error || patternError}</FieldError>
     </>
   );
 

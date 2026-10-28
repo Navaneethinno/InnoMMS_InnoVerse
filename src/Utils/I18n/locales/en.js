@@ -67,6 +67,7 @@ export default {
   "docs.legal": "Legal",
   "onb.standard": "Standard",
   "onb.remove": "Remove",
+  "onb.wrongFormat": "This value is not in the right format.",
   "onb.noFields": "There's nothing to fill in yet. Please check back later.",
   "nav.closeMenu": "Close menu",
   "nav.main": "Main navigation",
