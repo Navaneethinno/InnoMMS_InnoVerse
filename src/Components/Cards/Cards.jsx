@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { ArrowDownToLine, ArrowUpFromLine, CreditCard, Eye, KeyRound, Lock, LockOpen, Plus, Power, RotateCcw, ShieldAlert, Truck } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
-import { useCardChanged } from "@/Services/api/liveUpdates";
-import { activateCard, cancelRequest, loadCard, loadCards, loadOffers } from "@/Services/Cards/cards.api";
+import { useCardChanged } from "@/Hooks/Live/useLiveUpdates";
+import { useCardsActions } from "@/Hooks/Cards/useCardsActions";
 import { formatDateTime, formatMoney } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 import CardFace from "./CardFace";
@@ -16,6 +16,7 @@ import { PageHeading } from "@/Components/Common/PageTitle";
 // everything they can do with a card. Live: a change to any of their cards
 // (by them, the institution or the system) refreshes the page.
 export default function Cards() {
+  const { loadCards, loadOffers, loadCard } = useCardsActions();
   const { t } = useTranslation();
   const [state, setState] = useState({ cards: null, requests: [], offers: [] });
   const [selectedId, setSelectedId] = useState(null);
@@ -33,7 +34,7 @@ export default function Cards() {
       setState((s) => ({ ...s, cards: s.cards ?? [] }));
       setProblem(error.message);
     }
-  }, []);
+  }, [loadCards, loadOffers]);
 
   useEffect(() => {
     void refresh();
@@ -49,7 +50,7 @@ export default function Cards() {
     } catch {
       setDetail(null);
     }
-  }, []);
+  }, [loadCard]);
   useEffect(() => {
     void refreshDetail(selected?.id);
   }, [selected?.id, refreshDetail]);
@@ -129,6 +130,7 @@ export default function Cards() {
 // The selected card: its money and settings, the buttons its actions allow,
 // and its history.
 function CardPanel({ card, offer, onDialog, onDone }) {
+  const { activateCard } = useCardsActions();
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
@@ -268,6 +270,7 @@ function CardPanel({ card, offer, onDialog, onDone }) {
 
 // Requests for physical cards, with Cancel until the card is ordered.
 function Requests({ requests, onDone }) {
+  const { cancelRequest } = useCardsActions();
   const { t } = useTranslation();
   const [busy, setBusy] = useState(null);
   const [problem, setProblem] = useState("");

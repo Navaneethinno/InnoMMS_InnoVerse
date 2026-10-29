@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Compass,
   ShieldCheck,
-  Sparkles,
   UserRound,
   Building2,
   Banknote,
@@ -17,8 +16,7 @@ import AppHeader from "@/Components/Common/AppHeader";
 import Footer from "@/Components/Layout/Footer";
 import IndividualOnboardingWizard from "./IndividualOnboardingWizard";
 import CorporateOnboardingWizard from "./CorporateOnboardingWizard";
-import { corporateOnboardingFlow } from "@/Services/Onboarding/corporateOnboarding.api";
-import { individualOnboardingFlow } from "@/Services/Onboarding/individualOnboarding.api";
+import { useOnboardingFlows } from "@/Hooks/Onboarding/useOnboardingFlows";
 
 // Who is signing up (Agents, stores and POS, phase 1): agents sign up and sign
 // in through this same portal. Offered when the bank's options list the AGENT
@@ -41,6 +39,7 @@ const MERCHANT_KINDS = [
 // (from the sign-in page's "Get started" link) and runs themselves through
 // the institution's published onboarding form via IndividualOnboardingWizard.
 export default function SignUp() {
+  const { corporateOnboardingFlow, individualOnboardingFlow } = useOnboardingFlows();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [merchantKind, setMerchantKind] = useState("individual");
@@ -72,7 +71,7 @@ export default function SignUp() {
     return () => {
       live = false;
     };
-  }, []);
+  }, [corporateOnboardingFlow, individualOnboardingFlow]);
   useEffect(() => {
     let cancelled = false;
     corporateOnboardingFlow
@@ -82,7 +81,7 @@ export default function SignUp() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [corporateOnboardingFlow]);
 
 
   return (

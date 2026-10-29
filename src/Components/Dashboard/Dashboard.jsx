@@ -6,9 +6,9 @@ import { navScreens } from "@/Utils/Config/routeConfig";
 import { useTranslation } from "react-i18next";
 import { Check, LayoutGrid, RotateCcw } from "lucide-react";
 import { DashboardGrid } from "./layout/DashboardGrid";
-import { useDashboardLayout } from "./layout/useDashboardLayout";
-import { isHidden, useDashboardServer } from "./layout/dashboardData";
-import { AccountDataContext, useAccountDataLoader } from "./layout/accountData";
+import { useDashboardLayout } from "@/Hooks/Dashboard/useDashboardLayout";
+import { isHidden, useDashboardServer } from "@/Hooks/Dashboard/useDashboardServer";
+import { AccountDataContext, useAccountDataLoader } from "@/Hooks/Dashboard/useAccountData";
 import { WIDGET_REGISTRY } from "./layout/widgetRegistry";
 
 // A customizable widget dashboard (same model as the admin portal's Control

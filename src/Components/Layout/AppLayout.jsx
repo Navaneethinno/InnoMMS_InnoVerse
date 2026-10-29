@@ -11,14 +11,8 @@ import {
   TransactionPinDialog,
   useNeedsTransactionPin,
 } from "@/Components/Common/Payments/TransactionPinSetup";
-import { loadMenu } from "@/Services/Menu/menu.api";
-import { loadUnreadCount } from "@/Services/Inbox/inbox.api";
-import { countCases } from "@/Services/Cases/cases.api";
-import {
-  connectLive,
-  useNotificationReceived,
-  useCaseChanged,
-} from "@/Services/api/liveUpdates";
+import { useLiveChannel } from "@/Hooks/Live/useLiveUpdates";
+import { useMenuAndBadges } from "@/Hooks/Layout/useMenuAndBadges";
 import { useDispatch } from "react-redux";
 import { userUpdated } from "@/Redux/slices/authSlice";
 import { useIdleSignOut } from "@/Hooks/Auth/useIdleSignOut";
@@ -64,31 +58,7 @@ export default function AppLayout() {
   const needsTxnPin = useNeedsTransactionPin();
   const [pinDialogClosed, setPinDialogClosed] = useState(false);
   const dispatch = useDispatch();
-  const { i18n } = useTranslation();
-  // The menu and the features come from the API (labels in the portal's language).
-  useEffect(() => {
-    loadMenu()
-      .then((loaded) => dispatch(userUpdated(loaded)))
-      .catch(() => {});
-  }, [dispatch, i18n.language]);
-  // The inbox's unread count, for the badge; live while the portal is open.
-  // Cases waiting for the user: the menu's badge (zeros for a store user).
-  const refreshCases = () =>
-    countCases()
-      .then((count) => dispatch(userUpdated({ casesAction: count.action_needed ?? 0 })))
-      .catch(() => {});
-  useCaseChanged(refreshCases);
-  const refreshUnread = () => {
-    loadUnreadCount()
-      .then((unread) => dispatch(userUpdated({ unread })))
-      .catch(() => {});
-    refreshCases();
-  };
-  useEffect(() => {
-    void refreshUnread();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useNotificationReceived(refreshUnread);
+  useMenuAndBadges();
   useEffect(() => {
     const locked = () => dispatch(userUpdated({ pinLocked: true }));
     window.addEventListener("merchant:pin-locked", locked);
@@ -113,7 +83,7 @@ export default function AppLayout() {
   }, [refreshMe]);
 
   useEffect(() => setDrawer(false), [location.pathname]);
-  useEffect(() => connectLive(), []);
+  useLiveChannel();
   useEffect(() => {
     if (!drawer) return undefined;
     const onKey = (event) => event.key === "Escape" && setDrawer(false);

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { loadLimits } from "@/Services/Account/account.api";
+import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import { formatMoney } from "@/Utils/Lib/format";
 
 // How much of each limit is left for the wallet and kind of payment about to be
 // made, before an amount is typed. Nothing is drawn when no limit applies.
 export default function LimitsList({ wallet, txnType }) {
+  const { loadLimits } = useAccountActions();
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
   const acctNum = wallet?.acct_num;
@@ -18,7 +19,7 @@ export default function LimitsList({ wallet, txnType }) {
     return () => {
       cancelled = true;
     };
-  }, [acctNum]);
+  }, [acctNum, loadLimits]);
 
   const entry = rows.find((row) => row.acct_num === acctNum);
   const limits = entry?.types?.find((type) => type.txn_type === txnType)?.limits ?? [];

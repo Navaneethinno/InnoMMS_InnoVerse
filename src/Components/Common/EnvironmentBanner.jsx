@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useEnvironment } from "@/Services/api/environment";
+import { useEnvironment } from "@/Hooks/Layout/useEnvironment";
 
 // A diagonal ribbon across the top-right corner of every screen while the
 // platform runs as UAT (testing). It can't be dismissed and clicks pass

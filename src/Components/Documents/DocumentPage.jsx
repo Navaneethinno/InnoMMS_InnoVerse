@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AuthCard from "@/Components/Auth/AuthCard";
-import { getDocument } from "@/Services/Documents/documents.api";
+import { useDocumentActions } from "@/Hooks/Documents/useDocumentActions";
 import DocumentContent from "./DocumentContent";
 
 // /legal/:code: one of the institution's documents, opened from the footer,
 // the sign-in page or the sign-up page (in a new tab).
 export default function DocumentPage() {
+  const { getDocument } = useDocumentActions();
   const { code } = useParams();
   const { t, i18n } = useTranslation();
   const [doc, setDoc] = useState(null);
@@ -21,7 +22,7 @@ export default function DocumentPage() {
     return () => {
       live = false;
     };
-  }, [code, i18n.language]);
+  }, [code, getDocument, i18n.language]);
 
   if (error) return <AuthCard title={t("docs.unavailable")} description={error} />;
   if (!doc) return <AuthCard title={t("docs.loading")} />;

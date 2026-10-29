@@ -5,14 +5,18 @@ import { apiLanguageHeader } from "@/Utils/Lib/apiLanguage";
 // - Reads: identical calls started within JOIN_MS share one request (the same
 //   wallets or menu asked for by several widgets at once).
 // - Settings that rarely change (menu, branding, filters, transaction types,
-//   providers, PIN rules, ...): a successful reply is reused for CACHE_MS.
+//   providers, policy, ...): a successful reply is reused for CACHE_MS.
 // - Any other call (send, add, rename, upload, ...) empties the cache, so the
 //   portal never shows the merchant's own change stale. Sign-out empties it too.
+// - Paths match by their last segment, so a segment goes in READ only when
+//   every endpoint ending in it is a read. `status` is not there: card/status,
+//   pos_profile/status and pos_shift/status change things, and must clear the
+//   cache like any other write.
 
 const JOIN_MS = 300;
 const CACHE_MS = 60000;
-const READ = /\/(list|get|options|wallets|history|history_filters|transaction|receipt|limits|summary|txn_types|ext_providers|ext_last|saved_accounts|my_code|phone_transfers|menu|unread_count|profile|avatar_presets|status|layout_get|branding|language|pin_rules|policy|sessions|me|float|signups|agents|offers|quote|applications|application_get|preclose_quote|settlement_quote)$/;
-const CACHED = /\/(options|history_filters|txn_types|ext_providers|menu|avatar_presets|branding|language|pin_rules|policy)$/;
+const READ = /\/(list|get|options|wallets|history|history_filters|transaction|receipt|limits|summary|txn_types|ext_providers|ext_last|saved_accounts|my_code|phone_transfers|menu|unread_count|profile|avatar_presets|layout_get|branding|language|policy|sessions|me|float|signups|agents|offers|quote|applications|application_get|preclose_quote|settlement_quote)$/;
+const CACHED = /\/(options|history_filters|txn_types|ext_providers|menu|avatar_presets|branding|language|policy)$/;
 
 const inflight = new Map();
 const cache = new Map();

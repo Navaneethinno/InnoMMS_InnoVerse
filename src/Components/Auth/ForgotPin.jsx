@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { forgotPin, sendCode } from "@/Services/Auth/auth.api";
+import { useAuthActions } from "@/Hooks/Auth/useAuthActions";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import AuthCard from "./AuthCard";
 import CodeFlow from "./CodeFlow";
@@ -8,6 +8,7 @@ import CodeFlow from "./CodeFlow";
 // A forgotten PIN where the portal signs in with a PIN: a code to the
 // merchant's phone, then the new PIN typed twice. It also lifts a sign-in lock.
 export default function ForgotPin() {
+  const { sendCode, forgotPin } = useAuthActions();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const policy = usePortalPolicy();

@@ -7,7 +7,7 @@ import { cn } from "@/Utils/Lib/utils";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./dashboardGrid.css";
-import { mergeVisible, stackItems, toGridItems } from "./gridLayout";
+import { mergeVisible, stackItems, toGridItems } from "@/Utils/Lib/gridLayout";
 import { GRID_COLS, MAX_SPAN, ROW_HEIGHT, WIDGET_REGISTRY } from "./widgetRegistry";
 
 const ResponsiveGrid = WidthProvider(Responsive);

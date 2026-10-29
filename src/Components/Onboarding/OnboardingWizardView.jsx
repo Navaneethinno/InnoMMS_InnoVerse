@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, ArrowLeft, ArrowRight, Check, Phone, Info, RotateCcw } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, ArrowRight, Check, Info, RotateCcw } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import PhoneField from "@/Components/Common/PhoneField";
 import ConfirmDialog from "@/Components/Common/ConfirmDialog";
@@ -13,7 +13,7 @@ import OnboardingCodeDialog from "./OnboardingCodeDialog";
 import OnboardingField from "./OnboardingField";
 import OnboardingTour from "./OnboardingTour";
 import SignupConsent from "@/Components/Documents/SignupConsent";
-import { rememberConsent } from "@/Services/Documents/documents.api";
+import { useDocumentActions } from "@/Hooks/Documents/useDocumentActions";
 
 // Shared rendering for every self-service onboarding wizard, once it has
 // started: progress bar, KYC panel (individual only — a no-op otherwise),
@@ -24,6 +24,7 @@ import { rememberConsent } from "@/Services/Documents/documents.api";
 // party-type-and-what picker fields are the only part that genuinely
 // differs between individual and corporate.
 export default function OnboardingWizardView({ flow, identityFields, onSubmitted, onActiveChange, tourRequest, tourEnabled = false, askConsent = false }) {
+  const { rememberConsent } = useDocumentActions();
   // Sign-up only: the documents the institution requires, accepted before submitting.
   const [consent, setConsent] = useState({ ok: !askConsent, ids: [] });
   const {

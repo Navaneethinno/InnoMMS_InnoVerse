@@ -17,13 +17,8 @@ import { TransactionPinNotice } from "@/Components/Common/Payments/TransactionPi
 import WalletPanel from "@/Components/Common/Payments/WalletPanel";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { useExtOrderTracking } from "@/Hooks/Account/useExtOrderTracking";
-import { useWalletChanged } from "@/Services/api/liveUpdates";
-import {
-  loadExtProviders,
-  loadWallets,
-  quoteExt,
-  sendExt,
-} from "@/Services/Account/account.api";
+import { useWalletChanged } from "@/Hooks/Live/useLiveUpdates";
+import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import { formatMoney, newReference } from "@/Utils/Lib/format";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
@@ -64,6 +59,7 @@ export default function ExtFlow({
   credit,
   texts = {},
 }) {
+  const { loadWallets, quoteExt, sendExt } = useAccountActions();
   const { t } = useTranslation();
   const user = useSelector((state) => state.auth.user);
   const pinRules = usePinRules();
@@ -616,6 +612,7 @@ export function Chips({ options, value, onChange, allowNone, highlight }) {
 // The providers of one kind (MOBILE_WALLET, BANK, AIRTIME, ELECTRICITY,
 // BILLER); null while loading, [] when the call fails (its message in `problem`).
 export function useProviders(kind) {
+  const { loadExtProviders } = useAccountActions();
   const [state, setState] = useState({ list: null, problem: "" });
   useEffect(() => {
     loadExtProviders()
@@ -626,7 +623,7 @@ export function useProviders(kind) {
         }),
       )
       .catch((error) => setState({ list: [], problem: error.message }));
-  }, [kind]);
+  }, [kind, loadExtProviders]);
   return state;
 }
 

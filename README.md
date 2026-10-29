@@ -31,19 +31,16 @@ The shared axios client includes auth headers, single-flight refresh and one ret
 
 ## Architecture
 
-- `Components/Common`: reusable UI primitives (Radix handles modal/dropdown/tooltip accessibility). Reuse these before writing feature markup.
-- `Components/Layout`: authenticated shell and merchant-only route protection.
-- `Components/Auth`: independently designed login UI.
-- `Hooks/Master`: reserved for confirmed merchant reference lookups; `Hooks/Auth` owns login state.
-- `Services/api`: shared HTTP, storage, error/response normalization and pending contract mappings.
-- `Services/Auth`: thin API wrapper, importing centralized endpoints only.
-- `Redux`: cross-route session state.
-- `Router`: composition-only root, public/authenticated groups and verbatim generic admin `routeSupport.jsx`.
-- `Utils/I18n`: flat English/Portuguese translation maps; all screen copy uses translation keys.
-- `Utils/Config`: route metadata; `Utils/Lib`: notifications, class and field-layout helpers.
-- `Pages` and `assets`: reserved for future page shells/assets.
+See `CODING.md` for the full folder layout and conventions. In short:
 
-Add merchant feature folders and lazy route arrays only as features are implemented. Re-export each route group from `Router/index.js` and spread protected feature groups in `authenticatedRoutes.jsx`. There are no admin roles, master CRUD, maker-checker actions, onboarding configuration editors, or shared admin imports. Tables and file uploads are deferred until list/KYC screens exist.
+- `Components/<Module>/<Menu>/`: screens, mirroring the sidebar (Dashboard, Payments, Transactions, Cards, Finance, Messages, Account, Agents, Stores), each menu folder holding its own dialogs and helpers.
+- `Components/Common`, `Components/Layout`, `Components/Tour`: shared UI primitives (Radix handles modal/dropdown/tooltip accessibility), the authenticated shell with route protection, and the guided tour.
+- `Components/Auth`, `Components/Onboarding`, `Components/Documents`: the public (pre-login) screens.
+- `Hooks/<Feature>`: state and side effects; `Services/<Api group>`: thin API wrappers importing centralized endpoints only; `Services/api`: shared HTTP, storage, error/response normalization.
+- `Redux`: cross-route session state.
+- `Router`: composition-only root, public/authenticated groups, one route list per sidebar module, and verbatim `routeSupport.jsx`.
+- `Utils/I18n`: flat English/Portuguese/Arabic translation maps; all screen copy uses translation keys.
+- `Utils/Config`: sidebar/route metadata; `Utils/Lib`: pure helpers.
 
 ## Verification
 
@@ -55,10 +52,7 @@ React Router is kept on the explicitly requested v6. npm reports two moderate ad
 
 `src/fonts.css` is the single font source: Plus Jakarta Sans, matching the admin app. To change the font everywhere, edit its `--font-sans` value and the Google Fonts import in that same file. Tailwind font utilities, form controls, and toast notifications use that token. System fonts are used while the web font loads or if Google Fonts is unavailable.
 
-## Dashboard loading animation
+## Loading indicator
 
-The supplied asset is `src/assets/animations/dashboard-loading.lottie`. The feature-specific player is `Components/Dashboard/DashboardLoading.jsx`. It bundles the WASM renderer locally, loops while the request is pending, respects reduced motion, and falls back to the shared loading indicator if the animation fails. Loading status is announced to screen readers without visible text over the animation.
+Pages and sections show `Components/Common/LoadingAnimation.jsx`, a spinner drawn in the theme colour so it follows the bank branding; motion is switched off by the global `prefers-reduced-motion` rule in `styles.css`.
 
-Successful login navigates to the protected `/dashboard`. `useDashboard` handles loading, success, error, retry and cancellation. The dashboard service reports configuration missing until its verified URL, method and schema are supplied. It never simulates success or leaves an indefinite animation on an unconfigured endpoint.
-
-`npm run test:e2e` mocks contracts only in tests to verify the animation renders after login, disappears on completion or failure, supports retry and remains behind route protection.

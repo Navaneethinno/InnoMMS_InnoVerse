@@ -1,5 +1,3 @@
-import { useSyncExternalStore } from "react";
-
 // Which platform the API runs as: every reply carries `X-Environment` (UAT or
 // PRODUCTION). The first reply after the page loads decides it for the
 // session. Only an explicit UAT counts; a missing header is never taken as UAT.
@@ -37,9 +35,9 @@ export function setTabTitle(title) {
   applyTitle();
 }
 
-const subscribe = (listener) => {
+// For Hooks/Layout/useEnvironment.js.
+export const subscribeEnvironment = (listener) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
-export const useEnvironment = () =>
-  useSyncExternalStore(subscribe, () => environment);
+export const readEnvironment = () => environment;

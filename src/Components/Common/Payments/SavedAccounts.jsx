@@ -3,18 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Bookmark, Check, Pencil, Trash2, X } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import TextField from "@/Components/Common/TextField";
-import {
-  addSavedAccount,
-  deleteSavedAccount,
-  loadSavedAccounts,
-  renameSavedAccount,
-} from "@/Services/Account/account.api";
+import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 
 // Saved meters or numbers (kind ELECTRICITY | AIRTIME, up to 20): tap one to
 // use it; "Edit" renames or removes them.
 const SAVED_MAX = 20;
 
 export function useSavedAccounts(kind) {
+  const { loadSavedAccounts } = useAccountActions();
   const [items, setItems] = useState([]);
   const reload = useCallback(
     () =>
@@ -23,13 +19,14 @@ export function useSavedAccounts(kind) {
           setItems(rows.filter((r) => !r.kind || r.kind === kind)),
         )
         .catch(() => {}),
-    [kind],
+    [kind, loadSavedAccounts],
   );
   useEffect(() => void reload(), [reload]);
   return { items, reload };
 }
 
 export default function SavedAccounts({ saved, value, onPick, title }) {
+  const { renameSavedAccount, deleteSavedAccount } = useAccountActions();
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [renaming, setRenaming] = useState(null);
@@ -150,6 +147,7 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
 
 // "Save this meter / number", on the done screen, when it isn't saved yet.
 export function SaveAccount({ saved, kind, account, label }) {
+  const { addSavedAccount } = useAccountActions();
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [state, setState] = useState("");

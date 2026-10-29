@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import FitText from "@/Components/Common/FitText";
 import { formatMoney } from "@/Utils/Lib/format";
-import { monthTotals, useAccountData } from "../layout/accountData";
+import { monthTotals, useAccountData } from "@/Hooks/Dashboard/useAccountData";
 import { Balance, BalanceEye, BalanceGroup } from "@/Components/Common/Balance";
 
 function StatCard({ label, value, sub, icon, loading, action }) {

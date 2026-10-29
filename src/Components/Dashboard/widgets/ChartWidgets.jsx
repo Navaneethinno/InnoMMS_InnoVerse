@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { formatCompact, formatMoney } from "@/Utils/Lib/format";
-import { monthlyFlow, useAccountData } from "../layout/accountData";
+import { monthlyFlow, useAccountData } from "@/Hooks/Dashboard/useAccountData";
 import { WidgetCard } from "./WidgetCard";
 
 // Chart colours follow the theme (and the bank's branding) through CSS

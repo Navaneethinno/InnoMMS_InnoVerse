@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from "@/Utils/Constant";
 import { portalPost } from "@/Services/api/portalRequest";
-import { LAYOUT_VERSION } from "@/Components/Dashboard/layout/gridLayout";
+import { LAYOUT_VERSION } from "@/Utils/Lib/gridLayout";
 
 // The merchant's dashboard layout, kept by the server. `layout_get` answers
 // { layout (null until one is saved), widgets: the ids this merchant may

@@ -1,36 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Bell, CreditCard, FileText } from "lucide-react";
-import { loadCards } from "@/Services/Cards/cards.api";
-import { listNotifications } from "@/Services/Inbox/inbox.api";
-import { listStatements } from "@/Services/Statements/statements.api";
-import {
-  useCardChanged,
-  useNotificationReceived,
-} from "@/Services/api/liveUpdates";
+import { useCardsWidgetData, useNotificationsWidgetData, useStatementsWidgetData } from "@/Hooks/Dashboard/useWidgetData";
+import { useCardChanged, useNotificationReceived } from "@/Hooks/Live/useLiveUpdates";
 import { formatDate, formatDateTime } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 import { WidgetCard } from "./WidgetCard";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
-
-// A small widget's own data: `load` once, again when `refresh` events say so.
-function useWidgetData(load) {
-  const [state, setState] = useState({ data: null, loading: true, error: "" });
-  const run = useCallback(() => {
-    load()
-      .then((data) => setState({ data, loading: false, error: "" }))
-      .catch((error) =>
-        setState((previous) => ({
-          ...previous,
-          loading: false,
-          error: error.message,
-        })),
-      );
-  }, [load]);
-  useEffect(() => run(), [run]);
-  return { ...state, run };
-}
 
 const Body = ({ loading, error, empty, children }) => {
   if (loading)
@@ -64,10 +40,9 @@ const ViewAll = ({ to }) => {
   );
 };
 
-const loadCardList = async () => (await loadCards()).cards ?? [];
 export function CardsWidget() {
   const { t } = useTranslation();
-  const { data, loading, error, run } = useWidgetData(loadCardList);
+  const { data, loading, error, run } = useCardsWidgetData();
   useCardChanged(run);
   return (
     <WidgetCard title={t("dash.cardsWidget")} icon={CreditCard}>
@@ -104,10 +79,9 @@ export function CardsWidget() {
   );
 }
 
-const loadLatestNotifications = () => listNotifications({ limit: 4 });
 export function NotificationsWidget() {
   const { t } = useTranslation();
-  const { data, loading, error, run } = useWidgetData(loadLatestNotifications);
+  const { data, loading, error, run } = useNotificationsWidgetData();
   useNotificationReceived(run);
   const unread = data?.unread ?? 0;
   return (
@@ -153,10 +127,9 @@ export function NotificationsWidget() {
   );
 }
 
-const loadLatestStatements = () => listStatements({ limit: 3 });
 export function StatementsWidget() {
   const { t } = useTranslation();
-  const { data, loading, error } = useWidgetData(loadLatestStatements);
+  const { data, loading, error } = useStatementsWidgetData();
   return (
     <WidgetCard
       title={t("dash.statementsWidget")}

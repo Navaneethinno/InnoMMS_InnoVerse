@@ -10,9 +10,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useSelector } from "react-redux";
-import { TransactionLine } from "@/Components/History/History";
+import { TransactionLine } from "@/Components/Transactions/History/History";
 import FitText from "@/Components/Common/FitText";
-import { useAccountData } from "../layout/accountData";
+import { useAccountData } from "@/Hooks/Dashboard/useAccountData";
 import { WidgetCard } from "./WidgetCard";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
 

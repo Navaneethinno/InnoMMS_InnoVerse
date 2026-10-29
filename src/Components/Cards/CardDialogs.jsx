@@ -4,24 +4,13 @@ import { Eye, EyeOff } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import FilterSelect from "@/Components/Common/FilterSelect";
 import TextField from "@/Components/Common/TextField";
-import { loadWallets } from "@/Services/Account/account.api";
-import {
-  changeCardPin,
-  issueCard,
-  loadCardDetails,
-  quoteCardMove,
-  reissueCard,
-  requestCard,
-  resetCardPin,
-  sendCardMove,
-  setCardPin,
-  setCardStatus,
-} from "@/Services/Cards/cards.api";
+import { useAccountActions } from "@/Hooks/Account/useAccountActions";
+import { useCardsActions } from "@/Hooks/Cards/useCardsActions";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { PinInput, Shell, useCall } from "@/Components/Common/ActionDialog";
 import { formatMoney, newReference } from "@/Utils/Lib/format";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
-import PosReceipt from "../Common/Payments/PosReceipt";
+import PosReceipt from "@/Components/Common/Payments/PosReceipt";
 import { balanceText, useBalancesShown } from "@/Components/Common/Balance";
 
 // The card dialogs. Each makes its one call; `onDone` refreshes the page.
@@ -45,6 +34,7 @@ const feeLine = (t, fee, currency) => (Number(fee) > 0 ? t("cards.feeIs", { fee:
 // Get a card from an offer: a virtual card at once, or a personalised
 // physical card (a request). The fee is shown before the PIN.
 export function GetCardDialog({ offer, physical, onClose, onDone }) {
+  const { issueCard, requestCard } = useCardsActions();
   const { t } = useTranslation();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
@@ -78,6 +68,7 @@ export function GetCardDialog({ offer, physical, onClose, onDone }) {
 
 // The plastic of a virtual card: same number, delivered like a personalised card.
 export function PlasticDialog({ card, fee, onClose, onDone }) {
+  const { requestCard } = useCardsActions();
   const { t } = useTranslation();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
@@ -104,6 +95,7 @@ export function PlasticDialog({ card, fee, onClose, onDone }) {
 // The card PIN: set the first one (it activates a PIN_SET card), change it
 // with the current one, or reset it (also unlocks it) with the transaction PIN.
 export function CardPinDialog({ card, mode, onClose, onDone }) {
+  const { setCardPin, changeCardPin, resetCardPin } = useCardsActions();
   const { t } = useTranslation();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
@@ -134,6 +126,7 @@ export function CardPinDialog({ card, mode, onClose, onDone }) {
 // Block (at once), unblock (with the transaction PIN), or report lost or
 // stolen (for good: confirmed first).
 export function CardStatusDialog({ card, to, onClose, onDone }) {
+  const { setCardStatus } = useCardsActions();
   const { t } = useTranslation();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
@@ -155,6 +148,7 @@ const SHOW_SECONDS = 30;
 // the transaction PIN each time, shown for a short while, then gone. They
 // live only in this dialog's state and are dropped on close.
 export function CardDetailsDialog({ card, onClose }) {
+  const { loadCardDetails } = useCardsActions();
   const { t } = useTranslation();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
@@ -237,6 +231,7 @@ export function CardDetailsDialog({ card, onClose }) {
 // card, or a renewal near expiry. The fee, if the institution sets one, is
 // taken now.
 export function ReissueDialog({ card, reasons, onClose, onDone }) {
+  const { reissueCard } = useCardsActions();
   const { t } = useTranslation();
   const { entryMin: pinMin } = usePinRules();
   const { pending, problem, run } = useCall();
@@ -266,6 +261,8 @@ export function ReissueDialog({ card, reasons, onClose, onDone }) {
 // amount and wallet, the quote, the PIN when asked, then the receipt. One
 // client reference per attempt makes a retry safe.
 export function CardMoneyDialog({ card, txnType, onClose, onDone }) {
+  const { loadWallets } = useAccountActions();
+  const { quoteCardMove, sendCardMove } = useCardsActions();
   const { t } = useTranslation();
   const balancesShown = useBalancesShown();
   const { entryMin: pinMin } = usePinRules();
@@ -286,7 +283,7 @@ export function CardMoneyDialog({ card, txnType, onClose, onDone }) {
         setFrom(own[0]?.acct_num ?? "");
       })
       .catch(() => setWallets([]));
-  }, [card.currency_code]);
+  }, [card.currency_code, loadWallets]);
 
   const move = { txnType, cardId: card.id, amount, fromAcctNum: wallets.length > 1 ? from : "" };
   const review = () =>

@@ -21,13 +21,6 @@
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "")
   .replace(/\/+$/, "")
   .replace(/\/merchant\/(web|app)$/, "");
-// Public files (country flags) are served at the API host's root
-// (`/master/file/<path>`). VITE_ASSET_BASE_URL overrides the API host.
-const ASSET_BASE_URL = (
-  import.meta.env.VITE_ASSET_BASE_URL || API_BASE_URL
-).replace(/\/+$/, "");
-// A stored path (relative to the server's assets/ folder) passed through
-// unchanged, as the API requires.
 export const PORTAL_AUTHORIZATION =
   import.meta.env.VITE_PORTAL_AUTHORIZATION || "";
 // The digital product this portal runs under (its id), sent as
@@ -104,7 +97,6 @@ export const API_ENDPOINTS = {
     PIN_SET: authPath("pin_set"),
     SIGNIN_PIN_CHANGE: authPath("signin_pin_change"),
     PIN_RESET_START: authPath("pin_reset_start"),
-    PIN_RULES: authPath("pin_rules"),
     SESSIONS: authPath("sessions"),
     SESSION_END: authPath("session_end"),
     POLICY: authPath("policy"),
@@ -171,7 +163,6 @@ export const API_ENDPOINTS = {
   // "Complete your verification": a merchant approved at a lower KYC level
   // completes the next one, signed in.
   KYC: {
-    STATUS: kycPath("status"),
     UPGRADE: kycPath("upgrade"),
     UPGRADE_BACK: kycPath("upgrade_back"),
     UPGRADE_UPLOAD: kycPath("upgrade_upload"),
@@ -283,7 +274,6 @@ export const STORAGE_KEYS = {
   onboardingReference: (kind) => `innoverse-merchant:onboarding:${kind}`,
 };
 
-// One-time code settings for contact verification.
 // Server-wide file limits for `file` fields. A document type can narrow
 // both (`types[].file_formats` / `max_file_size_kb`).
 export const FILE_UPLOAD = {

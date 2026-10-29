@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useExtOrder } from "@/Services/api/liveUpdates";
+import { useExtOrder } from "@/Hooks/Live/useLiveUpdates";
 import { loadExtOrder, loadReceipt } from "@/Services/Account/account.api";
 
 // Follows an order to an outside provider (mobile money, bank, airtime,

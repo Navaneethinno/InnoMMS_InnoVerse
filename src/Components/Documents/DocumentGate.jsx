@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Modal from "@/Components/Common/Modal";
 import Button from "@/Components/Common/Button";
-import { acceptDocuments, getDocument, listDocuments, takeConsent } from "@/Services/Documents/documents.api";
+import { useDocumentActions } from "@/Hooks/Documents/useDocumentActions";
 import { forgetDocuments } from "@/Hooks/useDocuments";
 import DocumentContent from "./DocumentContent";
 
@@ -10,6 +10,7 @@ import DocumentContent from "./DocumentContent";
 // one, or a new version of one accepted before) block the portal until they
 // are accepted. What was accepted on the sign-up page is recorded first.
 export default function DocumentGate({ onSignOut }) {
+  const { takeConsent, acceptDocuments, listDocuments, getDocument } = useDocumentActions();
   const { t, i18n } = useTranslation();
   const [due, setDue] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -22,7 +23,7 @@ export default function DocumentGate({ onSignOut }) {
     const rows = await listDocuments().catch(() => []);
     const needed = rows.filter((d) => d.needs_acceptance);
     setDue(await Promise.all(needed.map((d) => getDocument(d.code).catch(() => d))));
-  }, []);
+  }, [acceptDocuments, getDocument, listDocuments, takeConsent]);
   useEffect(() => {
     void check();
   }, [check, i18n.language]);

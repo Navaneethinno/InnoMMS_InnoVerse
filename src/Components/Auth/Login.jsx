@@ -110,10 +110,10 @@ export default function Login() {
     window.setTimeout(() => navigate("/dashboard", { replace: true }), 700);
   };
   return (
-    <div className="min-h-screen bg-paper min-[880px]:grid min-[880px]:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+    <div className="min-h-screen bg-paper min-[880px]:grid min-[880px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {/* Brand panel: one hero message, vertically centred. */}
       <aside
-        className="brand-gradient login-hero sticky isolate top-0 hidden h-screen flex-col overflow-hidden px-10 py-9 text-white min-[880px]:flex xl:px-16"
+        className="brand-gradient login-hero sticky isolate top-0 hidden h-screen flex-col overflow-hidden rounded-r-[32px] px-10 py-9 text-white min-[880px]:flex xl:px-16"
         // The bank's own picture, under a wash of its colour so the text stays readable.
         style={
           background
@@ -156,7 +156,7 @@ export default function Login() {
             </div>
           </div>
         </div>
-        <div className="my-auto max-w-[520px]">
+        <div className="my-auto max-w-[520px] py-10">
           <div className="mb-6 flex items-center gap-3 text-[11px] font-semibold tracking-[0.2em] text-white/80">
             <span aria-hidden="true" className="h-px w-8 bg-white/60" />
             {t("auth.welcomeBadge")}
@@ -169,13 +169,13 @@ export default function Login() {
           <p className="mt-6 max-w-[38ch] text-base leading-7 text-white/[0.72]">
             {t("auth.heroDescription")}
           </p>
-          <ul className="login-features stagger mt-9 space-y-3.5">
+          <ul className="login-features stagger mt-9 grid gap-3">
             {FEATURES.map(([icon, key, fallback]) => (
               <li
                 key={key}
-                className="flex items-center gap-3 text-[15px] text-white/85"
+                className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-[14px] text-white/85"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.12] ring-1 ring-white/15">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.12] text-lime ring-1 ring-white/15">
                   {createElement(icon, { size: 17 })}
                 </span>
                 {t(key, { defaultValue: fallback })}
@@ -239,9 +239,9 @@ export default function Login() {
             <ThemeToggle className="h-9 w-9 border-ink/20" />
           </div>
         </header>
-        <main className="mx-auto flex w-full max-w-[400px] flex-1 flex-col justify-center py-4">
-          <div className="page-enter sm:rounded-3xl sm:border sm:border-slate-200 sm:bg-surface sm:p-8 sm:shadow-[0_20px_50px_-24px_rgb(15_23_42/0.25)] dark:sm:border-white/10 dark:sm:shadow-none">
-            <h1 className="font-display text-[28px] font-medium leading-tight tracking-tight text-ink">
+        <main className="mx-auto flex w-full max-w-[460px] flex-1 flex-col justify-center py-6">
+          <div className="page-enter relative rounded-3xl border border-ink/10 bg-surface px-6 py-8 shadow-xl shadow-ink/5 before:absolute before:left-8 before:right-8 before:top-0 before:h-1 before:rounded-b-full before:bg-lime sm:p-10 dark:border-white/10">
+            <h1 className="font-display text-[32px] font-medium leading-tight tracking-tight text-ink">
               {t("auth.title")}
             </h1>
             <p className="mt-2 text-[14.5px] text-slate-500">
@@ -257,7 +257,7 @@ export default function Login() {
               ].map(([key, fallback]) => (
                 <span
                   key={key}
-                  className="rounded-full bg-ink/5 px-2.5 py-1 text-[11px] font-semibold text-ink/70"
+                  className="rounded-full border border-ink/10 bg-paper px-2.5 py-1 text-[11px] font-semibold text-ink/70"
                 >
                   {t(key, { defaultValue: fallback })}
                 </span>

@@ -8,8 +8,7 @@ import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { usePolicy } from "@/Hooks/Auth/usePolicy";
-import { setTransactionPin } from "@/Services/Auth/auth.api";
-import { readAuthUser, updateAuthUser } from "@/Services/api/authStorage";
+import { useAuthActions } from "@/Hooks/Auth/useAuthActions";
 import { userUpdated } from "@/Redux/slices/authSlice";
 import { notifications } from "@/Utils/Lib/notifications";
 import { fitsPinRules, pinRuleText, sanitizePin } from "@/Utils/Lib/pinRules";
@@ -25,6 +24,7 @@ export function useNeedsTransactionPin() {
 // new PIN twice (sent once). The new PIN must differ from the sign-in PIN; the
 // API says so if it does not.
 export function TransactionPinForm({ onDone }) {
+  const { setTransactionPin, readAuthUser, updateAuthUser } = useAuthActions();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const rules = usePinRules();

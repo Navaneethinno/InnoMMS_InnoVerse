@@ -1,8 +1,8 @@
-import { flowLayout } from "./gridLayout";
-import { BalanceWidget, IncomeSpendingWidget } from "../widgets/StatWidgets";
-import { CashFlowWidget } from "../widgets/ChartWidgets";
-import { QuickActionsWidget, RecentTransactionsWidget, WalletsWidget } from "../widgets/ListWidgets";
-import { CardsWidget, NotificationsWidget, StatementsWidget } from "../widgets/FeatureWidgets";
+import { flowLayout } from "@/Utils/Lib/gridLayout";
+import { BalanceWidget, IncomeSpendingWidget } from "@/Components/Dashboard/widgets/StatWidgets";
+import { CashFlowWidget } from "@/Components/Dashboard/widgets/ChartWidgets";
+import { QuickActionsWidget, RecentTransactionsWidget, WalletsWidget } from "@/Components/Dashboard/widgets/ListWidgets";
+import { CardsWidget, NotificationsWidget, StatementsWidget } from "@/Components/Dashboard/widgets/FeatureWidgets";
 
 /**
  * @typedef {object} WidgetDefinition

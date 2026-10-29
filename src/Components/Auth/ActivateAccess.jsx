@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { activateAccess, sendCode } from "@/Services/Auth/auth.api";
+import { useAuthActions } from "@/Hooks/Auth/useAuthActions";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import AuthCard from "./AuthCard";
 import CodeFlow from "./CodeFlow";
@@ -8,6 +8,7 @@ import CodeFlow from "./CodeFlow";
 // First-time access for an approved merchant: code to their contact, then the
 // password and transaction PIN they choose.
 export default function ActivateAccess() {
+  const { sendCode, activateAccess } = useAuthActions();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const policy = usePortalPolicy();
