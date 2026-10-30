@@ -41,6 +41,13 @@ for (const client of [api, refreshClient]) {
     },
   );
 }
+// One notice for a burst of refused calls (a page loads several at once).
+let lastLocationNotice = 0;
+function noticeLocationBlocked(message) {
+  if (Date.now() - lastLocationNotice < 10000) return;
+  lastLocationNotice = Date.now();
+  notifications.error(message || "");
+}
 let refreshPromise = null;
 // 403s that refuse one call to this user's role, not the session.
 const ROLE_REFUSALS = new Set(["store.staff_not_allowed", "portal.super_agent_required"]);
@@ -136,6 +143,13 @@ api.interceptors.response.use(
     // Three wrong PINs lock the transaction PIN: tell the screens, which then
     // point to the reset.
     if (error.response?.data?.error_code === "portal.pin_locked") window.dispatchEvent(new Event("merchant:pin-locked"));
+    // Refused from where the user is (the institution's Access by Location
+    // policy): say why and keep the session. The same token works again from
+    // an allowed place. Only this code means it; other 403s are handled below.
+    if (error.response?.data?.error_code === "access.location_blocked") {
+      noticeLocationBlocked(error.response.data?.message);
+      return Promise.reject(error);
+    }
     // The institution disabled this merchant's access: say so and sign out.
     // A refusal of the call itself (keepsSession) leaves the session as it
     // is: the screen just says why.
