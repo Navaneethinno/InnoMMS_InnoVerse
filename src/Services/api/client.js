@@ -9,7 +9,7 @@ import {
   readSessionPolicy,
   clearAuthSession,
 } from "./authStorage";
-import { ApiConfigurationError } from "./apiErrors";
+import { ApiConfigurationError, readBlobPayload } from "./apiErrors";
 import { authContract } from "./authContract";
 import { deviceInfoHeader } from "./deviceInfo";
 import { notifications } from "@/Utils/Lib/notifications";
@@ -130,6 +130,12 @@ api.interceptors.response.use(
   },
   async (error) => {
     const request = error.config;
+    // A file call (an image, a statement) refuses in JSON too, but it arrives
+    // as a Blob: read it, so the checks below see its error_code.
+    if (error.response?.data instanceof Blob) {
+      const payload = await readBlobPayload(error.response.data);
+      if (payload) error.response.data = payload;
+    }
     // A sealed secret the server refused as damaged or too old: load the key
     // again where it changed, seal afresh and send once more.
     const sealCode = error.response?.data?.error_code;
