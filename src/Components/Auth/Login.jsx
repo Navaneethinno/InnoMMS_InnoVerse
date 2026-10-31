@@ -57,7 +57,10 @@ export default function Login() {
   const legal = useBrandingLinks();
   const docs = useDocuments();
   // The institution's own published document, else its branding link, else the portal's page.
-  const legalLink = (code, href, fallback) => (docs?.some((d) => d.code === code) ? { fallback: `/legal/${code}` } : { href, fallback });
+  const legalLink = (code, href, fallback) =>
+    docs?.some((d) => d.code === code)
+      ? { fallback: `/legal/${code}` }
+      : { href, fallback };
   const background = useBrandingLoginBackground();
   const navigate = useNavigate();
   const policy = usePortalPolicy();
@@ -230,7 +233,7 @@ export default function Login() {
 
       {/* Sign-in form, centred on the same axis as the hero. */}
       <div className="flex min-h-screen min-w-0 flex-col px-5 sm:px-10">
-        <header className="flex items-center justify-between gap-3 py-5 min-[880px]:justify-end">
+        <header className="login-head flex items-center justify-between gap-3 py-5 min-[880px]:justify-end">
           <div className="min-w-0 [&_span:last-child]:whitespace-nowrap [&_span:last-child]:text-base sm:[&_span:last-child]:text-xl min-[880px]:hidden">
             <Brand />
           </div>
@@ -239,8 +242,8 @@ export default function Login() {
             <ThemeToggle className="h-9 w-9 border-ink/20" />
           </div>
         </header>
-        <main className="mx-auto flex w-full max-w-[460px] flex-1 flex-col justify-center py-6">
-          <div className="page-enter relative rounded-3xl border border-ink/10 bg-surface px-6 py-8 shadow-xl shadow-ink/5 before:absolute before:left-8 before:right-8 before:top-0 before:h-1 before:rounded-b-full before:bg-lime sm:p-10 dark:border-white/10">
+        <main className="login-main mx-auto flex w-full max-w-[460px] flex-1 flex-col justify-center py-6">
+          <div className="login-card page-enter relative rounded-3xl border border-ink/10 bg-surface px-6 py-8 shadow-xl shadow-ink/5 before:absolute before:left-8 before:right-8 before:top-0 before:h-1 before:rounded-b-full before:bg-lime sm:p-10 dark:border-white/10">
             <h1 className="font-display text-[32px] font-medium leading-tight tracking-tight text-ink">
               {t("auth.title")}
             </h1>
@@ -249,7 +252,7 @@ export default function Login() {
             </p>
             {/* One sign-in for everyone in this portal: merchants, agents and
               super agents, and store managers and cashiers. */}
-            <p className="mt-3 inline-flex flex-wrap gap-1.5">
+            <p className="login-chips mt-3 inline-flex flex-wrap gap-1.5">
               {[
                 ["auth.whoMerchant", "Merchants"],
                 ["auth.whoAgent", "Agents"],
@@ -450,7 +453,7 @@ export default function Login() {
                 </button>
               )}
               {byPin && (
-                <p className="flex gap-2 rounded-xl bg-ink/[0.04] px-3 py-2.5 text-[11.5px] leading-4 text-slate-500 dark:bg-white/[0.04]">
+                <p className="login-hint flex gap-2 rounded-xl bg-ink/[0.04] px-3 py-2.5 text-[11.5px] leading-4 text-slate-500 dark:bg-white/[0.04]">
                   <Info size={14} className="mt-px shrink-0" />
                   {t("auth.staffPinHint", {
                     defaultValue:
@@ -471,7 +474,7 @@ export default function Login() {
                 </button>
               </p>
             )}
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 dark:border-white/10">
+            <div className="login-foot mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 dark:border-white/10">
               <p className="flex items-center gap-2 text-sm text-slate-500">
                 {t("auth.newHere")}
                 <button
@@ -496,17 +499,23 @@ export default function Login() {
             <Trans
               i18nKey="auth.terms"
               components={{
-                terms: <LegalLink {...legalLink("TERMS", legal.terms, "/terms")} />,
-                privacy: <LegalLink {...legalLink("PRIVACY", legal.privacy, "/privacy")} />,
+                terms: (
+                  <LegalLink {...legalLink("TERMS", legal.terms, "/terms")} />
+                ),
+                privacy: (
+                  <LegalLink
+                    {...legalLink("PRIVACY", legal.privacy, "/privacy")}
+                  />
+                ),
               }}
             />
           </p>
-          <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-400">
+          <p className="login-private mt-1 flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-400">
             <ShieldCheck size={13} className="shrink-0" />
             {t("auth.privateSession")}
           </p>
         </main>
-        <Footer className="py-4" />
+        <Footer className="login-footer py-4" />
       </div>
       <Modal
         open={Boolean(dialog)}

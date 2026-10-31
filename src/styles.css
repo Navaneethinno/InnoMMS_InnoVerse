@@ -262,6 +262,25 @@ html.dark:root {
   .login-hero h2 { font-size: 2.5rem; }
 }
 
+/* Sign-in on a short window (a laptop at 100%): the form tightens up and drops
+   its extras so the whole of it fits without scrolling. */
+@media (max-height: 900px) {
+  .login-head { padding-top: 0.75rem; padding-bottom: 0.5rem; }
+  .login-main { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+  .login-card { padding: 1.5rem 2rem; }
+  .login-card h1 { font-size: 1.625rem; }
+  .login-chips, .login-hint, .login-private { display: none; }
+  .login-foot { margin-top: 1rem; padding-top: 0.875rem; }
+  .login-main > p { margin-top: 0.75rem; }
+  .login-footer { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+}
+@media (max-height: 720px) {
+  .login-card form { margin-top: 1rem; }
+  .login-card form > * + * { margin-top: 0.75rem; }
+  .login-head { padding-top: 0.5rem; padding-bottom: 0.25rem; }
+  .login-card { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+}
+
 /* Sidebar motion: items arrive one after another, labels fade in as the rail
    opens, the active page's pill pops in with its accent bar, and the phone
    drawer slides in over a fading backdrop. */
