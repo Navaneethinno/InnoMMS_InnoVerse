@@ -1,3 +1,4 @@
+import { screenDenied } from "./screenDenied";
 import {
   MessagesSquare,
   ArrowRightLeft,
@@ -75,6 +76,8 @@ export const navScreens = {
     icon: MonitorSmartphone,
   },
 };
+
+export const isScreenDenied = (menu, pathname) => screenDenied(navScreens, menu, pathname);
 
 // The API's menu -> the sidebar's items, in its order, unknown keys dropped.
 export const navFromMenu = (menu) =>

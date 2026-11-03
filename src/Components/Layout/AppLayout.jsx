@@ -1,6 +1,8 @@
+import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { isScreenDenied } from "@/Utils/Config/routeConfig";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import Footer from "./Footer";
@@ -45,6 +47,7 @@ const readCollapsed = () => {
 export default function AppLayout() {
   const { t } = useTranslation();
   const location = useLocation();
+  const menu = useSelector((state) => state.auth.user?.menu);
   // Balances hide again on every new page, and when the tab is left.
   useHideBalancesOnLeave();
   useEffect(() => hideBalances(), [location.pathname]);
@@ -137,7 +140,7 @@ export default function AppLayout() {
           <main className="flex-1 px-1 pb-4 pt-2 sm:px-2">
             {/* Each screen rises in as it opens. */}
             <div key={location.pathname} className="page-enter">
-              <Outlet />
+              {isScreenDenied(menu, location.pathname) ? <Navigate to="/dashboard" replace /> : <Outlet />}
             </div>
           </main>
           <Footer className="py-2" />
