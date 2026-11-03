@@ -4,7 +4,7 @@ vi.mock("@/Utils/I18n/i18n", () => ({ default: { resolvedLanguage: "en-US" } }))
 
 const { formatMoney, rememberCurrencies } = await import("./format");
 
-const spaces = (text) => text.replace(/[\s  ]/g, " ");
+const spaces = (text) => text.replace(/\s/g, " ");
 
 describe("formatMoney", () => {
   it("shows a decimal string with its currency", () => {

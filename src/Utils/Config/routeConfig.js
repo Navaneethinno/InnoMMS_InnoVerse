@@ -76,15 +76,6 @@ export const navScreens = {
   },
 };
 
-// What the sidebar shows until the menu has been fetched (or when it cannot be).
-export const navItems = [
-  "dashboard",
-  "send",
-  "history",
-  "cards",
-  "security",
-].map((key) => ({ key, ...navScreens[key] }));
-
 // The API's menu -> the sidebar's items, in its order, unknown keys dropped.
 export const navFromMenu = (menu) =>
   [...(menu ?? [])]

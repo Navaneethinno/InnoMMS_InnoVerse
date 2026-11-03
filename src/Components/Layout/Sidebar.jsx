@@ -5,7 +5,7 @@ import { Layers, LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import BrandLogo from "@/Components/Common/BrandLogo";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import { useSignOut } from "@/Hooks/Auth/useSignOut";
-import { navFromMenu, navItems } from "@/Utils/Config/routeConfig";
+import { navFromMenu } from "@/Utils/Config/routeConfig";
 import { cn } from "@/Utils/Lib/utils";
 
 // The portal's menu: the bank's logo and name on top, every page of the
@@ -27,7 +27,8 @@ export default function Sidebar({
   const menu = useSelector((state) => state.auth.user?.menu);
   const unread = useSelector((state) => state.auth.user?.unread) ?? 0;
   const casesAction = useSelector((state) => state.auth.user?.casesAction) ?? 0;
-  const items = menu?.length ? navFromMenu(menu) : navItems;
+  // Only what the API's menu grants; nothing until it has answered.
+  const items = menu?.length ? navFromMenu(menu) : [];
   // Icons only while collapsed and not being pointed at.
   const slim = collapsed && !hovering;
 
