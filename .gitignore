@@ -8,4 +8,4 @@ test-results/
 playwright-report/
 tests/
 .vercel
-/.vercel
+/.vercel.preview/

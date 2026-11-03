@@ -1,8 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en";
-import pt from "./locales/pt";
-import ar from "./locales/ar";
 import { setApiLanguage } from "@/Utils/Lib/apiLanguage";
 let language = "en";
 try {
@@ -13,7 +11,8 @@ try {
 i18n
   .use(initReactI18next)
   .init({
-    resources: { en: { translation: en }, pt: { translation: pt }, ar: { translation: ar } },
+    resources: { en: { translation: en } },
+    partialBundledLanguages: true,
     lng: language,
     fallbackLng: "en",
     keySeparator: false,
@@ -41,4 +40,19 @@ i18n.on("languageChanged", (lng) => {
     /* Locale still updates in memory. */
   }
 });
+
+// Other languages load when first used, so nobody downloads all of them.
+const OTHERS = { pt: () => import("./locales/pt"), ar: () => import("./locales/ar") };
+export async function loadLanguage(lng) {
+  const code = String(lng ?? "").split("-")[0];
+  if (!OTHERS[code] || i18n.hasResourceBundle(code, "translation")) return;
+  const { default: bundle } = await OTHERS[code]();
+  i18n.addResourceBundle(code, "translation", bundle, true, true);
+}
+const switchLanguage = i18n.changeLanguage.bind(i18n);
+i18n.changeLanguage = async (lng, callback) => {
+  await loadLanguage(lng);
+  return switchLanguage(lng, callback);
+};
+
 export default i18n;
