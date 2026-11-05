@@ -34,6 +34,9 @@ export async function portalDownload(endpoint, body = {}) {
   }
 }
 
+// A call's first row: data(portalPost(PATH, body)).
+export const data = async (call) => (await call).data;
+
 export async function portalPost(endpoint, body = {}, { signedIn = true } = {}) {
   try {
     const send = async () => {

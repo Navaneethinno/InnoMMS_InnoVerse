@@ -1,3 +1,4 @@
+import { MIN_PHONE_DIGITS } from "@/Utils/Constant";
 import i18n from "@/Utils/I18n/i18n";
 
 // How many decimals each currency has (wallets and summaries say so), and the
@@ -36,6 +37,24 @@ export function nationalDigits(phone, countries = []) {
   return dial ? digits.slice(dial.length) : digits;
 }
 
+// Whether a typed number has the digits its country needs (the policy's rule);
+// with no rule from the API, whether it could be a phone number at all.
+export function isPhoneComplete(phone, countries = []) {
+  const digits = digitsOnly(phone);
+  const country = countries.find((item) => digits.startsWith(digitsOnly(item.dial)));
+  const national = nationalDigits(phone, countries);
+  return national.length >= (country?.min ?? (countries[0]?.min || MIN_PHONE_DIGITS));
+}
+
+// What an amount field may hold as it is typed.
+export const amountInput = (value, decimals = 2) => {
+  const clean = String(value).replace(/[^\d.]/g, "");
+  const [whole, ...rest] = clean.split(".");
+  return rest.length ? `${whole}.${rest.join("").slice(0, decimals)}` : whole;
+};
+export const formatPercent = (value) => (value == null || value === "" ? "\u2014" : `${Number(value)}%`);
+export const walletLabel = (w) => `${w.acct_num} \u00b7 ${w.acct_product_name ?? ""} \u00b7 ${formatMoney(w.avail_bal, w.currency_code)}`;
+
 // Amounts arrive as decimal strings ("100.50") with a currency code.
 export function formatMoney(amount, currency, { signed = false } = {}) {
   const value = Number(amount);
@@ -44,11 +63,11 @@ export function formatMoney(amount, currency, { signed = false } = {}) {
   try {
     // The decimal string goes in as it is, so a very large amount keeps every digit.
     const digits = String(amount).trim().replace(/^[-+]/, "");
-    const code = currency || homeCurrency || "USD";
+    const code = currency || homeCurrency;
     const places = decimalsOf.get(code);
     const formatter = new Intl.NumberFormat(i18n.resolvedLanguage, {
-      style: "currency",
-      currency: code,
+      // No currency known: the plain number, never a guessed currency.
+      ...(code ? { style: "currency", currency: code } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       ...(places != null
         ? { minimumFractionDigits: places, maximumFractionDigits: places }
         : {}),

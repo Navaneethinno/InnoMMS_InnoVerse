@@ -228,6 +228,12 @@ export const SESSION_END_WARN_SECONDS = 90;
 export const LOGIN_PAUSE_MS = 3 * 60 * 1000;
 export const STORAGE_KEYS = {
   session: "innoverse-merchant:session",
+  language: "innoverse-merchant:language",
+  apiLanguage: "apiLang",
+  deviceId: "innoverse-merchant:device-id",
+  printerSound: "innoverse-merchant:printer-sound",
+  documentsConsent: "documents.acceptAfterSignIn",
+  chunkReload: "innoverse:chunk-reload-attempted",
   branding: "innoverse-merchant:branding",
   theme: "innoverse-merchant:theme",
   // "1" while the merchant has collapsed the sidebar; cleared at every sign-in
@@ -238,6 +244,13 @@ export const STORAGE_KEYS = {
   onboardingTour: (kind) => `innoverse-merchant:tour:${kind}`,
   onboardingReference: (kind) => `innoverse-merchant:onboarding:${kind}`,
 };
+
+// The fewest digits that can be a phone number when the API gives no rule.
+export const MIN_PHONE_DIGITS = 7;
+// Longest text the portal's free-text fields take.
+export const FIELD_LIMITS = { note: 255, name: 64, nameOnCard: 26 };
+// A CREDELEC meter number's length.
+export const METER_LENGTH = { min: 6, max: 20 };
 
 // Server-wide file limits for `file` fields. A document type can narrow
 // both (`types[].file_formats` / `max_file_size_kb`).

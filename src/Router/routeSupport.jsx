@@ -1,3 +1,4 @@
+import { STORAGE_KEYS } from "@/Utils/Constant";
 import { Component, Suspense } from "react";
 import { LoadingAnimation } from "@/Components/Common/LoadingAnimation";
 const pageFallback = (
@@ -8,7 +9,7 @@ const pageFallback = (
 
 const CHUNK_ERROR_PATTERN =
   /Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed|dynamically imported module/i;
-const RELOAD_FLAG_KEY = "innoverse:chunk-reload-attempted";
+const RELOAD_FLAG_KEY = STORAGE_KEYS.chunkReload;
 // A reload triggered by an older stale-chunk error stays "recent" for this
 // long; after it, a new stale-chunk error is treated as a fresh occurrence
 // (e.g. a second deploy landed later in the same tab session) rather than

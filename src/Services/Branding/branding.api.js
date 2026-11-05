@@ -1,13 +1,10 @@
+import { portalHeaders } from "@/Services/api/portalHeaders";
 import i18n from "@/Utils/I18n/i18n";
-import { API_ENDPOINTS, INST_PROFILE_ID, PORTAL_AUTHORIZATION } from "@/Utils/Constant";
+import { API_ENDPOINTS, INST_PROFILE_ID } from "@/Utils/Constant";
 import { api, requireEndpoint } from "@/Services/api/client";
 import { readBlobPayload, toApiRequestError } from "@/Services/api/apiErrors";
 import { apiLanguageHeader } from "@/Utils/Lib/apiLanguage";
 
-const portalHeaders = () => ({
-  ...(PORTAL_AUTHORIZATION ? { Authorization: PORTAL_AUTHORIZATION } : {}),
-  ...apiLanguageHeader(),
-});
 
 // The bank's approved theme colours. Resolves to { primary_color,
 // secondary_color, logo, favicon }

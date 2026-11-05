@@ -1,9 +1,8 @@
 import { API_ENDPOINTS } from "@/Utils/Constant";
 import { rememberCurrencies } from "@/Utils/Lib/format";
-import { portalPost } from "@/Services/api/portalRequest";
+import { portalPost, data } from "@/Services/api/portalRequest";
 
 const { ACCOUNT, CONTACTS } = API_ENDPOINTS;
-const data = async (call) => (await call).data;
 
 // The merchant's Active wallets: { acct_num, currency_code, avail_bal,
 // ledger_bal, acct_product_name, digital_product_name, status_name,

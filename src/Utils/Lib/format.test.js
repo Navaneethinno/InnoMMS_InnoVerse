@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/Utils/I18n/i18n", () => ({ default: { resolvedLanguage: "en-US" } }));
 
-const { formatMoney, localIsoDay, moneyOrNull, nationalDigits, rememberCurrencies } = await import("./format");
+const { amountInput, formatMoney, isPhoneComplete, localIsoDay, moneyOrNull, nationalDigits, rememberCurrencies } = await import("./format");
 
 const spaces = (text) => text.replace(/\s/g, " ");
 
@@ -63,5 +63,32 @@ describe("moneyOrNull", () => {
     expect(moneyOrNull(null, "USD")).toBeNull();
     expect(moneyOrNull("", "USD")).toBeNull();
     expect(moneyOrNull("0", "USD")).toBe("$0.00");
+  });
+});
+
+describe("isPhoneComplete", () => {
+  it("follows the country's rule from the policy", () => {
+    const nigeria = [{ dial: "+234", min: 10 }];
+    expect(isPhoneComplete("+234801234567", nigeria)).toBe(false);
+    expect(isPhoneComplete("+2348012345678", nigeria)).toBe(true);
+  });
+  it("needs only a plausible length with no rule", () => {
+    expect(isPhoneComplete("123456", [])).toBe(false);
+    expect(isPhoneComplete("1234567", [])).toBe(true);
+  });
+});
+
+describe("amountInput", () => {
+  it("keeps digits and the allowed decimals", () => {
+    expect(amountInput("1a2.345", 2)).toBe("12.34");
+    expect(amountInput("1.2.3", 2)).toBe("1.23");
+  });
+});
+
+describe("formatMoney with no currency", () => {
+  it("shows the plain number, not a guessed currency", async () => {
+    vi.resetModules();
+    const fresh = await import("./format");
+    expect(fresh.formatMoney("10")).toBe("10.00");
   });
 });

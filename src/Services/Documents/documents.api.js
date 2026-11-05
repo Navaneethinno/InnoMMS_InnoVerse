@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, INST_PROFILE_ID } from "@/Utils/Constant";
+import { API_ENDPOINTS, INST_PROFILE_ID, STORAGE_KEYS } from "@/Utils/Constant";
 import { portalPost } from "@/Services/api/portalRequest";
 import { getStoredAccessToken } from "@/Services/api/authStorage";
 
@@ -19,7 +19,7 @@ export const getDocument = (code) => portalPost(API_ENDPOINTS.DOCUMENT.GET, with
 export const acceptDocuments = (versionIds) => portalPost(API_ENDPOINTS.DOCUMENT.ACCEPT, { version_ids: versionIds });
 
 // What was accepted on the sign-up page, recorded after the first sign-in.
-const CONSENT_KEY = "documents.acceptAfterSignIn";
+const CONSENT_KEY = STORAGE_KEYS.documentsConsent;
 export function rememberConsent(versionIds) {
   try {
     if (versionIds.length) window.localStorage.setItem(CONSENT_KEY, JSON.stringify(versionIds));

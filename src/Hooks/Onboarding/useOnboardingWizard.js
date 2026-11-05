@@ -1,3 +1,4 @@
+import { scrollToTop } from "@/Utils/Lib/utils";
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { notifications } from "@/Utils/Lib/notifications";
@@ -45,7 +46,6 @@ function forgetReference(kind) {
 
 // Every action's outcome (errors included) is shown at the top of the
 // page, so each one ends by bringing the merchant back there.
-const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 // An answer counts as empty when it is "", missing, an empty list, or a
 // front-and-back file pair with neither side.

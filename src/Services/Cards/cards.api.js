@@ -1,8 +1,7 @@
 import { API_ENDPOINTS } from "@/Utils/Constant";
-import { portalPost } from "@/Services/api/portalRequest";
+import { portalPost, data } from "@/Services/api/portalRequest";
 
 const { CARD, ACCOUNT } = API_ENDPOINTS;
-const data = async (call) => (await call).data;
 
 // The merchant's cards. `pin` is always the transaction PIN; `card_pin` the
 // card's own. Calls that charge money take an `idempotency_key` (one per

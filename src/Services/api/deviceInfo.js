@@ -1,6 +1,7 @@
+import { STORAGE_KEYS } from "@/Utils/Constant";
 // The `Deviceinfo` header sent with every call: the device is recorded on
 // every transaction. `device_id` is made once per browser and kept.
-const KEY = "innoverse-merchant:device-id";
+const KEY = STORAGE_KEYS.deviceId;
 
 function deviceId() {
   try {

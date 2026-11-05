@@ -1,10 +1,11 @@
+import { STORAGE_KEYS } from "@/Utils/Constant";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en";
 import { setApiLanguage } from "@/Utils/Lib/apiLanguage";
 let language = "en";
 try {
-  language = localStorage.getItem("innoverse-merchant:language") || "en";
+  language = localStorage.getItem(STORAGE_KEYS.language) || "en";
 } catch {
   /* Default locale. */
 }
@@ -35,7 +36,7 @@ i18n.on("languageChanged", (lng) => {
   applyDirection(lng);
   setApiLanguage(lng);
   try {
-    localStorage.setItem("innoverse-merchant:language", lng);
+    localStorage.setItem(STORAGE_KEYS.language, lng);
   } catch {
     /* Locale still updates in memory. */
   }
