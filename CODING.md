@@ -6,7 +6,9 @@ How this codebase is structured and the conventions to follow when changing it. 
 
 React 18 + Vite 6 (JS/JSX, no TypeScript) · React Router v6 (data router) · Redux Toolkit (session only) · axios · Tailwind 3 (CSS-variable colours) · i18next (en/pt/ar) · Radix UI primitives · lucide-react icons · react-toastify · react-joyride (onboarding tour) · react-grid-layout + recharts (dashboard) · Playwright (e2e).
 
-Commands: `npm run dev` (port 5174) · `npm run lint` · `npm run build` · `npm run test:e2e`.
+Commands: `npm run dev` (port 5174) · `npm run lint` · `npm test` · `npm run build` · `npm run test:e2e`.
+
+API paths live only in `Utils/Constant.jsx`, enforced by `Utils/apiPaths.test.js`. Polling goes through `Hooks/useVisiblePoll` (visible tab only, never overlapping). Fonts and the face detector's runtime are served with the portal; no outside hosts.
 
 Import alias: `@/` → `src/` (always use it; `./Sibling` is fine inside one folder, never `../`).
 
