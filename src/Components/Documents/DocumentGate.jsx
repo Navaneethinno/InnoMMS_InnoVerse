@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Modal from "@/Components/Common/Modal";
 import Button from "@/Components/Common/Button";
 import { useDocumentActions } from "@/Hooks/Documents/useDocumentActions";
 import { forgetDocuments } from "@/Hooks/useDocuments";
-import DocumentContent from "./DocumentContent";
+
+// The Markdown and clean-up libraries load only when a document is shown.
+const DocumentContent = lazy(() => import("./DocumentContent"));
 
 // After every sign-in: the documents the user must accept and hasn't (a new
 // one, or a new version of one accepted before) block the portal until they
@@ -54,7 +56,7 @@ export default function DocumentGate({ onSignOut }) {
           <section key={d.version_id}>
             <h3 className="mb-2 font-semibold text-ink">{d.title || d.name}</h3>
             <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200 p-4">
-              {d.content != null ? <DocumentContent doc={d} /> : <p className="text-sm text-slate-500">{t("docs.unavailable")}</p>}
+              {d.content != null ? <Suspense fallback={null}><DocumentContent doc={d} /></Suspense> : <p className="text-sm text-slate-500">{t("docs.unavailable")}</p>}
             </div>
           </section>
         ))}
