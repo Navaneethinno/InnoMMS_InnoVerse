@@ -60,7 +60,7 @@ export const navScreens = {
     labelKey: "nav.mobileMoney",
     icon: Smartphone,
   },
-  // Bank, airtime, CREDELEC, bills and the Paga-Daki code (owners, when offered).
+  // Bank, airtime, CREDELEC, bills and the merchant's code (owners, when offered).
   bank_transfer: {
     to: "/bank-transfer",
     labelKey: "nav.bankTransfer",

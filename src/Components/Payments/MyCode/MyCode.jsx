@@ -11,7 +11,7 @@ import PageTitle from "@/Components/Common/PageTitle";
 import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import { isStaff } from "@/Utils/Lib/roles";
 
-// The merchant's Paga-Daki code (account/my_code), large and as a QR
+// The merchant's code (account/my_code), large and as a QR
 // code, to show at the counter: customers type it (or scan it) to pay, and at
 // an agent, to take out cash. As on the Paysey portal, the QR can be
 // downloaded as a picture (made here, from the code) or printed.
@@ -44,7 +44,7 @@ export default function MyCode() {
 
   const heading = (
     <PageTitle
-      title={t("myCode.title", { defaultValue: "My Paga-Daki code" })}
+      title={t("myCode.title", { defaultValue: "My merchant code" })}
       subtitle={t("myCode.subtitle", {
         defaultValue: "Customers type this code in their app to pay you.",
       })}
@@ -67,7 +67,7 @@ export default function MyCode() {
           message={
             problem ||
             t("myCode.none", {
-              defaultValue: "You don't have a Paga-Daki code yet.",
+              defaultValue: "You don't have a merchant code yet.",
             })
           }
         />
@@ -78,7 +78,7 @@ export default function MyCode() {
   const isAgent = (user?.roles ?? []).some(
     (r) => String(r?.code ?? r).toUpperCase() === "AGENT",
   );
-  const label = t("myCode.label", { defaultValue: "Pay with Paga-Daki" });
+  const label = t("myCode.label", { defaultValue: "Pay by merchant code" });
   // A counter card: the name, the QR and the code, on white.
   const poster = () => {
     const qr = qrRef.current?.querySelector("canvas");
@@ -103,7 +103,7 @@ export default function MyCode() {
     ctx.fillText(
       t("myCode.posterHint", {
         defaultValue:
-          "Open your app, choose “Pay merchant Paga-Daki” and type this code.",
+          "Open your app, choose “Pay merchant” and type this code.",
       }),
       400,
       910,
@@ -116,7 +116,7 @@ export default function MyCode() {
     if (!url) return;
     const a = document.createElement("a");
     a.href = url;
-    a.download = `paga-daki-${code}.png`;
+    a.download = `merchant-code-${code}.png`;
     a.click();
   };
   const print = () => {
@@ -124,7 +124,7 @@ export default function MyCode() {
     const win = url && window.open("", "_blank", "width=600,height=800");
     if (!win) return;
     win.document.write(
-      `<title>Paga-Daki ${code}</title><body style="margin:0;display:flex;justify-content:center"><img src="${url}" style="max-width:100%;height:auto" onload="window.print()"></body>`,
+      `<title>${code}</title><body style="margin:0;display:flex;justify-content:center"><img src="${url}" style="max-width:100%;height:auto" onload="window.print()"></body>`,
     );
     win.document.close();
   };
@@ -182,7 +182,7 @@ export default function MyCode() {
                 Smartphone,
                 t("myCode.step1", {
                   defaultValue:
-                    "The customer opens their E-taku app and chooses “Pay merchant Paga-Daki”.",
+                    "The customer opens their {{brand}} app and chooses “Pay merchant”.",
                 }),
               ],
               [

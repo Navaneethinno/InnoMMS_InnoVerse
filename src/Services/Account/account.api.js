@@ -241,7 +241,7 @@ export const renameSavedAccount = ({ id, name }) =>
 export const deleteSavedAccount = (id) =>
   data(portalPost(ACCOUNT.SAVED_ACCOUNT_DELETE, { id }));
 
-// The merchant's Paga-Daki code: { merchant_code }.
+// The merchant's code: { merchant_code, qr_payload }.
 export const loadMyCode = () => data(portalPost(ACCOUNT.MY_CODE));
 
 // Newest first, every module. Resolves to { items, total, page }.

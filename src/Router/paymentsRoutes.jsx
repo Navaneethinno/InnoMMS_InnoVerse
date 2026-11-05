@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import { pageElement } from "./routeSupport";
 // Payments module: Send money, M-Pesa / e-Mola / mKesh, bank transfer,
-// airtime, CREDELEC, bills and the merchant's Paga-Daki code.
+// airtime, CREDELEC, bills and the merchant's code.
 const Send = lazy(() => import("@/Components/Payments/Send/Send"));
 const MobileMoney = lazy(() => import("@/Components/Payments/MobileMoney/MobileMoney"));
 const BankTransfer = lazy(() => import("@/Components/Payments/BankTransfer/BankTransfer"));

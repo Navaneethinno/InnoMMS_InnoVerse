@@ -121,7 +121,7 @@ export const API_ENDPOINTS = {
     SAVED_ACCOUNT_ADD: accountPath("saved_account_add"),
     SAVED_ACCOUNT_RENAME: accountPath("saved_account_rename"),
     SAVED_ACCOUNT_DELETE: accountPath("saved_account_delete"),
-    // The merchant's 7-digit Paga-Daki code.
+    // The merchant's code and its QR.
     MY_CODE: accountPath("my_code"),
     HISTORY_EXPORT: accountPath("history_export"),
     // Money sent to a number that is not a customer yet, waiting for them.
