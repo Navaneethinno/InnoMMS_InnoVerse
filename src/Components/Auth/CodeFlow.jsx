@@ -141,9 +141,9 @@ export default function CodeFlow({ askCode, submit, withPin = false, withPasswor
           <Button type="submit" pending={pending} disabled={code.length < CODE_LENGTH} className="w-full">
             {submitLabel}
           </Button>
-          <button type="button" onClick={requestCode} disabled={pending} className="mx-auto block text-xs font-semibold text-ink hover:underline disabled:opacity-50">
+          <Button variant="link" onClick={requestCode} disabled={pending} className="mx-auto block text-xs font-semibold disabled:opacity-50">
             {t("auth.sendCode")}
-          </button>
+          </Button>
         </form>
       )}
     </>

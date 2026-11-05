@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Check, Clock, Smartphone, XCircle } from "lucide-react";
-import Button from "@/Components/Common/Button";
+import Button, { buttonClass } from "@/Components/Common/Button";
 import CopyButton from "@/Components/Common/CopyButton";
 import DetailRow from "@/Components/Common/DetailRow";
 import ErrorState from "@/Components/Common/ErrorState";
@@ -243,7 +243,7 @@ export default function ExtFlow({
         </Button>
         <Link
           to="/history"
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-surface px-5 py-3.5 text-sm font-semibold text-ink hover:bg-slate-50"
+          className={buttonClass("secondary")}
         >
           {t("send.viewHistory")}
         </Link>
@@ -345,7 +345,7 @@ export default function ExtFlow({
       className="h-auto lg:sticky lg:top-28"
     />
   );
-  const card = "rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm";
+  const card = "panel p-6 shadow-sm";
 
   if (quote) {
     const needPin = quote.pin_required !== false;
@@ -359,7 +359,7 @@ export default function ExtFlow({
         </div>
         <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-2">
           <form onSubmit={send} className={card}>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+            <p className="eyebrow">
               {t("send.confirm")}
             </p>
             <FitText className="mt-2 font-black tracking-tight text-slate-800">
@@ -498,7 +498,7 @@ function StatusCard({
   const Icon = icon;
   const { t } = useTranslation();
   return (
-    <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-surface p-8 text-center shadow-sm">
+    <div className="mx-auto max-w-2xl panel p-8 text-center shadow-sm">
       <span
         className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-md ${tone === "bad" ? "bg-red-500/10 text-red-600" : "brand-gradient text-lime"}`}
       >
@@ -543,10 +543,10 @@ export function ExtDetails({ details }) {
   ]).filter(([, v]) => v != null && v !== "");
   if (!token && !rows.length) return null;
   return (
-    <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
+    <div className="mx-auto max-w-2xl panel p-6 shadow-sm">
       {token && (
         <>
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          <p className="eyebrow">
             {t("ext.token", { defaultValue: "Token" })}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">

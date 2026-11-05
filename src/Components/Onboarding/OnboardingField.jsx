@@ -6,7 +6,7 @@ import FieldError from "@/Components/Common/FieldError";
 import FilterSelect from "@/Components/Common/FilterSelect";
 import CheckboxPill from "@/Components/Common/CheckboxPill";
 import FileUploadField from "@/Components/Common/FileUploadField";
-import { cn } from "@/Utils/Lib/utils";
+import { cn, sameValue } from "@/Utils/Lib/utils";
 import DatePicker from "@/Components/Common/DatePicker";
 
 // Renders one wizard field exactly as the institution's form builder
@@ -35,7 +35,6 @@ function dateLimits(options = {}) {
 // What the server shows for a PIN it has stored.
 const PIN_MASK = "********";
 
-const sameValue = (a, b) => String(a) === String(b);
 
 // A text field's `pattern` option (and its `pattern_message`), checked as
 // the user types; the server checks it again on `next`.

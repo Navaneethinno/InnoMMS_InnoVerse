@@ -1,3 +1,4 @@
+import { FIELD_LIMITS } from "@/Utils/Constant";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Bookmark, Check, Pencil, Trash2, X } from "lucide-react";
@@ -73,7 +74,7 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
               <input
                 autoFocus
                 value={renaming.name}
-                maxLength={64}
+                maxLength={FIELD_LIMITS.name}
                 onChange={(event) =>
                   setRenaming({ ...renaming, name: event.target.value })
                 }
@@ -86,14 +87,13 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
               >
                 <Check size={14} />
               </button>
-              <button
-                type="button"
+              <Button variant="icon"
                 aria-label={t("list.clear")}
                 onClick={() => setRenaming(null)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-ink/5"
+                className="p-1 hover:bg-ink/5"
               >
                 <X size={14} />
-              </button>
+              </Button>
             </form>
           ) : (
             <span
@@ -185,7 +185,7 @@ export function SaveAccount({ saved, kind, account, label }) {
           name="saveName"
           icon={Bookmark}
           label={label}
-          maxLength={64}
+          maxLength={FIELD_LIMITS.name}
           placeholder={account}
           value={name}
           onChange={(event) => setName(event.target.value)}

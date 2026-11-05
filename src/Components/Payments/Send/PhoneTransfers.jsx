@@ -88,7 +88,7 @@ export default function PhoneTransfers({ version = 0, onCancelled, className }) 
       {current.rows.length === 0 ? (
         <p className="rounded-3xl border border-dashed border-slate-300 px-6 py-5 text-sm text-slate-500">{t("send.nothingWaiting", { defaultValue: "Nothing is waiting right now." })}</p>
       ) : (
-        <ul className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-surface shadow-sm">
+        <ul className="divide-y divide-slate-100 panel shadow-sm">
           {current.rows.map((row) => (
             <li key={row.id} className="flex flex-wrap items-center gap-3 p-4 sm:px-6">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink">

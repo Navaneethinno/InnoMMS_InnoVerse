@@ -27,7 +27,7 @@ export default function LimitsList({ wallet, txnType }) {
   const currency = entry?.currency_code ?? wallet?.currency_code;
   return (
     <div className="mt-4 rounded-2xl border border-slate-200 bg-paper/60 p-4">
-      <p className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">{t("limits.title")}</p>
+      <p className="mb-2 eyebrow">{t("limits.title")}</p>
       <ul className="space-y-3">
         {limits.map((limit, index) => {
           const byAmount = limit.max_amount != null;

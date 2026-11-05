@@ -31,7 +31,7 @@ export default function AuthCard({ title, description, children, wide = false })
         </div>
       </div>
       <main className={`mx-auto flex w-full flex-1 flex-col px-4 py-8 sm:px-0 ${wide ? "max-w-3xl" : "max-w-md justify-center"}`}>
-        <div className="rounded-3xl border border-slate-200 bg-surface p-7 shadow-sm sm:p-8">
+        <div className="panel p-7 shadow-sm sm:p-8">
           <h1 className="font-display text-[26px] font-medium leading-tight tracking-tight text-ink">{title}</h1>
           {description && <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p>}
           <div className="mt-6">{children}</div>

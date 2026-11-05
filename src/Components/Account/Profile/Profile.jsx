@@ -42,7 +42,7 @@ export default function Profile() {
   return (
     <div className="space-y-5">
       {error && <ErrorState message={error} />}
-      <section className="flex flex-col items-center gap-5 rounded-3xl border border-slate-200 bg-surface p-6 text-center shadow-sm sm:flex-row sm:text-start">
+      <section className="flex flex-col items-center gap-5 panel p-6 text-center shadow-sm sm:flex-row sm:text-start">
         <div className="relative shrink-0">
           <AvatarPreview name={header.name} onChange={() => setPhotoOpen(true)} />
           <button

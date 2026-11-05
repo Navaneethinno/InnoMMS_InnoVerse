@@ -1,3 +1,5 @@
+import { FIELD_LIMITS } from "@/Utils/Constant";
+import { scrollToTop } from "@/Utils/Lib/utils";
 import { useWalletChanged } from "@/Hooks/Live/useLiveUpdates";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -6,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, ArrowUpRight, Info, KeyRound, Store, Undo2, UserRound } from "lucide-react";
 import ModeSwitch from "@/Components/Common/ModeSwitch";
 import PageTitle from "@/Components/Common/PageTitle";
-import Button from "@/Components/Common/Button";
+import Button, { buttonClass } from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import PhoneField from "@/Components/Common/PhoneField";
 import TextField from "@/Components/Common/TextField";
@@ -14,7 +16,7 @@ import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import FitText from "@/Components/Common/FitText";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
-import { formatMoney, newReference } from "@/Utils/Lib/format";
+import { formatMoney, newReference, isPhoneComplete } from "@/Utils/Lib/format";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { rememberPayee } from "@/Utils/Lib/recentPayees";
 import LimitsList from "@/Components/Common/Payments/LimitsList";
@@ -39,7 +41,6 @@ import { Balance, BalanceEye } from "@/Components/Common/Balance";
 // only when `pin_required`. One `client_reference` is made per attempt and
 // reused when retrying, so a timeout and a retry can never pay twice.
 const refundableOf = (payment) => payment?.refundable ?? payment?.amount;
-const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 export default function Send() {
   const { loadWallets, checkPayee, quotePayment, sendPayment } = useAccountActions();
@@ -95,10 +96,11 @@ export default function Send() {
   // The number is checked on its own once it looks complete: who it is (the
   // name comes masked), or that no account has it yet.
   const number = form.to.trim();
+  const phoneComplete = isPhoneComplete(number, portalPolicy.phone.countries);
   useEffect(() => {
     setPayee(null);
     setUnknown(false);
-    if (refunding || number.replace(/\D/g, "").length < 7) return undefined;
+    if (refunding || !phoneComplete) return undefined;
     let live = true;
     const timer = setTimeout(async () => {
       setChecking(true);
@@ -120,7 +122,7 @@ export default function Send() {
       live = false;
       clearTimeout(timer);
     };
-  }, [checkPayee, number, refunding]);
+  }, [checkPayee, number, refunding, phoneComplete]);
   // Merchants send to people only: the server refuses a merchant's number.
   const payeeIsMerchant = payee?.party === "MERCHANT";
 
@@ -230,7 +232,7 @@ export default function Send() {
       >
         {!refunding && !refundOnly && !quote && !paid && user?.features?.mobile_money === true && (
           <Link to="/mobile-money" className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-ink underline-offset-2 hover:underline">
-            {t("ext.sendLink", { defaultValue: "Send to M-Pesa, e-Mola or mKesh, or top up →" })}
+            {t("ext.sendLink", { defaultValue: "Send to mobile money, or top up →" })}
           </Link>
         )}
       </PageTitle>
@@ -262,7 +264,7 @@ export default function Send() {
         className="py-2"
       >
         <Button onClick={again}>{refunding ? t("refund.again", { defaultValue: "Refund another" }) : t("send.again")}</Button>
-        <Link to="/history" className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-surface px-5 py-3.5 text-sm font-semibold text-ink hover:bg-slate-50">
+        <Link to="/history" className={buttonClass("secondary")}>
           {t("send.viewHistory")}
         </Link>
       </PosReceipt>
@@ -291,9 +293,9 @@ export default function Send() {
             event.preventDefault();
             if (!pending && !(quote.pin_required && pin.length < pinRules.entryMin)) void send();
           }}
-          className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm"
+          className="panel p-6 shadow-sm"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.confirm")}</p>
+          <p className="eyebrow">{t("send.confirm")}</p>
           <FitText className="mt-2 font-black tracking-tight text-slate-800">{formatMoney(quote.amount, quote.currency_code)}</FitText>
           <p className="mt-1 text-sm text-slate-500">
             {quote.txn_type_name} · {quote.to?.name ?? quote.to_phone ?? picked?.counterparty_name}
@@ -376,7 +378,7 @@ export default function Send() {
             <>
               {balanceAfter != null && (
                 <div className="mt-4 rounded-2xl bg-ink/5 p-4">
-                  <p className="flex items-center justify-between gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.balanceAfter", { defaultValue: "Balance after this payment" })}<BalanceEye className="-my-2 -me-1" /></p>
+                  <p className="flex items-center justify-between gap-2 eyebrow">{t("send.balanceAfter", { defaultValue: "Balance after this payment" })}<BalanceEye className="-my-2 -me-1" /></p>
                   <FitText className="mt-1 font-black tracking-tight text-slate-800"><Balance value={balanceAfter} currency={quote.currency_code} /></FitText>
                 </div>
               )}
@@ -413,7 +415,7 @@ export default function Send() {
       </div>
       <div className="grid max-w-6xl items-stretch gap-6 lg:grid-cols-2">
       <div className="min-w-0">
-      <form noValidate onSubmit={review} className="h-full space-y-5 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
+      <form noValidate onSubmit={review} className="h-full space-y-5 panel p-6 shadow-sm">
         {refunding ? (
           <RefundPicker picked={picked} onPick={pick} preselectRrn={refundRrn} />
         ) : (
@@ -462,12 +464,12 @@ export default function Send() {
             onChange={(event) => setForm((previous) => ({ ...previous, amount: event.target.value.replace(/[^\d.]/g, "") }))}
           />
           {refunding && picked && Number(form.amount) !== Number(refundMax) && !overRefund && (
-            <button type="button" onClick={() => setForm((previous) => ({ ...previous, amount: String(refundMax) }))} className="mt-2 text-xs font-bold text-ink underline-offset-2 hover:underline">
+            <Button variant="link" onClick={() => setForm((previous) => ({ ...previous, amount: String(refundMax) }))} className="mt-2 text-xs font-bold underline-offset-2">
               {t("refund.full", { amount: formatMoney(refundMax, picked.currency_code) })}
-            </button>
+            </Button>
           )}
         </div>
-        <TextField name="note" label={t("send.note")} maxLength={255} autoComplete="off" value={form.note} onChange={set("note")} />
+        <TextField name="note" label={t("send.note")} maxLength={FIELD_LIMITS.note} autoComplete="off" value={form.note} onChange={set("note")} />
         <Button type="submit" pending={pending} disabled={!ready || !Number(form.amount)} className="w-full">
           {t("send.review")}
           {!pending && <ArrowRight size={16} />}

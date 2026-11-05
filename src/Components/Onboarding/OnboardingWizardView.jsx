@@ -115,13 +115,12 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
       ))}
       {rowIndex !== undefined && editable && (
         <div className="sm:col-span-2">
-          <button
-            type="button"
+          <Button variant="danger"
             onClick={() => removeRow(rowIndex)}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10"
+            className="gap-1.5 rounded-lg px-2 py-1 text-xs font-bold"
           >
             <Trash2 size={13} /> {t("onb.remove")}
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -368,19 +367,18 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
           </div>
         )}
 
-        <div className="mt-6 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm sm:p-8">
+        <div className="mt-6 panel p-6 shadow-sm sm:p-8">
           {section.multi_row ? (
             <div className="grid grid-cols-1 gap-4">
               {(Array.isArray(effectiveDraft) ? effectiveDraft : []).map((row, i) => renderRow(section.fields, row, i))}
-              <button
-                type="button"
+              <Button variant="dashed"
                 data-tour="add-row"
                 disabled={section.max_rows != null && (effectiveDraft?.length ?? 0) >= section.max_rows}
                 onClick={addRow}
-                className="inline-flex w-fit items-center gap-1.5 rounded-xl border border-dashed border-ink/50 px-4 py-2 text-sm font-semibold text-ink hover:bg-ink/5 disabled:cursor-not-allowed disabled:opacity-40"
+                className="w-fit gap-1.5 border-ink/50 px-4 py-2 text-sm font-semibold text-ink hover:bg-ink/5 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Plus size={15} /> {t("onb.addAnother")}
-              </button>
+              </Button>
             </div>
           ) : (
             renderRow(section.fields, effectiveDraft ?? {}, undefined)
@@ -431,7 +429,7 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
           <Button variant="ghost"
-            disabled={isFirstStep || !canGoBack || navigating || saving}
+            disabled={isFirstStep || !canGoBack || navigating || saving} reason={t("common.pleaseWait")}
             onClick={() => void goBack()}
             className="gap-1.5 disabled:invisible"
           >
@@ -441,7 +439,7 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
             {section.required === false && (
               <Button variant="ghost"
                 data-tour="skip-step"
-                disabled={navigating || saving}
+                disabled={navigating || saving} reason={t("common.pleaseWait")}
                 onClick={() => void skipSection()}
                 
               >

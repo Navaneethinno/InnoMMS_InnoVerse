@@ -21,14 +21,13 @@ export function ListSearch({ list, placeholder, min = 6, className }) {
           className="w-full rounded-xl border border-slate-200 bg-surface py-2.5 ps-9 pe-9 text-sm outline-none transition focus:border-ink/40 focus:ring-2 focus:ring-ink/10 [&::-webkit-search-cancel-button]:hidden"
         />
         {list.query && (
-          <button
-            type="button"
+          <Button variant="icon"
             onClick={() => list.setQuery("")}
             aria-label={t("list.clear", { defaultValue: "Clear search" })}
-            className="absolute end-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 hover:bg-ink/5 hover:text-ink"
+            className="absolute end-2 top-1/2 -translate-y-1/2 p-1 hover:bg-ink/5 hover:text-ink"
           >
             <X size={14} />
-          </button>
+          </Button>
         )}
       </label>
       <span className="text-xs font-semibold text-slate-500">

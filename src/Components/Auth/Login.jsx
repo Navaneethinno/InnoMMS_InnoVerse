@@ -195,10 +195,9 @@ export default function Login() {
                 <Wallet size={13} />
                 {t("auth.previewWallet", { defaultValue: "Business wallet" })}
               </span>
-              <span>MZN</span>
             </div>
             <p className="mt-2 font-display text-2xl tracking-wide">
-              MZN ••••••
+              ••••••
             </p>
             <div className="mt-3 space-y-2 border-t border-white/15 pt-3 text-xs text-white/75">
               {[
@@ -405,23 +404,22 @@ export default function Login() {
                 </>
               )}
               <div className="-mt-1 flex items-center justify-end gap-3">
-                <button
-                  type="button"
+                <Button variant="link"
                   onClick={() =>
                     navigate(byPin ? "/forgot-pin" : "/forgot-password")
                   }
-                  className="rounded text-xs font-bold text-ink hover:underline"
+                  className="rounded text-xs font-bold"
                 >
                   {byPin
                     ? t("auth.forgotPin", { defaultValue: "Forgot PIN?" })
                     : t("auth.forgot")}
-                </button>
+                </Button>
               </div>
 
               <Button
                 type="submit"
                 animated
-                disabled={policy.status === "loading" || paused}
+                disabled={policy.status === "loading" || paused} reason={t("common.pleaseWait")}
                 pending={(pending || submitting) && !signedIn}
                 success={signedIn}
                 successLabel={t("auth.signedIn")}
@@ -465,13 +463,12 @@ export default function Login() {
             {canPassword && (
               <p className="mt-4 text-center text-sm text-slate-500">
                 {t("auth.firstTime")}{" "}
-                <button
-                  type="button"
+                <Button variant="link"
                   onClick={() => navigate("/activate")}
-                  className="font-bold text-ink hover:underline"
+                  className="font-bold"
                 >
                   {t("auth.activateLink")}
-                </button>
+                </Button>
               </p>
             )}
             <div className="login-foot mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 dark:border-white/10">

@@ -100,7 +100,7 @@ export default function CheckpointScreen({ flow }) {
           <ErrorState message={problemInfo.message} problems={problemInfo.problems} />
         </div>
       )}
-      <div className="rounded-3xl border border-slate-200 bg-surface p-6 text-center shadow-sm sm:p-8">
+      <div className="panel p-6 text-center shadow-sm sm:p-8">
         <span className="brand-gradient mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-lime">
           <Icon size={26} />
         </span>

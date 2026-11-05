@@ -13,7 +13,7 @@ import { PinInput, Shell, useCall } from "@/Components/Common/ActionDialog";
 import { TransactionPinNotice } from "@/Components/Common/Payments/TransactionPinSetup";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { useFinanceActions } from "@/Hooks/Finance/useFinanceActions";
-import { formatDate, formatDateTime, formatMoney } from "@/Utils/Lib/format";
+import { formatDate, formatDateTime, formatMoney, amountInput, formatPercent, walletLabel } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 
 // Term deposits: the merchant's own. Open one (the money moves at once),
@@ -22,13 +22,6 @@ import { cn } from "@/Utils/Lib/utils";
 
 const ORDER = ["ACTIVE", "MATURED", "CLOSED", "PREMATURELY_CLOSED"];
 const INSTRUCTIONS = ["PAYOUT", "RENEW_PRINCIPAL", "RENEW_PRINCIPAL_AND_INTEREST", "HOLD"];
-const amountInput = (value, decimals = 2) => {
-  const clean = String(value).replace(/[^\d.]/g, "");
-  const [whole, ...rest] = clean.split(".");
-  return rest.length ? `${whole}.${rest.join("").slice(0, decimals)}` : whole;
-};
-const pct = (value) => (value == null || value === "" ? "—" : `${Number(value)}%`);
-const walletLabel = (w) => `${w.acct_num} · ${w.acct_product_name ?? ""} · ${formatMoney(w.avail_bal, w.currency_code)}`;
 
 export default function Deposits() {
   const { loadDeposits, loadDeposit } = useFinanceActions();
@@ -91,12 +84,12 @@ export default function Deposits() {
       </div>
       <TransactionPinNotice />
       {problem && <ErrorState message={problem} onRetry={() => void refresh()} />}
-      {notice && <p className="rounded-2xl border border-emerald-500/40 bg-surface p-4 text-sm font-semibold text-emerald-700 dark:text-emerald-400">{notice}</p>}
+      {notice && <p className="notice-success">{notice}</p>}
 
       {rows === null ? (
         <p className="text-sm text-slate-500">{t("deposits.loading")}</p>
       ) : sorted.length === 0 ? (
-        <div className="rounded-3xl border border-slate-200 bg-surface">
+        <div className="panel">
           <EmptyState icon={Vault} title={t("deposits.empty")} description={t("deposits.emptyHint")} action={<Button onClick={() => setDialog({ kind: "open" })}>{t("deposits.open")}</Button>} />
         </div>
       ) : (
@@ -146,7 +139,7 @@ function DepositCard({ deposit: d, selected, onClick }) {
       </div>
       <p className="mt-3 text-xl font-black tabular-nums text-ink">{formatMoney(d.principal, d.currency_code)}</p>
       <p className="mt-1 text-xs text-slate-500">
-        {pct(d.annual_rate)} · {t("deposits.maturesOn", { date: formatDate(d.maturity_date) })}
+        {formatPercent(d.annual_rate)} · {t("deposits.maturesOn", { date: formatDate(d.maturity_date) })}
       </p>
     </button>
   );
@@ -157,7 +150,7 @@ function DepositDetail({ deposit: d, onAction }) {
   const interest = d.interest ?? {};
   const actions = d.actions ?? {};
   return (
-    <section className="space-y-5 rounded-3xl border border-slate-200 bg-surface p-5">
+    <section className="space-y-5 panel p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-black text-slate-800">{d.deposit_product_name ?? d.product_name}</h2>
@@ -171,7 +164,7 @@ function DepositDetail({ deposit: d, onAction }) {
         <DetailRow label={t("deposits.principal")} strong>
           {formatMoney(d.principal, d.currency_code)}
         </DetailRow>
-        <DetailRow label={t("deposits.rate")}>{pct(d.annual_rate)}</DetailRow>
+        <DetailRow label={t("deposits.rate")}>{formatPercent(d.annual_rate)}</DetailRow>
         <DetailRow label={t("deposits.tenor")}>{tenorText(t, d.tenor_label, d.tenor_days)}</DetailRow>
         <DetailRow label={t("deposits.start")}>{formatDate(d.start_date)}</DetailRow>
         <DetailRow label={t("deposits.maturity")}>{formatDate(d.maturity_date)}</DetailRow>
@@ -302,7 +295,7 @@ function OpenDepositDialog({ onClose, onDone }) {
           {quote && (
             <dl className="rounded-2xl bg-ink/5 px-4 py-1">
               <DetailRow label={t("deposits.rate")} strong>
-                {pct(quote.annual_rate)}
+                {formatPercent(quote.annual_rate)}
               </DetailRow>
               <DetailRow label={t("deposits.maturity")}>{formatDate(quote.maturity_date)}</DetailRow>
               <DetailRow label={t("deposits.payout")}>{t(`deposits.frequency.${config.interest_payout_frequency}`, { defaultValue: config.interest_payout_frequency })}</DetailRow>

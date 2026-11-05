@@ -76,9 +76,9 @@ export default function OnboardingCodeDialog({ flow }) {
           ) : cooldown > 0 && !expired ? (
             t("resume.resendIn", { time: clock(cooldown) })
           ) : (
-            <button type="button" disabled={starting || confirmingCode} onClick={() => void resendCode()} className="font-semibold text-ink hover:underline disabled:opacity-60">
+            <Button variant="link" disabled={starting || confirmingCode} reason={t("common.pleaseWait")} onClick={() => void resendCode()} className="font-semibold disabled:opacity-60">
               {t("resume.resend")}
-            </button>
+            </Button>
           )}
         </p>
       </form>

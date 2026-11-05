@@ -1,4 +1,4 @@
-import { nationalDigits } from "@/Utils/Lib/format";
+import { nationalDigits, isPhoneComplete } from "@/Utils/Lib/format";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
@@ -48,7 +48,7 @@ export default function MobileMoney() {
       : null;
   const typed = sending || form.other;
   const phone = typed ? form.phone.trim() : "";
-  const ready = Number(form.amount) > 0 && (!typed || digits.length >= 9);
+  const ready = Number(form.amount) > 0 && (!typed || isPhoneComplete(form.phone, portalPolicy.phone.countries));
   const request = sending
     ? { txn_type: TXN.send, to_phone_number: phone, amount: form.amount }
     : {
@@ -76,7 +76,7 @@ export default function MobileMoney() {
               label: t("ext.send", { defaultValue: "Send" }),
               description: t("ext.sendHint", {
                 defaultValue:
-                  "From your wallet to an M-Pesa, e-Mola or mKesh number.",
+                  "From your wallet to a mobile money number.",
               }),
             },
             {

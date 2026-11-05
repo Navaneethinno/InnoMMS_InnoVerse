@@ -1,3 +1,4 @@
+import { digitsOnly } from "@/Utils/Lib/format";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import FilterSelect from "./FilterSelect";
@@ -82,7 +83,7 @@ export default function PhoneField({ label, value, onChange, countries = [], all
             onChange={(event) => {
               // A number of the institution's countries is digits only; "Other" keeps what is typed (a leading + too).
               const raw = event.target.value;
-              const next = other ? raw.replace(/(?!^\+)\D/g, "").slice(0, 20) : raw.replace(/\D/g, "").slice(0, country.max);
+              const next = other ? raw.replace(/(?!^\+)\D/g, "").slice(0, 20) : digitsOnly(raw).slice(0, country.max);
               setDigits(next);
               emit(other, country, next);
             }}

@@ -90,7 +90,7 @@ export default function Statements() {
         </div>
       )}
 
-      <form onSubmit={exportRange} className="mb-8 rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm">
+      <form onSubmit={exportRange} className="mb-8 panel p-5 shadow-sm">
         <h2 className="text-base font-bold text-slate-800">{t("statements.exportTitle")}</h2>
         <p className="mt-1 text-sm text-slate-500">{t("statements.exportHint")}</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.4fr)_1fr_1fr_auto] lg:items-end">

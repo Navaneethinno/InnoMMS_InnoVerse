@@ -67,7 +67,7 @@ export default function AvatarDialog({ open, onOpenChange, avatar, name, onChang
               <li key={preset.code}>
                 <button
                   type="button"
-                  disabled={Boolean(busy)}
+                  disabled={Boolean(busy)} reason={t("common.pleaseWait")}
                   onClick={() => void run(preset.code, () => setAvatar(preset.code))}
                   aria-label={preset.label}
                   aria-pressed={chosen === preset.code}
@@ -91,13 +91,13 @@ export default function AvatarDialog({ open, onOpenChange, avatar, name, onChang
             if (file) void run("upload", () => uploadAvatar(file));
           }}
         />
-        <Button variant="secondary" className="w-full" pending={busy === "upload"} disabled={Boolean(busy)} onClick={() => input.current?.click()}>
+        <Button variant="secondary" className="w-full" pending={busy === "upload"} disabled={Boolean(busy)} reason={t("common.pleaseWait")} onClick={() => input.current?.click()}>
           <Upload size={16} /> {t("profile.upload", { defaultValue: "Upload a photo" })}
         </Button>
         <p className="text-center text-xs text-slate-500">{t("profile.uploadHint", { defaultValue: "JPG or PNG, up to 2 MB." })}</p>
         {avatar && avatar.kind !== "DEFAULT" && (
           <div className="text-center">
-            <button type="button" disabled={Boolean(busy)} onClick={() => void run("remove", removeAvatar)} className="text-sm font-semibold text-red-600 hover:underline disabled:opacity-60 dark:text-red-300">
+            <button type="button" disabled={Boolean(busy)} reason={t("common.pleaseWait")} onClick={() => void run("remove", removeAvatar)} className="text-sm font-semibold text-red-600 hover:underline disabled:opacity-60 dark:text-red-300">
               {t("profile.removePhoto", { defaultValue: "Remove photo" })}
             </button>
           </div>

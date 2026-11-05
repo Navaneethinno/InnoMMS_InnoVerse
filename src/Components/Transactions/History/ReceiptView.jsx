@@ -30,7 +30,7 @@ export default function ReceiptView({ receipt, className }) {
     <div className={cn("rounded-2xl border border-slate-200 bg-surface p-5", className)}>
       <div className="flex items-center justify-between gap-3 border-b border-dashed border-slate-300 pb-3">
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("receipt.title")}</p>
+          <p className="eyebrow">{t("receipt.title")}</p>
           <p className="truncate text-base font-semibold text-ink">{receipt.txn_short_desc ?? receipt.txn_type}</p>
         </div>
         {receipt.print_count > 0 && <span className="shrink-0 rounded-full bg-amber-400/25 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-amber-700 dark:text-amber-300">{t("receipt.duplicate")}</span>}

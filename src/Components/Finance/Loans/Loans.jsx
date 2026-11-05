@@ -14,7 +14,7 @@ import { PinInput, Shell, useCall } from "@/Components/Common/ActionDialog";
 import { TransactionPinNotice } from "@/Components/Common/Payments/TransactionPinSetup";
 import { usePinRules } from "@/Hooks/Auth/usePinRules";
 import { useFinanceActions } from "@/Hooks/Finance/useFinanceActions";
-import { formatDate, formatDateTime, formatMoney } from "@/Utils/Lib/format";
+import { formatDate, formatDateTime, formatMoney, amountInput, formatPercent, walletLabel, digitsOnly } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 
 // Loans: the merchant's own. See an exact offer and apply (accepting it);
@@ -22,13 +22,6 @@ import { cn } from "@/Utils/Lib/utils";
 // the loan off early.
 
 const OPEN_LOAN = ["DELINQUENT", "ACTIVE", "PENDING_DISBURSEMENT"];
-const amountInput = (value, decimals = 2) => {
-  const clean = String(value).replace(/[^\d.]/g, "");
-  const [whole, ...rest] = clean.split(".");
-  return rest.length ? `${whole}.${rest.join("").slice(0, decimals)}` : whole;
-};
-const pct = (value) => (value == null || value === "" ? "—" : `${Number(value)}%`);
-const walletLabel = (w) => `${w.acct_num} · ${w.acct_product_name ?? ""} · ${formatMoney(w.avail_bal, w.currency_code)}`;
 const termText = (t, value, unit) => t(`loans.unit.${unit}`, { count: Number(value), defaultValue: `${value} ${unit ?? ""}` });
 
 export default function Loans() {
@@ -105,7 +98,7 @@ export default function Loans() {
       </div>
       <TransactionPinNotice />
       {problem && <ErrorState message={problem} onRetry={() => void refresh()} />}
-      {notice && <p className="rounded-2xl border border-emerald-500/40 bg-surface p-4 text-sm font-semibold text-emerald-700 dark:text-emerald-400">{notice}</p>}
+      {notice && <p className="notice-success">{notice}</p>}
 
       <SegmentedTabs
         items={[
@@ -119,7 +112,7 @@ export default function Loans() {
       {loans === null ? (
         <p className="text-sm text-slate-500">{t("loans.loading")}</p>
       ) : empty ? (
-        <div className="rounded-3xl border border-slate-200 bg-surface">
+        <div className="panel">
           <EmptyState icon={BadgePercent} title={t(tab === "loans" ? "loans.noLoans" : "loans.noApplications")} description={t("loans.emptyHint")} action={<Button onClick={() => setDialog({ kind: "apply" })}>{t("loans.apply")}</Button>} />
         </div>
       ) : (
@@ -174,7 +167,7 @@ function ItemCard({ item: x, kind, selected, onClick }) {
       </div>
       <p className="mt-3 text-xl font-black tabular-nums text-ink">{formatMoney(kind === "loans" ? x.principal : x.amount, x.currency_code)}</p>
       <p className="mt-1 text-xs text-slate-500">
-        {pct(x.annual_rate)} · {termText(t, x.term_value, x.term_unit)}
+        {formatPercent(x.annual_rate)} · {termText(t, x.term_value, x.term_unit)}
         {kind === "loans" && x.status === "DELINQUENT" && Number(x.days_past_due) > 0 && <span className="font-bold text-red-600"> · {t("loans.daysLate", { count: Number(x.days_past_due) })}</span>}
       </p>
     </button>
@@ -220,7 +213,7 @@ function LoanDetail({ loan: l, onAction }) {
   const actions = l.actions ?? {};
   const cur = l.currency_code;
   return (
-    <section className="space-y-5 rounded-3xl border border-slate-200 bg-surface p-5">
+    <section className="space-y-5 panel p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-black text-slate-800">{l.product_name}</h2>
@@ -258,7 +251,7 @@ function LoanDetail({ loan: l, onAction }) {
       <dl>
         <DetailRow label={t("loans.principal")}>{formatMoney(l.principal, cur)}</DetailRow>
         <DetailRow label={t("loans.received")}>{formatMoney(l.net_disbursed, cur)}</DetailRow>
-        <DetailRow label={t("loans.rate")}>{pct(l.annual_rate)}</DetailRow>
+        <DetailRow label={t("loans.rate")}>{formatPercent(l.annual_rate)}</DetailRow>
         <DetailRow label={t("loans.term")}>{termText(t, l.term_value, l.term_unit)}</DetailRow>
         <DetailRow label={t("loans.paidOut")}>{formatDate(l.disbursement_date)}</DetailRow>
         <DetailRow label={t("loans.maturity")}>{formatDate(l.maturity_date)}</DetailRow>
@@ -282,7 +275,7 @@ function Disclosure({ d, currency }) {
             {formatMoney(first.total_due, cur)}
           </DetailRow>
         )}
-        <DetailRow label={t("loans.rate")}>{pct(d.annual_rate)}</DetailRow>
+        <DetailRow label={t("loans.rate")}>{formatPercent(d.annual_rate)}</DetailRow>
         {(d.fees ?? []).map((f) => (
           <DetailRow key={f.fee_code} label={f.fee_name ?? f.fee_code}>
             {formatMoney(f.amount, cur)}
@@ -302,7 +295,7 @@ function Disclosure({ d, currency }) {
 function ApplicationDetail({ application: a, onOpenLoan, onWithdraw }) {
   const { t } = useTranslation();
   return (
-    <section className="space-y-5 rounded-3xl border border-slate-200 bg-surface p-5">
+    <section className="space-y-5 panel p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-black text-slate-800">{a.product_name}</h2>
@@ -434,7 +427,7 @@ function ApplyDialog({ onClose, onDone }) {
             <FilterSelect label={t("loans.purpose")} value={form.purpose_code} onChange={(v) => change({ purpose_code: v })} placeholder={t("loans.choosePurpose")} options={purposes.map((p) => ({ value: p.code, label: p.label ?? p.code }))} />
             <TextField name="purpose_description" label={t("loans.purposeDetail")} maxLength={200} value={form.purpose_description} onChange={(e) => change({ purpose_description: e.target.value })} />
             {asksIncome && <TextField name="monthly_income" inputMode="decimal" label={t("loans.monthlyIncome")} value={form.monthly_income} onChange={(e) => change({ monthly_income: amountInput(e.target.value) })} />}
-            {asksMonths && <TextField name="operating_months" inputMode="numeric" label={t("loans.operatingMonths")} value={form.operating_months} onChange={(e) => change({ operating_months: e.target.value.replace(/\D/g, "").slice(0, 4) })} />}
+            {asksMonths && <TextField name="operating_months" inputMode="numeric" label={t("loans.operatingMonths")} value={form.operating_months} onChange={(e) => change({ operating_months: digitsOnly(e.target.value).slice(0, 4) })} />}
             <FilterSelect label={t("loans.paidInto")} placeholder={t("loans.mainAccount")} clearable value={form.disbursement} onChange={(v) => change({ disbursement: v })} options={wallets.map((w) => ({ value: String(w.id), label: walletLabel(w) }))} />
             <FilterSelect label={t("loans.repaidFrom")} placeholder={t("loans.sameAccount")} clearable value={form.repayment} onChange={(v) => change({ repayment: v })} options={wallets.map((w) => ({ value: String(w.id), label: walletLabel(w) }))} />
           </div>

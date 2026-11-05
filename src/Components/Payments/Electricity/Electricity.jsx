@@ -1,3 +1,4 @@
+import { METER_LENGTH } from "@/Utils/Constant";
 import Button from "@/Components/Common/Button";
 import { digitsOnly } from "@/Utils/Lib/format";
 import { useState } from "react";
@@ -27,7 +28,7 @@ export default function Electricity() {
   const saved = useSavedAccounts("ELECTRICITY");
   const [form, setForm] = useState(EMPTY);
   const meter = digitsOnly(form.meter);
-  const meterOk = meter.length >= 6 && meter.length <= 20;
+  const meterOk = meter.length >= METER_LENGTH.min && meter.length <= METER_LENGTH.max;
   const ready = meterOk && Number(form.amount) > 0;
   const request = {
     txn_type: "PREPAID_ELECTRICITY",
@@ -41,7 +42,7 @@ export default function Electricity() {
       title={t("power.title", { defaultValue: "Electricity" })}
       subtitle={t("power.subtitle", {
         defaultValue:
-          "Buy CREDELEC prepaid electricity and get the token here.",
+          "Buy prepaid electricity and get the token here.",
       })}
       featureKey="electricity"
       providers={list}
@@ -50,7 +51,7 @@ export default function Electricity() {
       ready={ready}
       onReset={() => setForm(EMPTY)}
       lines={() => [
-        [t("ext.type"), t("power.type", { defaultValue: "CREDELEC prepaid" })],
+        [t("ext.type"), t("power.type", { defaultValue: "Prepaid electricity" })],
         [t("power.meter", { defaultValue: "Meter number" }), meter],
       ]}
       extra={() => (
@@ -75,7 +76,7 @@ export default function Electricity() {
           name="meter"
           inputMode="numeric"
           autoComplete="off"
-          maxLength={24}
+          maxLength={METER_LENGTH.max}
           label={t("power.meter")}
           value={form.meter}
           onChange={(event) =>

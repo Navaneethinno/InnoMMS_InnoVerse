@@ -4,7 +4,7 @@ import { Camera, Check, Minus, RotateCcw, ScanFace, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useFaceDetector } from "@/Hooks/Camera/useFaceDetector";
 import { OVAL, PREVIEW, evaluateFrame } from "@/Utils/Lib/faceChecks";
-import { cn } from "@/Utils/Lib/utils";
+import { cn, reducedMotion } from "@/Utils/Lib/utils";
 
 // "Take a photo" for a `liveness` FILE field: the photo can only come from
 // the live camera, never from a gallery. The face is checked on every third
@@ -27,7 +27,6 @@ const CHIPS = [
 ];
 const NO_CHECKS = { found: false, distance: false, centred: false, lighting: false, steady: false };
 
-const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 export default function CameraCapture({ open, onOpenChange, onCapture }) {
   const { t } = useTranslation();

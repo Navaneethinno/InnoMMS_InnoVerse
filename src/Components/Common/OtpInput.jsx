@@ -1,3 +1,4 @@
+import { digitsOnly } from "@/Utils/Lib/format";
 import { useRef } from "react";
 import { cn } from "@/Utils/Lib/utils";
 
@@ -11,7 +12,7 @@ export default function OtpInput({ length, value, onChange, disabled = false, in
   const focusBox = (index) => boxes.current[Math.max(0, Math.min(length - 1, index))]?.focus();
 
   const setFrom = (index, text) => {
-    const clean = text.replace(/\D/g, "");
+    const clean = digitsOnly(text);
     if (!clean) return;
     const next = [...digits];
     for (let i = 0; i < clean.length && index + i < length; i += 1) next[index + i] = clean[i];

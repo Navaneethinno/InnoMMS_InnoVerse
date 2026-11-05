@@ -85,7 +85,7 @@ export default function Cards() {
           <ErrorState message={problem} onRetry={() => void refresh()} />
         </div>
       )}
-      {notice && <p className="rounded-2xl border border-emerald-500/40 bg-surface p-4 text-sm font-semibold text-emerald-700 dark:text-emerald-400">{notice}</p>}
+      {notice && <p className="notice-success">{notice}</p>}
 
       {state.cards === null ? (
         <p className="text-sm text-slate-500">{t("cards.loading")}</p>
@@ -186,7 +186,7 @@ function CardPanel({ card, offer, onDialog, onDone }) {
   return (
     <section className="min-w-0 lg:sticky lg:top-24">
       <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{t("cards.detailsTitle")}</h2>
-      <div className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm sm:p-7">
+      <div className="panel p-6 shadow-sm sm:p-7">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-5">
         <div className="min-w-0">
           <p className="font-mono text-lg font-bold text-slate-800 [overflow-wrap:anywhere]">{card.pan_masked}</p>
@@ -213,7 +213,7 @@ function CardPanel({ card, offer, onDialog, onDone }) {
         if (!items.length) return null;
         return (
           <div key={group} className={wrapper}>
-            {heading && <p className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">{t(heading)}</p>}
+            {heading && <p className="mb-2 eyebrow">{t(heading)}</p>}
             <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(min(100%,9.5rem),1fr))]">
               {items.map((b) => {
                 const Icon = b.icon;
@@ -249,7 +249,7 @@ function CardPanel({ card, offer, onDialog, onDone }) {
 
       {card.history?.length > 0 && (
         <div className="mt-6 border-t border-slate-100 pt-6">
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500">{t("cards.history")}</p>
+          <p className="mb-3 eyebrow">{t("cards.history")}</p>
           <ol className="max-h-64 space-y-2 overflow-y-auto pe-1 text-sm">
             {card.history.map((h, i) => (
               <li key={`${h.at}-${i}`} className="flex flex-wrap justify-between gap-x-3">
@@ -332,7 +332,7 @@ function Offers({ offers, onGet }) {
         {offers.map((o) => {
           const full = Number(o.held) >= Number(o.max_cards_per_customer);
           return (
-            <div key={o.card_product_id} className="flex min-w-0 flex-col rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
+            <div key={o.card_product_id} className="flex min-w-0 flex-col panel p-6 shadow-sm">
               <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-ink/5 text-ink">
                 <CreditCard size={19} />
               </span>
@@ -347,12 +347,12 @@ function Offers({ offers, onGet }) {
               </div>
               <div className="mt-auto grid gap-2.5 pt-5">
                 {o.virtual && (
-                  <Button disabled={full} onClick={() => onGet(o, false)} className="w-full px-4 py-3">
+                  <Button disabled={full} reason={t("cards.atMax")} onClick={() => onGet(o, false)} className="w-full px-4 py-3">
                     <Plus size={15} /> {t("cards.getVirtual")}
                   </Button>
                 )}
                 {o.personalised && (
-                  <Button variant="secondary" disabled={full} onClick={() => onGet(o, true)} className="w-full px-4 py-3">
+                  <Button variant="secondary" disabled={full} reason={t("cards.atMax")} onClick={() => onGet(o, true)} className="w-full px-4 py-3">
                     <Truck size={15} /> {t("cards.requestPhysical")}
                   </Button>
                 )}

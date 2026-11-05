@@ -1,3 +1,5 @@
+import { STORAGE_KEYS } from "@/Utils/Constant";
+import { reducedMotion } from "@/Utils/Lib/utils";
 import Button from "@/Components/Common/Button";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -29,9 +31,8 @@ import "./posReceipt.css";
 const ROOM = 32; // px under the paper: its bottom zigzag (8) and the lift after the tear
 const LIFT = 14; // how far the torn receipt hangs below the slot
 const FINAL = `translateY(${LIFT}px)`;
-const SOUND_KEY = "innoverse-merchant:printer-sound";
+const SOUND_KEY = STORAGE_KEYS.printerSound;
 const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
-const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 // The printer sound is on unless the merchant has switched it off.
 const readSound = () => {
   try {

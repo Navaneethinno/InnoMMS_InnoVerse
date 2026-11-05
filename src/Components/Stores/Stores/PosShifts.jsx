@@ -1,3 +1,4 @@
+import { FIELD_LIMITS } from "@/Utils/Constant";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Clock, Pencil, Plus, Trash2 } from "lucide-react";
@@ -52,16 +53,16 @@ function ShiftWindows({ windows, onChange }) {
             <input type="time" aria-label={t("stores.closes", { defaultValue: "Closes" })} className={cn("field-control w-28 py-1.5", w.opens === w.closes && "border-red-400")} value={w.closes} onChange={(e) => set(i, { closes: e.target.value })} />
             {TIME.test(w.opens) && TIME.test(w.closes) && w.closes < w.opens && <span className="text-xs text-slate-500">{t("pos.nextDay", { defaultValue: "(next day)" })}</span>}
             {windows.length > 1 && (
-              <button type="button" aria-label={t("pos.removeWindow", { defaultValue: "Remove this time" })} onClick={() => onChange(windows.filter((_, j) => j !== i))} className="ms-auto rounded-lg p-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-600">
+              <Button variant="icon" aria-label={t("pos.removeWindow", { defaultValue: "Remove this time" })} onClick={() => onChange(windows.filter((_, j) => j !== i))} className="ms-auto p-1.5 hover:bg-red-500/10 hover:text-red-600">
                 <Trash2 size={15} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...windows, { days: [], opens: "14:00", closes: "18:00" }])} className="flex items-center gap-1 text-xs font-semibold text-ink hover:underline">
+      <Button variant="link" onClick={() => onChange([...windows, { days: [], opens: "14:00", closes: "18:00" }])} className="flex gap-1 text-xs font-semibold">
         <Plus size={13} /> {t("pos.addWindow", { defaultValue: "Add another time (e.g. after a break)" })}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -94,7 +95,7 @@ export function ShiftDialog({ shift, onClose, onSaved }) {
     <Modal open onOpenChange={(open) => !open && onClose()} pending={pending} size="lg" title={editing ? t("pos.editShift", { defaultValue: "Edit shift" }) : t("pos.addShift", { defaultValue: "Add a shift" })}>
       <form noValidate onSubmit={submit} className="space-y-4">
         {problem && <ErrorState message={problem} />}
-        <TextField name="name" maxLength={64} label={t("pos.name", { defaultValue: "Name" })} value={name} onChange={(event) => setName(event.target.value)} />
+        <TextField name="name" maxLength={FIELD_LIMITS.name} label={t("pos.name", { defaultValue: "Name" })} value={name} onChange={(event) => setName(event.target.value)} />
         <div>
           <ShiftWindows windows={windows} onChange={setWindows} />
           {bad && <p className="mt-2 text-xs text-red-600">{t("pos.shiftHoursBad", { defaultValue: "Each time needs at least one day, and a start and an end time that aren't the same." })}</p>}
@@ -120,7 +121,7 @@ export default function PosShifts({ shifts, onEdit, onChanged }) {
   if (shifts === null) return <LoadingState />;
   if (!shifts.length)
     return (
-      <div className="rounded-3xl border border-slate-200 bg-surface shadow-sm">
+      <div className="panel shadow-sm">
         <EmptyState icon={Clock} title={t("pos.noShifts", { defaultValue: "No shifts yet" })} description={t("pos.noShiftsHint", { defaultValue: "A shift limits when a store user may sign in on a terminal. A user without one may sign in any time." })} />
       </div>
     );
@@ -131,7 +132,7 @@ export default function PosShifts({ shifts, onEdit, onChanged }) {
       <NoMatches list={list} />
       <ul className="grid gap-4 md:grid-cols-2">
         {list.visible.map((shift) => (
-          <li key={shift.id} className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm">
+          <li key={shift.id} className="flex flex-col panel p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <p className="min-w-0 truncate text-sm font-bold text-slate-800">{shift.name}</p>
               <span className="flex shrink-0 gap-1.5">

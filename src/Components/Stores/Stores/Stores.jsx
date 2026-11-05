@@ -42,7 +42,7 @@ import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import { useStoreActions } from "@/Hooks/Stores/useStoreActions";
 import { useStoreChanged, useWalletChanged } from "@/Hooks/Live/useLiveUpdates";
-import { formatDateTime, formatMoney, newReference } from "@/Utils/Lib/format";
+import { formatDateTime, formatMoney, newReference, isPhoneComplete, digitsOnly } from "@/Utils/Lib/format";
 import { notifications } from "@/Utils/Lib/notifications";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { isOwner, isOwnMoney, roleName, staffRole } from "@/Utils/Lib/roles";
@@ -527,7 +527,7 @@ function UserDialog({ user, stores, profiles, shifts, managerMode, onClose, onSa
             value={form.operator_id}
             error={operatorBad ? t("storeUsers.operatorIdRule", { defaultValue: "2 to 8 digits." }) : undefined}
             onChange={(event) =>
-              setForm((previous) => ({ ...previous, operator_id: event.target.value.replace(/\D/g, "") }))
+              setForm((previous) => ({ ...previous, operator_id: digitsOnly(event.target.value) }))
             }
           />
           <FilterSelect
@@ -603,7 +603,7 @@ function UserDialog({ user, stores, profiles, shifts, managerMode, onClose, onSa
               !form.store_ids.length ||
               operatorBad ||
               (!editing &&
-                (form.phone_number.replace(/\D/g, "").length < 7 || pinShort))
+                (!isPhoneComplete(form.phone_number, portalPolicy.phone.countries) || pinShort))
             }
           >
             {t("common.save", { defaultValue: "Save" })}
@@ -1102,7 +1102,7 @@ export default function Stores() {
           {managesUsers && tab === "users" && (
             <Button
               onClick={() => setDialog({ kind: "user", user: null })}
-              disabled={!stores?.length}
+              disabled={!stores?.length} reason={t("stores.addStoreFirst")}
               className="px-4 py-2.5"
             >
               <Plus size={16} />{" "}
@@ -1124,7 +1124,7 @@ export default function Stores() {
         (stores === null ? (
           <LoadingState />
         ) : stores.length === 0 ? (
-          <div className="rounded-3xl border border-slate-200 bg-surface shadow-sm">
+          <div className="panel shadow-sm">
             <EmptyState
               icon={Store}
               title={t("stores.empty", { defaultValue: "No stores yet" })}
@@ -1157,7 +1157,7 @@ export default function Stores() {
                 return (
                   <li
                     key={store.id}
-                    className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
+                    className="flex flex-col panel p-5 shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -1237,7 +1237,7 @@ export default function Stores() {
         (users === null ? (
           <LoadingState />
         ) : users.length === 0 ? (
-          <div className="rounded-3xl border border-slate-200 bg-surface shadow-sm">
+          <div className="panel shadow-sm">
             <EmptyState
               icon={Users}
               title={t("storeUsers.empty", {
@@ -1263,7 +1263,7 @@ export default function Stores() {
             />
             <NoMatches list={userList} />
             {userList.matches > 0 && (
-              <ul className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-surface shadow-sm">
+              <ul className="divide-y divide-slate-100 panel shadow-sm">
                 {userList.visible.map((person) => (
                   <li
                     key={person.id}
@@ -1389,7 +1389,7 @@ export default function Stores() {
             {walletList.visible.map((wallet) => (
               <li
                 key={wallet.acct_num}
-                className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
+                className="flex flex-col panel p-5 shadow-sm"
               >
                 <div className="flex items-center gap-3">
                   <span className="brand-gradient flex h-10 w-10 items-center justify-center rounded-xl text-lime">

@@ -1,3 +1,5 @@
+import { FIELD_LIMITS } from "@/Utils/Constant";
+import { scrollToTop } from "@/Utils/Lib/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -11,7 +13,7 @@ import {
   Send as SendIcon,
   Smartphone,
 } from "lucide-react";
-import Button from "@/Components/Common/Button";
+import Button, { buttonClass } from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import FitText from "@/Components/Common/FitText";
 import PhoneField from "@/Components/Common/PhoneField";
@@ -23,7 +25,7 @@ import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { useWalletChanged } from "@/Hooks/Live/useLiveUpdates";
 import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import { useAgentActions } from "@/Hooks/Agents/useAgentActions";
-import { formatMoney, newReference } from "@/Utils/Lib/format";
+import { formatMoney, newReference, isPhoneComplete } from "@/Utils/Lib/format";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import { isSuperAgent } from "@/Utils/Lib/roles";
@@ -46,7 +48,6 @@ const ACTIONS = {
   cashOut: { txnType: "AGENT_CASH_OUT", icon: ArrowUpFromLine },
   float: { txnType: "AGENT_FLOAT_TRANSFER", icon: SendIcon },
 };
-const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 // What the agent earns on this transaction: the server's `agent_earns` (the
 // shares paid to the serving agent, a super agent's share included when nobody
@@ -247,7 +248,7 @@ export default function AgentCash() {
     </div>
   );
   const floatCard = (
-    <aside data-tour="agent-wallet" className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
+    <aside data-tour="agent-wallet" className="panel p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <span className="brand-gradient flex h-10 w-10 items-center justify-center rounded-xl text-lime shadow-md">
           <Banknote size={18} />
@@ -321,7 +322,7 @@ export default function AgentCash() {
         </Button>
         <Link
           to="/history"
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-surface px-5 py-3.5 text-sm font-semibold text-ink hover:bg-slate-50"
+          className={buttonClass("secondary")}
         >
           {t("send.viewHistory")}
         </Link>
@@ -371,7 +372,7 @@ export default function AgentCash() {
               event.preventDefault();
               if (!pending && !pinShort) void send();
             }}
-            className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-surface p-6 text-center shadow-sm"
+            className="mx-auto max-w-md panel p-6 text-center shadow-sm"
           >
             <span className="brand-gradient mx-auto flex h-12 w-12 items-center justify-center rounded-2xl text-lime">
               <Smartphone size={22} />
@@ -449,9 +450,9 @@ export default function AgentCash() {
                 setStep("customer");
               } else if (!pinShort) void send();
             }}
-            className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm"
+            className="panel p-6 shadow-sm"
           >
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+            <p className="eyebrow">
               {t("send.confirm")}
             </p>
             <FitText className="mt-2 font-black tracking-tight text-slate-800">
@@ -581,7 +582,7 @@ export default function AgentCash() {
         <form
           noValidate
           onSubmit={review}
-          className="space-y-5 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm"
+          className="space-y-5 panel p-6 shadow-sm"
         >
           {/* The cards above say what cash in and out are; float has a rule. */}
           {!cashOut && mode !== "cashIn" && (
@@ -617,7 +618,7 @@ export default function AgentCash() {
           <TextField
             name="note"
             label={t("send.note")}
-            maxLength={255}
+            maxLength={FIELD_LIMITS.note}
             autoComplete="off"
             value={form.note}
             onChange={(event) =>
@@ -628,7 +629,7 @@ export default function AgentCash() {
             type="submit"
             pending={pending}
             disabled={
-              form.phone.replace(/\D/g, "").length < 7 || !Number(form.amount)
+              !isPhoneComplete(form.phone, portalPolicy.phone.countries) || !Number(form.amount)
             }
             className="w-full"
           >

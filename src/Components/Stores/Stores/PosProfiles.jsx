@@ -1,3 +1,4 @@
+import { FIELD_LIMITS } from "@/Utils/Constant";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, ShieldCheck, Trash2 } from "lucide-react";
@@ -12,7 +13,7 @@ import TextField from "@/Components/Common/TextField";
 import { ListSearch, NoMatches, ShowMore } from "@/Components/Common/ListControls";
 import { useListControls } from "@/Hooks/Common/useListControls";
 import { useStoreActions } from "@/Hooks/Stores/useStoreActions";
-import { formatMoney } from "@/Utils/Lib/format";
+import { formatMoney, digitsOnly } from "@/Utils/Lib/format";
 import { notifications } from "@/Utils/Lib/notifications";
 import { ActiveToggle, DeleteButton, Pill, StatusPill } from "./posShared";
 
@@ -90,7 +91,7 @@ export function ProfileDialog({ profile, txnTypes, currencies, onClose, onSaved 
       <form noValidate onSubmit={submit} className="space-y-4">
         {problem && <ErrorState message={problem} />}
         <div className="grid gap-4 sm:grid-cols-2">
-          <TextField name="name" maxLength={64} label={t("pos.name", { defaultValue: "Name" })} value={form.name} onChange={(event) => set("name", event.target.value)} />
+          <TextField name="name" maxLength={FIELD_LIMITS.name} label={t("pos.name", { defaultValue: "Name" })} value={form.name} onChange={(event) => set("name", event.target.value)} />
           {currencies.length > 1 && (
             <FilterSelect
               label={t("pos.currency", { defaultValue: "Currency" })}
@@ -132,16 +133,16 @@ export function ProfileDialog({ profile, txnTypes, currencies, onClose, onSaved 
                     </p>
                     {type?.description && <p className="text-xs text-slate-500">{type.description}</p>}
                   </div>
-                  <button type="button" aria-label={t("pos.removeTransaction", { defaultValue: "Remove" })} onClick={() => set("transactions", form.transactions.filter((_, j) => j !== i))} className="rounded-lg p-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-600">
+                  <Button variant="icon" aria-label={t("pos.removeTransaction", { defaultValue: "Remove" })} onClick={() => set("transactions", form.transactions.filter((_, j) => j !== i))} className="p-1.5 hover:bg-red-500/10 hover:text-red-600">
                     <Trash2 size={15} />
-                  </button>
+                  </Button>
                 </div>
                 {(type?.amounts || type?.counted) && (
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     {type.amounts && amountField(`max_${i}`, t("pos.maxAmount", { defaultValue: "Largest amount" }), row.max_amount, (v) => setRow(i, { max_amount: v }), badAmount(row.max_amount))}
                     {type.amounts && amountField(`daily_${i}`, t("pos.dailyAmount", { defaultValue: "Daily amount" }), row.daily_amount, (v) => setRow(i, { daily_amount: v }), badAmount(row.daily_amount))}
                     {type.counted && (
-                      <TextField name={`count_${i}`} inputMode="numeric" label={t("pos.dailyCount", { defaultValue: "Daily count" })} value={row.daily_count} error={badCount(row.daily_count) ? t("pos.countRule", { defaultValue: "A whole number above 0." }) : undefined} onChange={(event) => setRow(i, { daily_count: event.target.value.replace(/\D/g, "") })} />
+                      <TextField name={`count_${i}`} inputMode="numeric" label={t("pos.dailyCount", { defaultValue: "Daily count" })} value={row.daily_count} error={badCount(row.daily_count) ? t("pos.countRule", { defaultValue: "A whole number above 0." }) : undefined} onChange={(event) => setRow(i, { daily_count: digitsOnly(event.target.value) })} />
                     )}
                   </div>
                 )}
@@ -189,7 +190,7 @@ export default function PosProfiles({ profiles, onEdit, onChanged }) {
   if (profiles === null) return <LoadingState />;
   if (!profiles.length)
     return (
-      <div className="rounded-3xl border border-slate-200 bg-surface shadow-sm">
+      <div className="panel shadow-sm">
         <EmptyState icon={ShieldCheck} title={t("pos.noProfiles", { defaultValue: "No terminal profiles yet" })} description={t("pos.noProfilesHint", { defaultValue: "A profile sets which transactions a store user may make on a terminal, and up to how much." })} />
       </div>
     );
@@ -200,7 +201,7 @@ export default function PosProfiles({ profiles, onEdit, onChanged }) {
       <NoMatches list={list} />
       <ul className="grid gap-4 md:grid-cols-2">
         {list.visible.map((profile) => (
-          <li key={profile.id} className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm">
+          <li key={profile.id} className="flex flex-col panel p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate text-sm font-bold text-slate-800">{profile.name}</p>

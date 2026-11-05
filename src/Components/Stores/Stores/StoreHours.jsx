@@ -1,3 +1,4 @@
+import Button from "@/Components/Common/Button";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/Utils/Lib/utils";
 
@@ -52,9 +53,9 @@ export default function StoreHoursEditor({ week, onChange }) {
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold text-slate-700">{t("stores.hours", { defaultValue: "Opening hours (optional)" })}</p>
-        <button type="button" onClick={copyMonday} disabled={!week[1].open} className="text-xs font-semibold text-ink hover:underline disabled:opacity-40">
+        <Button variant="link" onClick={copyMonday} disabled={!week[1].open} className="text-xs font-semibold disabled:opacity-40">
           {t("stores.hoursCopyMonday", { defaultValue: "Use Monday's hours Tue–Fri" })}
-        </button>
+        </Button>
       </div>
       <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200">
         {DAYS.map((d) => {

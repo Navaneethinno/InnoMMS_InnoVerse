@@ -151,7 +151,7 @@ export default function AssistedSignup() {
             "Take the photos of the real person with this device's camera: the selfie is checked against the document photo.",
         })}
       </p>
-      <div className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm sm:p-8">
+      <div className="panel p-6 shadow-sm sm:p-8">
         <Wizard
           key={`${storageKind}-${continuing ?? "new"}`}
           flowApi={flowApi}

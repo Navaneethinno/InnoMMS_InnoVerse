@@ -1,4 +1,5 @@
-import { nationalDigits } from "@/Utils/Lib/format";
+import Button from "@/Components/Common/Button";
+import { nationalDigits, isPhoneComplete } from "@/Utils/Lib/format";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PhoneField from "@/Components/Common/PhoneField";
@@ -45,7 +46,7 @@ export default function Airtime() {
   const ready =
     Number(form.amount) > 0 &&
     (form.who === "own" ||
-      (form.who === "other" ? digits.length >= 9 : Boolean(form.saved)));
+      (form.who === "other" ? isPhoneComplete(form.phone, portalPolicy.phone.countries) : Boolean(form.saved)));
   const request = {
     txn_type: "AIRTIME",
     amount: form.amount,
@@ -186,10 +187,9 @@ function BuyAgain({ onPick, currency }) {
   }, [loadExtLast]);
   if (!last) return null;
   return (
-    <button
-      type="button"
+    <Button variant="dashed"
       onClick={() => onPick(last)}
-      className="inline-flex items-center gap-2 rounded-xl border border-dashed border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-ink/40 hover:text-ink"
+      className="border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-ink/40 hover:text-ink"
     >
       <RotateCcw size={13} />
       {t("airtime.again", {
@@ -197,6 +197,6 @@ function BuyAgain({ onPick, currency }) {
         number: last.account,
         defaultValue: "Buy again: {{amount}} for {{number}}",
       })}
-    </button>
+    </Button>
   );
 }

@@ -3,7 +3,7 @@
 export default function IconCard({ icon, title, hint, children }) {
   const Icon = icon;
   return (
-    <section className="h-full rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
+    <section className="h-full panel p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <span className="flex h-9 w-9 items-center justify-center rounded-xl brand-gradient text-lime shadow-md">
           <Icon size={16} />

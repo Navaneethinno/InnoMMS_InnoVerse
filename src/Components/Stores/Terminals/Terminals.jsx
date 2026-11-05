@@ -1,3 +1,4 @@
+import { FIELD_LIMITS } from "@/Utils/Constant";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -18,7 +19,7 @@ import LoadingState from "@/Components/Common/LoadingState";
 import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
 import { useStoreActions } from "@/Hooks/Stores/useStoreActions";
-import { formatDateTime } from "@/Utils/Lib/format";
+import { formatDateTime, digitsOnly } from "@/Utils/Lib/format";
 import { useStoreChanged, useTerminalChanged } from "@/Hooks/Live/useLiveUpdates";
 import { notifications } from "@/Utils/Lib/notifications";
 import { isOwner, roleName } from "@/Utils/Lib/roles";
@@ -244,7 +245,7 @@ function BlockDialog({ terminal, onClose, onSaved }) {
         <TextField
           name="reason"
           label={t("terminals.reason", { defaultValue: "What happened" })}
-          maxLength={255}
+          maxLength={FIELD_LIMITS.note}
           value={reason}
           onChange={(event) => setReason(event.target.value)}
         />
@@ -299,7 +300,7 @@ function IdleSettings() {
     }
   };
   return (
-    <section className="mb-6 rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm">
+    <section className="mb-6 panel p-5 shadow-sm">
       <p className="text-sm font-bold text-slate-800">{t("terminals.settings", { defaultValue: "Terminal settings" })}</p>
       <div className="mt-3 flex flex-wrap items-end gap-4">
         <CheckboxPill
@@ -315,7 +316,7 @@ function IdleSettings() {
               label={t("terminals.idleMinutes", { defaultValue: "Sign terminal users out after (minutes idle)" })}
               value={minutes}
               error={bad ? t("terminals.idleRange", { least, most, defaultValue: "{{least}} to {{most}} minutes." }) : undefined}
-              onChange={(event) => setMinutes(event.target.value.replace(/\D/g, ""))}
+              onChange={(event) => setMinutes(digitsOnly(event.target.value))}
             />
           </div>
         )}
@@ -400,7 +401,7 @@ export default function Terminals() {
       {terminals === null ? (
         <LoadingState />
       ) : terminals.length === 0 ? (
-        <div className="rounded-3xl border border-slate-200 bg-surface shadow-sm">
+        <div className="panel shadow-sm">
           <EmptyState
             icon={MonitorSmartphone}
             title={t("terminals.empty", { defaultValue: "No terminals yet" })}
@@ -475,7 +476,7 @@ export default function Terminals() {
               return (
                 <li
                   key={terminal.id}
-                  className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
+                  className="flex flex-col panel p-5 shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">

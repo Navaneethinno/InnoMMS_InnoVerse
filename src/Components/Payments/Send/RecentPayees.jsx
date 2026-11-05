@@ -33,7 +33,7 @@ export default function RecentPayees({ onPick, className }) {
   if (!payees.length) return null;
   return (
     <div className={cn("min-w-0", className)}>
-      <p className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">{t("send.recent", { defaultValue: "Recent" })}</p>
+      <p className="mb-2 eyebrow">{t("send.recent", { defaultValue: "Recent" })}</p>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {payees.map((payee) => (
           <button

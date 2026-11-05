@@ -78,7 +78,7 @@ export default function MyAgents() {
       {agents === null ? (
         <LoadingState />
       ) : agents.length === 0 && !problem ? (
-        <div className="rounded-3xl border border-slate-200 bg-surface shadow-sm">
+        <div className="panel shadow-sm">
           <EmptyState
             icon={Users}
             title={t("myAgents.empty", { defaultValue: "No agents yet" })}
@@ -104,7 +104,7 @@ export default function MyAgents() {
               return (
                 <li
                   key={agent.entity_id ?? agent.phone_number}
-                  className="flex flex-col rounded-3xl border border-slate-200 bg-surface p-5 shadow-sm"
+                  className="flex flex-col panel p-5 shadow-sm"
                 >
                   <BalanceGroup>
                     <div className="flex items-start justify-between gap-3">

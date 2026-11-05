@@ -160,7 +160,7 @@ export default function Inbox() {
               setPages(1);
             }}
           />
-          <Button variant="secondary" pending={busy} disabled={state.unread === 0} onClick={() => void markAll()} className="notif-focus h-9 px-3 py-0 text-xs">
+          <Button variant="secondary" pending={busy} disabled={state.unread === 0} reason={t("inbox.nothingUnread")} onClick={() => void markAll()} className="notif-focus h-9 px-3 py-0 text-xs">
             <CheckCheck size={15} /> {t("inbox.markAll")}
           </Button>
         </div>
@@ -173,7 +173,7 @@ export default function Inbox() {
       )}
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-surface shadow-sm">
+        <div className="overflow-hidden panel shadow-sm">
           {list}
           {state.items.length < state.total && (
             <div className="border-t border-slate-100 p-3 text-center">
@@ -185,7 +185,7 @@ export default function Inbox() {
         </div>
 
         {wide && (
-          <aside className="sticky top-28 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
+          <aside className="sticky top-28 panel p-6 shadow-sm">
             {detail || (
               <div className="flex flex-col items-center py-12 text-center">
                 <span className="notif-tile-generic flex h-12 w-12 items-center justify-center rounded-2xl">

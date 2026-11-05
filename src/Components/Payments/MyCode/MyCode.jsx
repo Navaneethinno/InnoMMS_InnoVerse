@@ -11,12 +11,12 @@ import PageTitle from "@/Components/Common/PageTitle";
 import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import { isStaff } from "@/Utils/Lib/roles";
 
-// The merchant's 7-digit Paga-Daki code (account/my_code), large and as a QR
+// The merchant's Paga-Daki code (account/my_code), large and as a QR
 // code, to show at the counter: customers type it (or scan it) to pay, and at
 // an agent, to take out cash. As on the Paysey portal, the QR can be
 // downloaded as a picture (made here, from the code) or printed.
 const spaced = (code) =>
-  code.length === 7 ? `${code.slice(0, 3)} ${code.slice(3)}` : code;
+  code.length >= 6 ? `${code.slice(0, code.length >> 1)} ${code.slice(code.length >> 1)}` : code;
 
 export default function MyCode() {
   const { loadMyCode } = useAccountActions();
@@ -133,8 +133,8 @@ export default function MyCode() {
     <div>
       {heading}
       <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-2">
-        <div className="flex flex-col items-center rounded-3xl border border-slate-200 bg-surface p-8 text-center shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+        <div className="flex flex-col items-center panel p-8 text-center shadow-sm">
+          <p className="eyebrow">
             {label}
           </p>
           {user?.name && (
@@ -172,8 +172,8 @@ export default function MyCode() {
             </Button>
           </div>
         </div>
-        <div className="rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm">
-          <p className="mb-5 text-xs font-bold uppercase tracking-widest text-slate-500">
+        <div className="panel p-6 shadow-sm">
+          <p className="mb-5 eyebrow">
             {t("myCode.how", { defaultValue: "How customers use it" })}
           </p>
           <ol className="space-y-4">

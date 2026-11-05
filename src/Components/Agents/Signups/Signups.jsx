@@ -148,7 +148,7 @@ export default function Signups() {
       {state.loading && state.page === 0 ? (
         <LoadingState />
       ) : state.items.length === 0 && !state.problem ? (
-        <div className="rounded-3xl border border-slate-200 bg-surface shadow-sm">
+        <div className="panel shadow-sm">
           <EmptyState
             icon={UserPlus}
             title={t("signups.empty", { defaultValue: "No sign-ups yet" })}
@@ -159,7 +159,7 @@ export default function Signups() {
           />
         </div>
       ) : (
-        <ul className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-surface shadow-sm">
+        <ul className="divide-y divide-slate-100 panel shadow-sm">
           {state.items.map((item) => {
             const tone = STATUS[item.status]?.[2] ?? "bg-ink/5 text-ink";
             const who = item.party === "MERCHANT" ? "agent" : "customer";

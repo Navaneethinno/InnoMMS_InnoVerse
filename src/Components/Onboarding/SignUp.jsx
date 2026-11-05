@@ -179,7 +179,7 @@ export default function SignUp() {
             className={
               formActive
                 ? ""
-                : "mt-6 rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm sm:p-10"
+                : "mt-6 panel p-6 shadow-sm sm:p-10"
             }
           >
             {merchantKind === "corporate" ? (

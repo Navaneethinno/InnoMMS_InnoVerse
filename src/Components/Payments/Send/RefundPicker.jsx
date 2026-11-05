@@ -39,9 +39,9 @@ function PickedPayment({ payment, onChange }) {
         </span>
         <span className="shrink-0 text-end">
           <span className="block text-sm font-black text-slate-800">{formatMoney(payment.amount, payment.currency_code)}</span>
-          <button type="button" onClick={onChange} className="text-xs font-bold text-ink underline-offset-2 hover:underline">
+          <Button variant="link" onClick={onChange} className="text-xs font-bold underline-offset-2">
             {t("refund.change", { defaultValue: "Change" })}
-          </button>
+          </Button>
         </span>
       </div>
     </div>

@@ -5,7 +5,7 @@ import { formatDate } from "@/Utils/Lib/format";
 import Button from "@/Components/Common/Button";
 import ErrorState from "@/Components/Common/ErrorState";
 import FileUploadField from "@/Components/Common/FileUploadField";
-import { cn } from "@/Utils/Lib/utils";
+import { cn, sameValue } from "@/Utils/Lib/utils";
 import OnboardingField from "./OnboardingField";
 
 // What the merchant sees once the application is submitted: the outcome
@@ -28,7 +28,6 @@ const OUTCOMES = {
   NOT_APPROVED: { icon: CircleX, tone: "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-300" },
 };
 
-const sameValue = (a, b) => String(a) === String(b);
 // The field keys a FIELDS request names (target.items, or the older flat list).
 const fieldsOf = (target) => (target.items?.length ? target.items.map((item) => item.field) : (target.fields ?? []));
 const dateText = (iso) => (iso ? formatDate(iso) : "");
@@ -79,17 +78,16 @@ function SectionForm({ section, only, draft, setDraft, requestId, flow }) {
       ))}
       {multi && (
         <div className="flex gap-2">
-          <button
-            type="button"
+          <Button variant="dashed"
             onClick={() => setDraft([...rows, {}])}
-            className="rounded-xl border border-dashed border-ink/50 px-3 py-1.5 text-xs font-semibold text-ink hover:bg-ink/5"
+            className="border-ink/50 px-3 py-1.5 text-xs font-semibold text-ink hover:bg-ink/5"
           >
             {t("onb.addAnother")}
-          </button>
+          </Button>
           {rows.length > 0 && (
-            <button type="button" onClick={() => setDraft(rows.slice(0, -1))} className="rounded-xl px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10">
+            <Button variant="danger" onClick={() => setDraft(rows.slice(0, -1))} className="rounded-xl px-3 py-1.5 text-xs font-semibold">
               {t("onb.removeLast")}
-            </button>
+            </Button>
           )}
         </div>
       )}

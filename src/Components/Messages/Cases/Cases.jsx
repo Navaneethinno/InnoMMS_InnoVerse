@@ -523,10 +523,10 @@ export default function Cases() {
       )}
 
       {!wide && thread ? (
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-surface shadow-sm">{thread}</div>
+        <div className="overflow-hidden panel shadow-sm">{thread}</div>
       ) : (
         <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-surface shadow-sm">
+          <div className="overflow-hidden panel shadow-sm">
             {list}
             {state.cases.length < state.total && (
               <div className="border-t border-slate-100 p-3 text-center">
@@ -537,7 +537,7 @@ export default function Cases() {
             )}
           </div>
           {wide && (
-            <div className="sticky top-28 overflow-hidden rounded-3xl border border-slate-200 bg-surface shadow-sm">
+            <div className="sticky top-28 overflow-hidden panel shadow-sm">
               {thread || (
                 <div className="flex flex-col items-center py-20 text-center">
                   <MessagesSquare size={26} strokeWidth={1.7} className="text-slate-400" />

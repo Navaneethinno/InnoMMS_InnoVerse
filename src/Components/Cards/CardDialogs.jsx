@@ -1,3 +1,4 @@
+import { FIELD_LIMITS } from "@/Utils/Constant";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
@@ -23,7 +24,7 @@ function DeliveryFields({ value, onChange }) {
   return (
     <>
       <FilterSelect label={t("cards.delivery")} value={value.delivery_mode} onChange={(v) => onChange({ ...value, delivery_mode: v })} options={DELIVERY.map((m) => ({ value: m, label: t(`cards.deliveryMode.${m}`) }))} />
-      <TextField name="delivery_ref" label={t("cards.deliveryRef")} maxLength={255} value={value.delivery_ref} onChange={(event) => onChange({ ...value, delivery_ref: event.target.value })} />
+      <TextField name="delivery_ref" label={t("cards.deliveryRef")} maxLength={FIELD_LIMITS.note} value={value.delivery_ref} onChange={(event) => onChange({ ...value, delivery_ref: event.target.value })} />
     </>
   );
 }
@@ -59,7 +60,7 @@ export function GetCardDialog({ offer, physical, onClose, onDone }) {
       disabled={pin.length < pinMin || (offer.emboss_name_required && !name.trim())}
       onConfirm={submit}
     >
-      <TextField name="name_on_card" label={t(offer.emboss_name_required ? "cards.nameOnCard" : "cards.nameOnCardOptional")} maxLength={26} value={name} onChange={(event) => setName(event.target.value.toUpperCase())} />
+      <TextField name="name_on_card" label={t(offer.emboss_name_required ? "cards.nameOnCard" : "cards.nameOnCardOptional")} maxLength={FIELD_LIMITS.nameOnCard} value={name} onChange={(event) => setName(event.target.value.toUpperCase())} />
       {physical && <DeliveryFields value={delivery} onChange={setDelivery} />}
       <PinInput label={t("cards.transactionPin")} value={pin} onChange={setPin} />
     </Shell>
@@ -136,7 +137,7 @@ export function CardStatusDialog({ card, to, onClose, onDone }) {
   const submit = () => run(async () => onDone(await setCardStatus({ id: card.id, to, ...(to === "ACTIVE" ? { pin } : {}), ...(final && reason.trim() ? { reason: reason.trim() } : {}) }), `status_${to}`));
   return (
     <Shell title={t(`cards.statusTitle.${to}`)} description={t(`cards.statusHint.${to}`)} problem={problem} onClose={onClose} pending={pending} confirm={t(`cards.statusConfirm.${to}`)} disabled={to === "ACTIVE" && pin.length < pinMin} danger={to !== "ACTIVE"} onConfirm={submit}>
-      {final && <TextField name="reason" label={t("cards.reasonOptional")} maxLength={255} value={reason} onChange={(event) => setReason(event.target.value)} />}
+      {final && <TextField name="reason" label={t("cards.reasonOptional")} maxLength={FIELD_LIMITS.note} value={reason} onChange={(event) => setReason(event.target.value)} />}
       {to === "ACTIVE" && <PinInput label={t("cards.transactionPin")} value={pin} onChange={setPin} />}
     </Shell>
   );
@@ -249,7 +250,7 @@ export function ReissueDialog({ card, reasons, onClose, onDone }) {
   return (
     <Shell title={t(reason === "EXPIRED" ? "cards.renewTitle" : "cards.replaceTitle")} description={t(physical ? "cards.reissuePhysical" : "cards.reissueVirtual")} problem={problem} onClose={onClose} pending={pending} confirm={t(reason === "EXPIRED" ? "cards.renew" : "cards.replace")} disabled={pin.length < pinMin} onConfirm={submit}>
       {reasons.length > 1 && <FilterSelect label={t("cards.reason")} value={reason} onChange={setReason} options={reasons.map((r) => ({ value: r, label: t(`cards.reissueReason.${r}`) }))} />}
-      <TextField name="name_on_card" label={t("cards.nameOnCardOptional")} maxLength={26} value={name} onChange={(event) => setName(event.target.value.toUpperCase())} />
+      <TextField name="name_on_card" label={t("cards.nameOnCardOptional")} maxLength={FIELD_LIMITS.nameOnCard} value={name} onChange={(event) => setName(event.target.value.toUpperCase())} />
       {physical && <DeliveryFields value={delivery} onChange={setDelivery} />}
       <p className="text-xs text-slate-500">{t("cards.reissueFee")}</p>
       <PinInput label={t("cards.transactionPin")} value={pin} onChange={setPin} />

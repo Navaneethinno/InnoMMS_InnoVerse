@@ -27,8 +27,8 @@ export default function WalletPanel({ wallets, selected, onSelect, footer, class
   if (!wallets?.length) return null;
   const several = wallets.length > 1;
   return (
-    <aside aria-label={t("send.yourWallets")} className={cn("flex h-full min-w-0 flex-col rounded-3xl border border-slate-200 bg-surface p-6 shadow-sm", className)}>
-      <p className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-500">{several ? t("send.yourWallets") : t("send.payingFrom")}</p>
+    <aside aria-label={t("send.yourWallets")} className={cn("flex h-full min-w-0 flex-col panel p-6 shadow-sm", className)}>
+      <p className="mb-4 eyebrow">{several ? t("send.yourWallets") : t("send.payingFrom")}</p>
       <ul className="flex flex-1 flex-col gap-3">
         {wallets.map((wallet) => {
           const active = wallet.acct_num === selected?.acct_num;
