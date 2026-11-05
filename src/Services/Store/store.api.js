@@ -12,22 +12,22 @@ const listOf = (rows, key) =>
 // address, province, phone_number, latitude, longitude, status (PENDING |
 // ACTIVE | REJECTED | INACTIVE), decision_note, created_at, decided_at }].
 export const loadStores = async () =>
-  listOf((await portalPost(STORE.list)).rows, "stores");
+  listOf((await portalPost(STORE.LIST)).rows, "stores");
 // Owner only. `store` without `id` adds one (it waits for the bank), with `id`
 // edits it (the code cannot change; a rejected store goes back to the bank).
 export const saveStore = async (store) =>
-  (await portalPost(store.id ? STORE.edit : STORE.add, store)).data;
-export const closeStore = (id) => portalPost(STORE.close, { id });
-export const reopenStore = (id) => portalPost(STORE.reopen, { id });
+  (await portalPost(store.id ? STORE.EDIT : STORE.ADD, store)).data;
+export const closeStore = (id) => portalPost(STORE.CLOSE, { id });
+export const reopenStore = (id) => portalPost(STORE.REOPEN, { id });
 
 // Store managers and cashiers: [{ id, role (STORE_MANAGER | CASHIER), name,
 // phone_number, status, refund_limit, stores: [...], last_sign_in_at }].
 export const loadStoreUsers = async () =>
-  listOf((await portalPost(STORE.users)).rows, "users");
+  listOf((await portalPost(STORE.USERS)).rows, "users");
 // Owner only. Without `id` adds a user (with their first PIN), with `id` edits
 // them (role, name, stores, refund limit, ACTIVE/INACTIVE).
 export const saveStoreUser = async (user) =>
-  (await portalPost(user.id ? STORE.user_edit : STORE.user_add, user)).data;
+  (await portalPost(user.id ? STORE.USER_EDIT : STORE.USER_ADD, user)).data;
 // Owner only: a new PIN for a user who forgot theirs or is locked out.
 export const setStoreUserPin = (id, pin) =>
-  portalPost(STORE.user_pin, { id, pin });
+  portalPost(STORE.USER_PIN, { id, pin });

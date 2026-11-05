@@ -1,20 +1,13 @@
 /**
- * Backend: the merchant-portal API ("Merchant web: onboarding API"). It is a
- * separate service from the admin panel's API, so VITE_API_BASE_URL must
- * point at the merchant-portal host (the host root,
- * https://etakuapi.innovitegrasuite.com). Every call is a POST with a JSON
- * body (only the file upload is multipart). No login and no token: one fixed
- * Basic credential (VITE_PORTAL_AUTHORIZATION, the full header value) on
- * every call; the admin panel's credential and admin tokens are NOT
- * accepted.
- * The portal has no logged-in user, so it must say which bank the merchant
- * onboards with: VITE_INST_PROFILE_ID is sent as `inst_profile_id` on
- * `options` and `add`. The other calls work from the onboarding's
- * `reference_id`.
- * No merchant login/dashboard spec has been supplied yet, so those paths
- * stay null below. Never add a path here that is not confirmed by the real
- * backend spec. Keep groups in merchant navigation order; all domain URLs
- * belong here.
+ * Backend: the merchant-portal API, a separate service from the admin panel's
+ * API. VITE_API_BASE_URL is the host root. Calls are POSTs with a JSON body
+ * (uploads are multipart). Calls made before sign-in carry the portal's fixed
+ * Basic credential (VITE_PORTAL_AUTHORIZATION, the full header value); signed-in
+ * calls carry the merchant's token. VITE_INST_PROFILE_ID says which institution
+ * this deployment serves.
+ * Every API path lives in API_ENDPOINTS below, one group per area
+ * (Utils/apiPaths.test.js enforces it). Never add a path not confirmed by the
+ * backend.
  */
 // An older value that still ends in /merchant/web is accepted and trimmed,
 // since every path below now carries its own /merchant/... prefix.
@@ -74,6 +67,8 @@ const terminalPath = channelPath("terminal");
 const posProfilePath = channelPath("pos_profile");
 const posShiftPath = channelPath("pos_shift");
 const casePath = channelPath("case");
+// A group's calls, keyed by the call's name in capitals: { LIST: ".../list" }.
+const callsOf = (path, calls) => Object.fromEntries(calls.map((call) => [call.toUpperCase(), path(call)]));
 export const API_ENDPOINTS = {
   // WebSocket path (the host is API_BASE_URL with ws/wss).
   LIVE: "/merchant/web/live",
@@ -133,7 +128,7 @@ export const API_ENDPOINTS = {
     PHONE_TRANSFERS: accountPath("phone_transfers"),
     PHONE_TRANSFER_CANCEL: accountPath("phone_transfer_cancel"),
   },
-  // Which of a list of numbers are e-taku customers (at most 500 at once).
+  // Which of a list of numbers are customers (at most 500 at once).
   CONTACTS: { MATCH: contactsPath("match") },
   // The signed-in menu and the features this merchant has.
   MENU: "/merchant/web/menu",
@@ -175,28 +170,10 @@ export const API_ENDPOINTS = {
     LAYOUT_SAVE: dashboardPath("layout_save"),
   },
   // Term deposits and loans (Merchant portal handoff, 22 Oct 2026).
-  DEPOSIT: Object.fromEntries(["offers", "quote", "open", "list", "get", "instruct", "preclose_quote", "preclose"].map((call) => [call, depositPath(call)])),
-  LOAN: Object.fromEntries(
-    ["offers", "quote", "apply", "applications", "application_get", "withdraw", "list", "get", "repay", "settlement_quote", "settle"].map((call) => [call, loanPath(call)]),
-  ),
+  DEPOSIT: callsOf(depositPath, ["offers", "quote", "open", "list", "get", "instruct", "preclose_quote", "preclose"]),
+  LOAN: callsOf(loanPath, ["offers", "quote", "apply", "applications", "application_get", "withdraw", "list", "get", "repay", "settlement_quote", "settle"]),
   // Cards (Merchant portals: cards, 3 Oct 2026).
-  CARD: Object.fromEntries(
-    [
-      "list",
-      "get",
-      "offers",
-      "issue",
-      "request",
-      "request_cancel",
-      "activate",
-      "pin_set",
-      "pin_change",
-      "pin_reset",
-      "status",
-      "details",
-      "reissue",
-    ].map((call) => [call, cardPath(call)]),
-  ),
+  CARD: callsOf(cardPath, ["list", "get", "offers", "issue", "request", "request_cancel", "activate", "pin_set", "pin_change", "pin_reset", "status", "details", "reissue",]),
   BRANDING: {
     GET: "/merchant/web/branding",
     FILE: "/merchant/web/branding/file",
@@ -228,19 +205,7 @@ export const API_ENDPOINTS = {
     "/merchant/corporate/agent",
   ),
   // Stores and their users (phase 5); terminals placed in stores (phase 6).
-  STORE: Object.fromEntries(
-    [
-      "list",
-      "add",
-      "edit",
-      "close",
-      "reopen",
-      "users",
-      "user_add",
-      "user_edit",
-      "user_pin",
-    ].map((call) => [call, storePath(call)]),
-  ),
+  STORE: callsOf(storePath, ["list", "add", "edit", "close", "reopen", "users", "user_add", "user_edit", "user_pin",]),
   TERMINAL: {
     LIST: terminalPath("list"),
     SETUP: terminalPath("setup"),
@@ -249,8 +214,8 @@ export const API_ENDPOINTS = {
     SETTINGS_SET: terminalPath("settings_set"),
   },
   // What a store user may do on a terminal (profiles) and when (shifts).
-  POS_PROFILE: Object.fromEntries(["txn_types", "list", "add", "edit", "status", "delete"].map((call) => [call, posProfilePath(call)])),
-  POS_SHIFT: Object.fromEntries(["list", "add", "edit", "status", "delete"].map((call) => [call, posShiftPath(call)])),
+  POS_PROFILE: callsOf(posProfilePath, ["txn_types", "list", "add", "edit", "status", "delete"]),
+  POS_SHIFT: callsOf(posShiftPath, ["list", "add", "edit", "status", "delete"]),
 };
 // Until the API says otherwise (the `session` block of sign-in and refresh): a
 // web session unused for this long ends on the server, and the portal signs the

@@ -9,30 +9,30 @@ const data = async (call) => (await call).data;
 // tap, reused on a retry, so nothing is charged twice).
 
 // { cards: [...], requests: [...] }
-export const loadCards = async () => (await data(portalPost(CARD.list))) ?? { cards: [], requests: [] };
+export const loadCards = async () => (await data(portalPost(CARD.LIST))) ?? { cards: [], requests: [] };
 // One card, with its `history`.
-export const loadCard = (id) => data(portalPost(CARD.get, { id }));
+export const loadCard = (id) => data(portalPost(CARD.GET, { id }));
 // The card products the merchant can get now, with their fees.
 export const loadOffers = async () => {
-  const { rows } = await portalPost(CARD.offers);
+  const { rows } = await portalPost(CARD.OFFERS);
   const inner = rows.length === 1 ? (rows[0]?.offers ?? rows[0]?.items) : null;
   return Array.isArray(inner) ? inner : rows.filter((row) => row?.card_product_id);
 };
 
-export const issueCard = (body) => data(portalPost(CARD.issue, body));
+export const issueCard = (body) => data(portalPost(CARD.ISSUE, body));
 // A personalised card ({ card_product_id }) or a virtual card's plastic ({ id }).
-export const requestCard = (body) => data(portalPost(CARD.request, body));
-export const cancelRequest = (id) => portalPost(CARD.request_cancel, { id });
-export const activateCard = (id) => portalPost(CARD.activate, { id });
-export const setCardPin = (body) => portalPost(CARD.pin_set, body);
-export const changeCardPin = (body) => portalPost(CARD.pin_change, body);
-export const resetCardPin = (body) => portalPost(CARD.pin_reset, body);
+export const requestCard = (body) => data(portalPost(CARD.REQUEST, body));
+export const cancelRequest = (id) => portalPost(CARD.REQUEST_CANCEL, { id });
+export const activateCard = (id) => portalPost(CARD.ACTIVATE, { id });
+export const setCardPin = (body) => portalPost(CARD.PIN_SET, body);
+export const changeCardPin = (body) => portalPost(CARD.PIN_CHANGE, body);
+export const resetCardPin = (body) => portalPost(CARD.PIN_RESET, body);
 // to: BLOCKED | LOST | STOLEN (with an optional reason), or ACTIVE with the PIN.
-export const setCardStatus = (body) => portalPost(CARD.status, body);
+export const setCardStatus = (body) => portalPost(CARD.STATUS, body);
 // { pan, expiry, cvv, name_on_card }: secrets, shown briefly and never kept.
-export const loadCardDetails = (body) => data(portalPost(CARD.details, body));
+export const loadCardDetails = (body) => data(portalPost(CARD.DETAILS, body));
 // { replaced, card, request }
-export const reissueCard = (body) => data(portalPost(CARD.reissue, body));
+export const reissueCard = (body) => data(portalPost(CARD.REISSUE, body));
 
 // Loading (CARD_LOAD, wallet -> card) and unloading (CARD_UNLOAD, card ->
 // wallet) use the payment quote and send. `fromAcctNum` names the wallet
