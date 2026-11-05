@@ -1,3 +1,5 @@
+import PillChoice from "@/Components/Common/PillChoice";
+import Button from "@/Components/Common/Button";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -93,31 +95,29 @@ export default function SignUp() {
             action={
               <>
                 {formActive && merchantKind === "individual" && (
-                  <button
-                    type="button"
+                  <Button variant="pill"
                     onClick={() => setTourRequest((n) => n + 1)}
                     aria-label={t("signup.takeTour")}
-                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-forest px-3 py-2 text-sm font-bold text-white transition hover:bg-forest/90 lg:px-5 lg:py-2.5 dark:bg-lime dark:text-on-secondary dark:hover:bg-lime/90"
+                    className="lg:px-5 lg:py-2.5"
                   >
                     <Compass size={15} />
                     <span className="hidden lg:inline">
                       {t("signup.takeTour")}
                     </span>
-                  </button>
+                  </Button>
                 )}
-                <button
-                  type="button"
+                <Button variant="pill-outline"
                   onClick={() => navigate("/login")}
                   aria-label={
                     formActive ? t("signup.exit") : t("signup.backToSignIn")
                   }
-                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] border-forest px-3 py-2 text-sm font-bold text-forest transition hover:bg-forest/5 lg:px-5 lg:py-2.5 dark:border-lime dark:text-lime dark:hover:bg-lime/10"
+                  className="lg:px-5 lg:py-2.5"
                 >
                   {formActive ? <X size={15} /> : <ArrowLeft size={15} />}
                   <span className="hidden lg:inline">
                     {formActive ? t("signup.exit") : t("signup.backToSignIn")}
                   </span>
-                </button>
+                </Button>
               </>
             }
           />
@@ -147,26 +147,15 @@ export default function SignUp() {
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-ink/60">
                 {t("signup.whoAreYou", { defaultValue: "Sign up" })}
               </p>
-              <div className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm">
-                {PARTIES.map((party) => {
-                  const PartyIcon = party.icon;
-                  return (
-                    <button
-                      key={party.value}
-                      type="button"
-                      onClick={() => {
-                        setPartyType(party.value);
-                        if (!corporateParties.includes(party.value)) setMerchantKind("individual");
-                      }}
-                      className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-semibold transition ${
-                        partyType === party.value ? "bg-forest text-white dark:bg-lime dark:text-on-secondary" : "text-ink/70 hover:bg-ink/5"
-                      }`}
-                    >
-                      <PartyIcon size={15} /> {t(party.labelKey, { defaultValue: party.fallback })}
-                    </button>
-                  );
-                })}
-              </div>
+              <PillChoice
+                className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm"
+                items={PARTIES.map((party) => ({ key: party.value, icon: party.icon, label: t(party.labelKey, { defaultValue: party.fallback }) }))}
+                value={partyType}
+                onChange={(value) => {
+                  setPartyType(value);
+                  if (!corporateParties.includes(value)) setMerchantKind("individual");
+                }}
+              />
               {partyType === "AGENT" && (
                 <p className="mx-auto mt-3 max-w-md text-xs text-slate-500">
                   {t("signup.agentNote", {
@@ -178,25 +167,12 @@ export default function SignUp() {
           )}
           {!formActive && corporateOffered && (!agentOffered || corporateParties.includes(partyType)) && (
             <div className="mt-8 flex justify-center">
-              <div className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm">
-                {MERCHANT_KINDS.map((kind) => {
-                  const Icon = kind.icon;
-                  return (
-                    <button
-                      key={kind.value}
-                      type="button"
-                      onClick={() => setMerchantKind(kind.value)}
-                      className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-semibold transition ${
-                        merchantKind === kind.value
-                          ? "bg-forest text-white dark:bg-lime dark:text-on-secondary"
-                          : "text-ink/70 hover:bg-ink/5"
-                      }`}
-                    >
-                      <Icon size={15} /> {t(kind.labelKey)}
-                    </button>
-                  );
-                })}
-              </div>
+              <PillChoice
+                className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm"
+                items={MERCHANT_KINDS.map((kind) => ({ key: kind.value, icon: kind.icon, label: t(kind.labelKey) }))}
+                value={merchantKind}
+                onChange={setMerchantKind}
+              />
             </div>
           )}
           <div

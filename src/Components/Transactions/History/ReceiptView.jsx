@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { cn } from "@/Utils/Lib/utils";
-import { formatDateTime, formatMoney } from "@/Utils/Lib/format";
+import { formatDateTime, moneyOrNull } from "@/Utils/Lib/format";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // One receipt, as the API returns it: rrn, txn_short_desc, txn_time,
@@ -23,7 +23,7 @@ export default function ReceiptView({ receipt, className }) {
   if (!receipt) return null;
   const payload = receipt.receipt_payload ?? {};
   const currency = receipt.currency_code;
-  const money = (value) => (value != null && value !== "" ? formatMoney(value, currency) : null);
+  const money = (value) => moneyOrNull(value, currency);
   // Who, by name only (the wallet number is on the Wallet line). A number with
   // no account is named by the number.
   return (

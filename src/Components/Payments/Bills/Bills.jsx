@@ -278,14 +278,13 @@ export default function Bills() {
                 })}
               </p>
             </div>
-            <button
-              type="button"
+            <Button variant="ghost" size="sm"
               onClick={() => pickBiller("")}
-              className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink"
+              className="shrink-0 gap-1"
             >
               <ChevronLeft size={14} />
               {t("bills.change", { defaultValue: "Change" })}
-            </button>
+            </Button>
           </div>
           {services.length > 1 && (
             <FilterSelect

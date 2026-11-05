@@ -358,9 +358,9 @@ export default function Send() {
             </div>
           )}
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-            <button type="button" onClick={() => setQuote(null)} disabled={pending} className="rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink">
+            <Button variant="ghost" onClick={() => setQuote(null)} disabled={pending} >
               {t("send.back")}
-            </button>
+            </Button>
             <Button type="submit" pending={pending} disabled={quote.pin_required && pin.length < pinRules.entryMin} className="px-8">
               {t("send.send")}
               {!pending && <ArrowRight size={16} />}

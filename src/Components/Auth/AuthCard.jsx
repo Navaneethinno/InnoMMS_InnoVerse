@@ -1,3 +1,4 @@
+import Button from "@/Components/Common/Button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -17,15 +18,14 @@ export default function AuthCard({ title, description, children, wide = false })
         <div className="mx-auto w-full max-w-6xl">
           <AppHeader
             action={
-              <button
-                type="button"
+              <Button variant="pill-outline"
                 onClick={() => navigate("/login")}
                 aria-label={t("auth.backToSignIn")}
-                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] border-forest px-3 py-2 text-sm font-bold text-forest transition hover:bg-forest/5 sm:px-5 sm:py-2.5 dark:border-lime dark:text-lime dark:hover:bg-lime/10"
+                className="sm:px-5 sm:py-2.5"
               >
                 <ArrowLeft size={15} />
                 <span className="hidden sm:inline">{t("auth.backToSignIn")}</span>
-              </button>
+              </Button>
             }
           />
         </div>

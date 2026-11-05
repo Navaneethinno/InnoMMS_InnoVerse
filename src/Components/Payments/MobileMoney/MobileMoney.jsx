@@ -1,3 +1,4 @@
+import { nationalDigits } from "@/Utils/Lib/format";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
@@ -8,7 +9,6 @@ import TextField from "@/Components/Common/TextField";
 import ExtFlow, {
   Chips,
   cleanAmount,
-  digitsOnly,
   useProviders,
 } from "@/Components/Common/Payments/ExtFlow";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
@@ -39,7 +39,7 @@ export default function MobileMoney() {
       ? `${names.slice(0, -1).join(", ")} ${t("ext.or", { defaultValue: "or" })} ${names.at(-1)}`
       : (names[0] ?? "");
   // The provider the typed number belongs to (the server decides; this lights its chip).
-  const digits = digitsOnly(form.phone).replace(/^258/, "");
+  const digits = nationalDigits(form.phone, portalPolicy.phone.countries);
   const guessed =
     digits.length >= 2
       ? offered.find((p) =>

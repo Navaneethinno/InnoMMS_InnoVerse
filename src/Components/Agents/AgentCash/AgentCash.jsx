@@ -411,17 +411,16 @@ export default function AgentCash() {
               />
             </div>
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
+              <Button variant="ghost"
                 disabled={pending}
                 onClick={() => {
                   setPin("");
                   setStep("confirm");
                 }}
-                className="rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink"
+                
               >
                 {t("send.back")}
-              </button>
+              </Button>
               <Button
                 type="submit"
                 pending={pending}
@@ -538,14 +537,13 @@ export default function AgentCash() {
               </div>
             )}
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
+              <Button variant="ghost"
                 onClick={() => setQuote(null)}
                 disabled={pending}
-                className="rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink"
+                
               >
                 {t("send.back")}
-              </button>
+              </Button>
               <Button
                 type="submit"
                 pending={pending}

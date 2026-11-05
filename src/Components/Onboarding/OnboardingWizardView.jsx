@@ -430,25 +430,23 @@ export default function OnboardingWizardView({ flow, identityFields, onSubmitted
         )}
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
+          <Button variant="ghost"
             disabled={isFirstStep || !canGoBack || navigating || saving}
             onClick={() => void goBack()}
-            className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 transition hover:bg-ink/5 hover:text-ink disabled:invisible"
+            className="gap-1.5 disabled:invisible"
           >
             <ArrowLeft size={16} /> {t("onb.back")}
-          </button>
+          </Button>
           <div className="flex items-center gap-2">
             {section.required === false && (
-              <button
-                type="button"
+              <Button variant="ghost"
                 data-tour="skip-step"
                 disabled={navigating || saving}
                 onClick={() => void skipSection()}
-                className="rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 transition hover:bg-ink/5 hover:text-ink"
+                
               >
                 {t("onb.skip")}
-              </button>
+              </Button>
             )}
             <Button type="button" data-tour="save" pending={saving} onClick={() => void persistSection()} className="px-6">
               {verifying ? t("review.verifying") : isLast ? t("onb.save") : t("onb.saveContinue")}

@@ -414,14 +414,13 @@ export default function ExtFlow({
               </div>
             )}
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
+              <Button variant="ghost"
                 disabled={pending}
                 onClick={() => setQuote(null)}
-                className="rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink"
+                
               >
                 {t("send.back")}
-              </button>
+              </Button>
               <Button
                 type="submit"
                 pending={pending}
@@ -627,5 +626,4 @@ export function useProviders(kind) {
   return state;
 }
 
-export const digitsOnly = (value) => String(value ?? "").replace(/\D/g, "");
 export const cleanAmount = (value) => value.replace(/[^\d.]/g, "");

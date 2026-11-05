@@ -1,3 +1,4 @@
+import PillChoice from "@/Components/Common/PillChoice";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -132,32 +133,15 @@ export default function AssistedSignup() {
           </p>
         </div>
         {!continuing && corporateOffered && (
-          <div className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm">
-            {[
-              {
-                value: "individual",
-                label: t("signup.individual"),
-                icon: UserRound,
-              },
-              {
-                value: "corporate",
-                label: t("signup.corporate"),
-                icon: Building2,
-              },
-            ].map(({ value, label, icon }) => {
-              const KindIcon = icon;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setKind(value)}
-                  className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition ${kind === value ? "bg-forest text-white dark:bg-lime dark:text-on-secondary" : "text-ink/70 hover:bg-ink/5"}`}
-                >
-                  <KindIcon size={15} /> {label}
-                </button>
-              );
-            })}
-          </div>
+          <PillChoice
+            className="inline-flex rounded-full border border-ink/20 bg-surface p-1 shadow-sm"
+            items={[
+              { key: "individual", label: t("signup.individual"), icon: UserRound },
+              { key: "corporate", label: t("signup.corporate"), icon: Building2 },
+            ]}
+            value={kind}
+            onChange={setKind}
+          />
         )}
       </div>
       <p className="mb-5 flex items-start gap-2 rounded-2xl border border-slate-200 bg-surface px-4 py-3 text-sm text-slate-600 shadow-sm">

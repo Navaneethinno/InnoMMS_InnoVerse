@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/Utils/I18n/i18n", () => ({ default: { resolvedLanguage: "en-US" } }));
 
-const { formatMoney, localIsoDay, rememberCurrencies } = await import("./format");
+const { formatMoney, localIsoDay, moneyOrNull, nationalDigits, rememberCurrencies } = await import("./format");
 
 const spaces = (text) => text.replace(/\s/g, " ");
 
@@ -43,5 +43,25 @@ describe("localIsoDay", () => {
   it("gives the calendar day of the user's own clock", () => {
     expect(localIsoDay(new Date(2026, 0, 5, 0, 30))).toBe("2026-01-05");
     expect(localIsoDay(new Date(2026, 11, 31, 23, 59))).toBe("2026-12-31");
+  });
+});
+
+describe("nationalDigits", () => {
+  const countries = [{ dial: "+258" }, { dial: "+234" }];
+  it("drops the country code the number starts with", () => {
+    expect(nationalDigits("+258841234567", countries)).toBe("841234567");
+    expect(nationalDigits("+2348012345678", countries)).toBe("8012345678");
+  });
+  it("keeps a number with no known code", () => {
+    expect(nationalDigits("841234567", countries)).toBe("841234567");
+    expect(nationalDigits("+258841234567", [])).toBe("258841234567");
+  });
+});
+
+describe("moneyOrNull", () => {
+  it("hides an absent amount but not a zero", () => {
+    expect(moneyOrNull(null, "USD")).toBeNull();
+    expect(moneyOrNull("", "USD")).toBeNull();
+    expect(moneyOrNull("0", "USD")).toBe("$0.00");
   });
 });

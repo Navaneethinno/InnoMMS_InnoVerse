@@ -24,6 +24,18 @@ export const setDisplayTimeZone = (zone) => {
 export const localIsoDay = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
+export const digitsOnly = (value) => String(value ?? "").replace(/\D/g, "");
+// A whole phone number's digits without its country code. `countries` is the
+// policy's list, [{ dial: "+258" }, ...].
+export function nationalDigits(phone, countries = []) {
+  const digits = digitsOnly(phone);
+  const dial = countries
+    .map((country) => digitsOnly(country.dial))
+    .sort((a, b) => b.length - a.length)
+    .find((code) => code && digits.startsWith(code));
+  return dial ? digits.slice(dial.length) : digits;
+}
+
 // Amounts arrive as decimal strings ("100.50") with a currency code.
 export function formatMoney(amount, currency, { signed = false } = {}) {
   const value = Number(amount);
@@ -54,6 +66,10 @@ export function formatMoney(amount, currency, { signed = false } = {}) {
 }
 
 // 2,580,000,000,041 -> 2.6T: for chart axes, where there is no room for the digits.
+// For lines that may be absent: null when there is no amount, so the line hides.
+export const moneyOrNull = (value, currency) =>
+  value != null && value !== "" ? formatMoney(value, currency) : null;
+
 export const formatCompact = (value) =>
   new Intl.NumberFormat(i18n.resolvedLanguage, {
     notation: "compact",
@@ -64,7 +80,7 @@ export const formatCompact = (value) =>
 // the trillions must not run out of the card).
 // Times arrive in UTC; they are shown in the institution's time zone when the
 // API has said which (`timezone` in auth/me), else the browser's.
-const toDate = (value) => {
+export const toDate = (value) => {
   if (value instanceof Date) return value;
   if (!value) return null;
   const text = String(value);

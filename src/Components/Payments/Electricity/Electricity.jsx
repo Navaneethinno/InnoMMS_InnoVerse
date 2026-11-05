@@ -1,3 +1,5 @@
+import Button from "@/Components/Common/Button";
+import { digitsOnly } from "@/Utils/Lib/format";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RotateCcw } from "lucide-react";
@@ -6,7 +8,6 @@ import ExtFlow, {
   Chips,
   ExtDetails,
   cleanAmount,
-  digitsOnly,
   useProviders,
 } from "@/Components/Common/Payments/ExtFlow";
 import SavedAccounts, {
@@ -140,18 +141,17 @@ function ResendLast({ meter }) {
   };
   return (
     <div className="mt-2">
-      <button
-        type="button"
+      <Button variant="ghost" size="sm"
         disabled={state.pending}
         onClick={resend}
-        className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink disabled:opacity-50"
+        className="gap-1.5 disabled:opacity-50"
       >
         <RotateCcw
           size={13}
           className={state.pending ? "animate-spin" : undefined}
         />
         {t("power.resend", { defaultValue: "Resend the last token" })}
-      </button>
+      </Button>
       {state.problem && (
         <p className="mt-1 text-xs text-red-600">{state.problem}</p>
       )}

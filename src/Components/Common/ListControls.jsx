@@ -1,3 +1,4 @@
+import Button from "@/Components/Common/Button";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, Search, X } from "lucide-react";
 import { cn } from "@/Utils/Lib/utils";
@@ -45,14 +46,10 @@ export function ShowMore({ list, className }) {
   if (!list.hasMore) return null;
   return (
     <div className={cn("mt-4 flex justify-center", className)}>
-      <button
-        type="button"
-        onClick={list.showMore}
-        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-surface px-4 py-2.5 text-sm font-semibold text-ink shadow-sm transition hover:bg-ink/5"
-      >
+      <Button variant="secondary" onClick={list.showMore} className="gap-1.5 px-4 py-2.5 shadow-sm hover:bg-ink/5">
         <ChevronDown size={15} />
         {t("list.showMore", { count: list.remaining, defaultValue: "Show more ({{count}} left)" })}
-      </button>
+      </Button>
     </div>
   );
 }

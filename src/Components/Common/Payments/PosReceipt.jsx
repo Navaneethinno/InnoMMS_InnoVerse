@@ -1,8 +1,9 @@
+import Button from "@/Components/Common/Button";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Printer, Volume2, VolumeX } from "lucide-react";
 import { barcodeBars } from "@/Utils/Lib/barcode";
-import { formatDate, formatMoney, formatTime } from "@/Utils/Lib/format";
+import { formatDate, formatTime, moneyOrNull, toDate } from "@/Utils/Lib/format";
 import { downloadReceiptPdf } from "@/Utils/Lib/receiptPdf";
 import { accountLine, receiptTexts } from "@/Utils/Lib/receiptTransaction";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
@@ -82,8 +83,8 @@ const PosReceipt = forwardRef(function PosReceipt({ transaction, children, note,
   const [sound, setSound] = useState(soundOn.current);
 
   const tx = transaction ?? {};
-  const money = (value) => (value != null && value !== "" ? formatMoney(value, tx.currency) : null);
-  const when = tx.dateTime ? new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(tx.dateTime) ? tx.dateTime : `${tx.dateTime}Z`) : null;
+  const money = (value) => moneyOrNull(value, tx.currency);
+  const when = toDate(tx.dateTime);
   const validDate = when && !Number.isNaN(when.getTime());
   const brand = t("brand.name");
   const words = receiptTexts(tx, t, brand);
@@ -457,14 +458,14 @@ const PosReceipt = forwardRef(function PosReceipt({ transaction, children, note,
 
       {/* 4. Keep it: print, or download as a PDF */}
       <div className="mt-5 flex flex-wrap gap-3 [&>*]:flex-1">
-        <button type="button" onClick={printReceipt} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-surface px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">
+        <Button variant="secondary" onClick={printReceipt} className="px-4 py-3 hover:bg-ink/5">
           <Printer size={16} />
           {t("pos.print")}
-        </button>
-        <button type="button" onClick={() => void downloadPdf()} disabled={downloading} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-surface px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5 disabled:opacity-60">
+        </Button>
+        <Button variant="secondary" onClick={() => void downloadPdf()} disabled={downloading} className="px-4 py-3 hover:bg-ink/5">
           <Download size={16} />
           {t("pos.download")}
-        </button>
+        </Button>
       </div>
 
       {/* 5. Actions */}

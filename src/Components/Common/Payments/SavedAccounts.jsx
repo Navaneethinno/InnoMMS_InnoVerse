@@ -44,15 +44,14 @@ export default function SavedAccounts({ saved, value, onPick, title }) {
     <div>
       <div className="mb-2 flex items-center justify-between gap-2">
         <p className="text-sm font-semibold text-slate-700">{title}</p>
-        <button
-          type="button"
+        <Button variant="ghost" size="sm"
           onClick={() => setEditing((e) => !e)}
-          className="rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink"
+          
         >
           {editing
             ? t("cards.done")
             : t("saved.edit", { defaultValue: "Edit" })}
-        </button>
+        </Button>
       </div>
       <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto">
         {saved.items.map((item) =>

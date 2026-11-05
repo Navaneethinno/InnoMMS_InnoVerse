@@ -1,3 +1,4 @@
+import { digitsOnly } from "@/Utils/Lib/format";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -11,7 +12,7 @@ import { sanitizePin } from "@/Utils/Lib/pinRules";
 // The pieces of an action dialog (cards, deposits, loans): the PIN field,
 // the dialog with its problem and confirm button, and the call runner.
 
-const digits = (value, max) => value.replace(/\D/g, "").slice(0, max);
+const digits = (value, max) => digitsOnly(value).slice(0, max);
 
 // The transaction PIN (letters allowed when the product says so) or, with
 // `length`, the card's own PIN (digits only, of the card's length).

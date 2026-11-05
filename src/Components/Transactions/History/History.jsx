@@ -631,25 +631,23 @@ export default function History() {
       )}
       {state.total > LIMIT && (
         <div className="mt-5 flex items-center justify-between gap-3 text-sm">
-          <button
-            type="button"
+          <Button variant="ghost"
             disabled={page <= 1 || state.loading}
             onClick={() => setPage((value) => value - 1)}
-            className="rounded-xl px-4 py-2 font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink disabled:invisible"
+            className="py-2 disabled:invisible"
           >
             {t("history.prev")}
-          </button>
+          </Button>
           <span className="text-slate-500">
             {t("history.page", { page, pages })}
           </span>
-          <button
-            type="button"
+          <Button variant="ghost"
             disabled={page >= pages || state.loading}
             onClick={() => setPage((value) => value + 1)}
-            className="rounded-xl px-4 py-2 font-semibold text-slate-500 hover:bg-ink/5 hover:text-ink disabled:invisible"
+            className="py-2 disabled:invisible"
           >
             {t("history.next")}
-          </button>
+          </Button>
         </div>
       )}
       <TransactionDialog item={open} onClose={() => setOpen(null)} />

@@ -1,3 +1,4 @@
+import { nationalDigits } from "@/Utils/Lib/format";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PhoneField from "@/Components/Common/PhoneField";
@@ -6,7 +7,6 @@ import TextField from "@/Components/Common/TextField";
 import ExtFlow, {
   Chips,
   cleanAmount,
-  digitsOnly,
   useProviders,
 } from "@/Components/Common/Payments/ExtFlow";
 import SavedAccounts, {
@@ -29,7 +29,7 @@ export default function Airtime() {
   const { list, problem } = useProviders("AIRTIME");
   const saved = useSavedAccounts("AIRTIME");
   const [form, setForm] = useState(EMPTY);
-  const digits = digitsOnly(form.phone).replace(/^258/, "");
+  const digits = nationalDigits(form.phone, portalPolicy.phone.countries);
   const guessed =
     digits.length >= 2
       ? (list ?? []).find((p) =>

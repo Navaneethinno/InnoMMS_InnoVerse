@@ -2,7 +2,10 @@ import { Check } from "lucide-react";
 import Spinner from "./Spinner";
 import { cn } from "@/Utils/Lib/utils";
 
-// Shared button. `pending` disables it and shows a spinner.
+// Shared button. `pending` disables it and shows a spinner. `variant`: primary,
+// secondary (outlined), ghost (quiet: Back, Cancel, small actions), pill or
+// pill-outline (the headers of the pages before sign-in). `size` sm is for
+// small actions inside a row.
 //
 // `animated` switches on the submit animation used by Sign in (and later
 // Verify / Start onboarding): while pending, a darker fill swipes in from
@@ -11,6 +14,16 @@ import { cn } from "@/Utils/Lib/utils";
 // a tick and `successLabel`. When pending ends without success the fill
 // retracts and the label comes back. Reduced-motion users get plain swaps
 // (the global prefers-reduced-motion rule in styles.css).
+const SOLID = "bg-forest text-white hover:bg-forest/90 dark:bg-lime dark:text-on-secondary dark:hover:bg-lime/90";
+const PILL = "gap-1.5 whitespace-nowrap rounded-full px-3 py-2 font-bold";
+const VARIANTS = {
+  primary: SOLID,
+  secondary: "border border-slate-200 bg-surface text-ink hover:bg-slate-50",
+  ghost: "px-4 py-3 text-slate-500 hover:bg-ink/5 hover:text-ink",
+  pill: cn(PILL, SOLID),
+  "pill-outline": cn(PILL, "border-[1.5px] border-forest text-forest hover:bg-forest/5 dark:border-lime dark:text-lime dark:hover:bg-lime/10"),
+};
+
 export default function Button({
   children,
   pending = false,
@@ -18,6 +31,7 @@ export default function Button({
   className,
   variant = "primary",
   type = "button",
+  size = "md",
   animated = false,
   success = false,
   successLabel,
@@ -26,9 +40,8 @@ export default function Button({
   const busy = pending || success;
   const base = cn(
     "inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed",
-    variant === "primary"
-      ? "bg-forest text-white hover:bg-forest/90 dark:bg-lime dark:text-on-secondary dark:hover:bg-lime/90"
-      : "border border-slate-200 bg-surface text-ink hover:bg-slate-50",
+    VARIANTS[variant],
+    size === "sm" && "rounded-lg px-2 py-1 text-xs",
   );
 
   if (!animated) {
