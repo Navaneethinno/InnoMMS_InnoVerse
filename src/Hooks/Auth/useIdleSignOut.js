@@ -50,7 +50,7 @@ export function useIdleSignOut() {
       if (!idle) return;
       const quiet = (Date.now() - lastInput.current) / 1000;
       // Active recently, but the server has heard nothing for a while: say hello.
-      if (quiet < idle / 2 && (Date.now() - lastApiActivity()) / 1000 > idle / 2) void loadMe().catch(() => {});
+      if (document.visibilityState === "visible" && quiet < idle / 2 && (Date.now() - lastApiActivity()) / 1000 > idle / 2) void loadMe().catch(() => {});
       const warnAt = Math.max(idle - WARN_SECONDS, idle / 2);
       if (quiet >= idle) {
         window.clearInterval(timer);

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useVisiblePoll } from "@/Hooks/useVisiblePoll";
 import { useExtOrder } from "@/Hooks/Live/useLiveUpdates";
 import { loadExtOrder, loadReceipt } from "@/Services/Account/account.api";
 
@@ -52,19 +53,17 @@ export function useExtOrderTracking(done) {
   });
   useEffect(() => {
     if (!open || !orderRef) return undefined;
-    const poll = window.setInterval(
-      () =>
-        loadExtOrder(orderRef)
-          .then((next) => latest.current(next))
-          .catch(() => {}),
-      POLL_MS,
-    );
     const stop = window.setTimeout(() => setGaveUp(true), WAIT_MS);
-    return () => {
-      window.clearInterval(poll);
-      window.clearTimeout(stop);
-    };
+    return () => window.clearTimeout(stop);
   }, [open, orderRef]);
+  useVisiblePoll(
+    () =>
+      loadExtOrder(orderRef)
+        .then((next) => latest.current(next))
+        .catch(() => {}),
+    POLL_MS,
+    open && Boolean(orderRef),
+  );
 
   const reset = () => {
     setOrder(null);

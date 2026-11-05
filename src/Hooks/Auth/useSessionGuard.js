@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { hasSession, clearAuthSession } from "@/Services/api/authStorage";
 import { sessionCleared } from "@/Redux/slices/authSlice";
 
-// Whether the signed-in area may show: re-checked every 10 seconds, on focus,
+// Whether the signed-in area may show: re-checked every 10 seconds while the
+// tab is visible, on focus,
 // and when the API client reports the session expired.
 export function useSessionGuard() {
   const dispatch = useDispatch();
@@ -25,7 +26,9 @@ export function useSessionGuard() {
       check();
     };
     check();
-    const timer = window.setInterval(check, 10000);
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") check();
+    }, 10000);
     window.addEventListener("merchant:session-expired", expire);
     window.addEventListener("focus", check);
     return () => {

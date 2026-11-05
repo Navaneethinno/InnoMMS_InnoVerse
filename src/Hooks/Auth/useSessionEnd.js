@@ -29,6 +29,8 @@ export function useSessionEnd() {
         setSecondsLeft(null);
         notifications.info(t("auth.sessionEnded", { defaultValue: "Your session has ended. Sign in again to continue." }));
         void signOut();
+      } else if (document.visibilityState !== "visible") {
+        // The sign-out above still runs in a hidden tab; the countdown needn't.
       } else if (left <= SESSION_END_WARN_SECONDS) {
         setSecondsLeft(left);
       } else {
