@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { localIsoDay } from "@/Utils/Lib/format";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { KeyRound } from "lucide-react";
 import FieldError from "@/Components/Common/FieldError";
@@ -18,15 +19,14 @@ import DatePicker from "@/Components/Common/DatePicker";
 // `file` (FILE fields only): { upload(file, side), download, formats,
 // maxBytes, capture } from the wizard.
 
-const isoDate = (date) => date.toISOString().slice(0, 10);
 const yearsAgo = (years) => {
   const date = new Date();
   date.setFullYear(date.getFullYear() - years);
-  return isoDate(date);
+  return localIsoDay(date);
 };
 
 function dateLimits(options = {}) {
-  const today = isoDate(new Date());
+  const today = localIsoDay();
   const mins = [options.min_date, options.no_past && today, options.max_age != null && yearsAgo(Number(options.max_age) + 1)].filter(Boolean);
   const maxes = [options.max_date, options.no_future && today, options.min_age != null && yearsAgo(Number(options.min_age))].filter(Boolean);
   return { min: mins.sort().at(-1), max: maxes.sort()[0] };

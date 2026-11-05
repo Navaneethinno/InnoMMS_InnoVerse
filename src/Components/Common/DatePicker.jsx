@@ -1,3 +1,4 @@
+import { localIsoDay } from "@/Utils/Lib/format";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -16,10 +17,6 @@ const parse = (value) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value ?? ""));
   return m ? { y: Number(m[1]), m: Number(m[2]) - 1, d: Number(m[3]) } : null;
 };
-const todayIso = () => {
-  const now = new Date();
-  return iso(now.getFullYear(), now.getMonth(), now.getDate());
-};
 const WIDTH = 288;
 
 export default function DatePicker({ value, onChange, min, max, disabled, className, placeholder, id, "aria-invalid": invalid }) {
@@ -32,7 +29,7 @@ export default function DatePicker({ value, onChange, min, max, disabled, classN
   const selected = parse(value);
   // A min/max date pulls the calendar into range (e.g. a date of birth
   // opens at the latest allowed year, not today).
-  const start = () => selected ?? parse(max && todayIso() > max ? max : min && todayIso() < min ? min : todayIso());
+  const start = () => selected ?? parse(max && localIsoDay() > max ? max : min && localIsoDay() < min ? min : localIsoDay());
   const [cursor, setCursor] = useState(start);
   const [pos, setPos] = useState(null);
 
@@ -93,7 +90,7 @@ export default function DatePicker({ value, onChange, min, max, disabled, classN
   const daysIn = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
   const cells = [...Array(first).fill(null), ...Array.from({ length: daysIn }, (_, i) => i + 1)];
   const yearStart = y - (y % 12);
-  const today = todayIso();
+  const today = localIsoDay();
   const step = (delta) => {
     if (view === "days") setCursor(({ y: cy, m: cm }) => ({ y: cm + delta < 0 ? cy - 1 : cm + delta > 11 ? cy + 1 : cy, m: (cm + delta + 12) % 12 }));
     else setCursor((c) => ({ ...c, y: c.y + delta * (view === "years" ? 12 : 1) }));

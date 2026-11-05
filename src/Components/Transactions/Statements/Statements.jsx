@@ -9,14 +9,13 @@ import Modal from "@/Components/Common/Modal";
 import { useAccountActions } from "@/Hooks/Account/useAccountActions";
 import { useStatementsActions } from "@/Hooks/Statements/useStatementsActions";
 import { saveBlob } from "@/Utils/Lib/download";
-import { formatDate, formatMoney } from "@/Utils/Lib/format";
+import { formatDate, formatMoney, localIsoDay } from "@/Utils/Lib/format";
 import { PageHeading } from "@/Components/Common/PageTitle";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
 import DatePicker from "@/Components/Common/DatePicker";
 
 const LIMIT = 20;
 const DAY = 86400000;
-const isoDay = (date) => date.toISOString().slice(0, 10);
 const dateInput = "field-control h-11 border-ink/25 py-0 focus:border-ink";
 
 // Statements: the ones the bank made (with their lines and a CSV each), and a
@@ -31,7 +30,7 @@ export default function Statements() {
   const [detail, setDetail] = useState(null);
   const [busy, setBusy] = useState(null);
   const [problem, setProblem] = useState("");
-  const [range, setRange] = useState(() => ({ from: isoDay(new Date(Date.now() - 30 * DAY)), to: isoDay(new Date()), acctNum: "" }));
+  const [range, setRange] = useState(() => ({ from: localIsoDay(new Date(Date.now() - 30 * DAY)), to: localIsoDay(), acctNum: "" }));
 
   const currencyOf = useMemo(() => Object.fromEntries(wallets.map((wallet) => [wallet.acct_num, wallet.currency_code])), [wallets]);
 

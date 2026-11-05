@@ -19,6 +19,11 @@ export const setDisplayTimeZone = (zone) => {
   displayTimeZone = zone || undefined;
 };
 
+// A date as YYYY-MM-DD on the user's own calendar. (toISOString gives the UTC
+// day, which is yesterday or tomorrow for part of the day in most time zones.)
+export const localIsoDay = (date = new Date()) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
 // Amounts arrive as decimal strings ("100.50") with a currency code.
 export function formatMoney(amount, currency, { signed = false } = {}) {
   const value = Number(amount);

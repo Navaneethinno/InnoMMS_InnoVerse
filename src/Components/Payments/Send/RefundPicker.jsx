@@ -6,18 +6,17 @@ import ErrorState from "@/Components/Common/ErrorState";
 import FilterSelect from "@/Components/Common/FilterSelect";
 import TextField from "@/Components/Common/TextField";
 import { useRefundablePayments } from "@/Hooks/Transactions/useRefundablePayments";
-import { formatClock, formatDate, formatMoney } from "@/Utils/Lib/format";
+import { formatClock, formatDate, formatMoney, localIsoDay } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 
 // The day a line belongs to, as a heading: Today, Yesterday, else the date.
 const dayKey = (value) => String(value ?? "").slice(0, 10);
 function dayLabel(key, t) {
   const today = new Date();
-  const iso = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
-  if (key === iso(today)) return t("refund.today", { defaultValue: "Today" });
-  if (key === iso(yesterday)) return t("refund.yesterday", { defaultValue: "Yesterday" });
+  if (key === localIsoDay(today)) return t("refund.today", { defaultValue: "Today" });
+  if (key === localIsoDay(yesterday)) return t("refund.yesterday", { defaultValue: "Yesterday" });
   return formatDate(key);
 }
 
