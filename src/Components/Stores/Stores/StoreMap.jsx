@@ -33,6 +33,7 @@ export default function StoreMap({
   height = "h-56",
 }) {
   const { t } = useTranslation();
+  const [loaded, setLoaded] = useState(false);
   const point = validPoint(latitude, longitude);
   if (!point) return null;
   const d = 0.004;
@@ -49,12 +50,20 @@ export default function StoreMap({
         className,
       )}
     >
-      <iframe
-        title={t("stores.location", { defaultValue: "Store location" })}
-        className={cn("w-full", height)}
-        loading="lazy"
-        src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${point.latitude},${point.longitude}`}
-      />
+      {/* The map loads only when scrolled to, doesn't tell the map site which
+          page it is on, and can't open pop-ups or move this page. A soft
+          placeholder holds its place until it has loaded. */}
+      <div className={cn("w-full", height, !loaded && "animate-pulse bg-ink/5")}>
+        <iframe
+          title={t("stores.location", { defaultValue: "Store location" })}
+          className={cn("h-full w-full transition-opacity duration-300", !loaded && "opacity-0")}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          sandbox="allow-scripts allow-same-origin"
+          onLoad={() => setLoaded(true)}
+          src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${point.latitude},${point.longitude}`}
+        />
+      </div>
       <a
         className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-ink hover:underline"
         href={`https://www.openstreetmap.org/?mlat=${point.latitude}&mlon=${point.longitude}#map=17/${point.latitude}/${point.longitude}`}
