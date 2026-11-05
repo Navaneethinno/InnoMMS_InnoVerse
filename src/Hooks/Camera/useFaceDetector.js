@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
 // MediaPipe's Face Detector, loaded only when the camera dialog opens. The
-// model is served with the portal (public/models); the small WASM runtime
-// comes from the package's CDN copy, pinned to the installed version.
-const WASM_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm";
+// model and the WASM runtime are served with the portal: public/models, and
+// public/mediapipe-wasm (copied from the package by vite.config.js).
+const WASM_URL = `${window.location.origin}${import.meta.env.BASE_URL}mediapipe-wasm`;
 const MODEL_URL = `${import.meta.env.BASE_URL}models/blaze_face_short_range.tflite`;
 
 // `status`: "loading" | "ready" | "failed" (no model or no network: the

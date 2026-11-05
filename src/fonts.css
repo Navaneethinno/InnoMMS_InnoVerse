@@ -1,11 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap");
+@import "@fontsource-variable/fraunces/wght.css";
+@import "@fontsource-variable/plus-jakarta-sans/wght.css";
 
 :root {
-  /* Change the font here for the whole portal. When choosing a different
-     web font, update the import above in this same file as well. */
-  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  /* Change the font here for the whole portal. Fonts are served with the
+     portal (the imports above), never from an outside host. */
+  --font-sans: "Plus Jakarta Sans Variable", system-ui, -apple-system, sans-serif;
   /* Display serif for the wordmark and big headings. */
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
 }
 
 /* Toastify has its own font token; use the application font there too. */
