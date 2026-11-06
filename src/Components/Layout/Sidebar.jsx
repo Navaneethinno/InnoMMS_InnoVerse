@@ -1,5 +1,6 @@
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Layers, LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import BrandLogo from "@/Components/Common/BrandLogo";
@@ -31,6 +32,19 @@ export default function Sidebar({
   const items = menu?.length ? navFromMenu(menu) : [];
   // Icons only while collapsed and not being pointed at.
   const slim = collapsed && !hovering;
+  const navRef = useRef(null);
+  const { pathname } = useLocation();
+  // On a short screen the menu scrolls: keep the current page's item in view.
+  // Only the menu moves, never the page.
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector('[aria-current="page"]');
+    if (!active) return;
+    const top = active.offsetTop - nav.offsetTop;
+    if (top < nav.scrollTop) nav.scrollTop = top;
+    else if (top + active.offsetHeight > nav.scrollTop + nav.clientHeight)
+      nav.scrollTop = top + active.offsetHeight - nav.clientHeight;
+  }, [pathname, items.length]);
 
   return (
     <aside
@@ -72,6 +86,7 @@ export default function Sidebar({
       </div>
 
       <nav
+        ref={navRef}
         aria-label={t("nav.main")}
         className="sidebar-nav thin-scrollbar -me-1 mt-4 grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overflow-x-hidden pe-1"
       >
