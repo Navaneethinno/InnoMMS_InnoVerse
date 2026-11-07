@@ -1,7 +1,7 @@
 import i18n from "@/Utils/I18n/i18n";
 import { api, requireEndpoint } from "./client";
 import { portalHeaders } from "./portalHeaders";
-import { readBlobPayload, toApiRequestError } from "./apiErrors";
+import { keyedMessage, readBlobPayload, toApiRequestError } from "./apiErrors";
 import { cachedPost } from "./readCache";
 
 // One call to the merchant API. Every reply is { status, code, message,
@@ -47,7 +47,7 @@ export async function portalPost(endpoint, body = {}, { signedIn = true } = {}) 
       }
       const rows = Array.isArray(payload?.data) ? payload.data : payload?.data ? [payload.data] : [];
       // `data` is the first item; `rows` the whole list (for calls that answer with one).
-      return { data: rows[0] ?? null, rows, message: payload?.message ?? "" };
+      return { data: rows[0] ?? null, rows, message: keyedMessage(payload) };
     };
     // Sign-in calls are never shared or kept.
     return await (signedIn ? cachedPost(endpoint, body, send) : send());

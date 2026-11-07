@@ -1,5 +1,5 @@
 import { FIELD_LIMITS } from "@/Utils/Constant";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, ShieldCheck, Trash2 } from "lucide-react";
 import Button from "@/Components/Common/Button";
@@ -238,5 +238,73 @@ export default function PosProfiles({ profiles, onEdit, onChanged }) {
       </ul>
       <ShowMore list={list} />
     </>
+  );
+}
+
+// A new terminal profile copied from one of the bank's templates: the owner
+// picks the template and names the profile.
+export function TemplateDialog({ currencies, onClose, onSaved }) {
+  const { loadPosTemplates, posProfileFromTemplate } = useStoreActions();
+  const { t } = useTranslation();
+  const [templates, setTemplates] = useState(null);
+  const [form, setForm] = useState({ template_code: "", name: "", currency_code: "" });
+  const [pending, setPending] = useState(false);
+  const [problem, setProblem] = useState("");
+  useEffect(() => {
+    loadPosTemplates()
+      .then((rows) => setTemplates(rows.filter((row) => row.active !== false)))
+      .catch((error) => {
+        setTemplates([]);
+        setProblem(error.message);
+      });
+  }, [loadPosTemplates]);
+  const set = (key, value) => setForm((previous) => ({ ...previous, [key]: value }));
+  const chosen = templates?.find((x) => x.code === form.template_code);
+  const pick = (code) => {
+    const template = templates.find((x) => x.code === code);
+    setForm((previous) => ({ ...previous, template_code: code, name: previous.name || template?.name || "", currency_code: template?.currency_code || previous.currency_code }));
+  };
+  const submit = async (event) => {
+    event.preventDefault();
+    setPending(true);
+    setProblem("");
+    try {
+      await posProfileFromTemplate({ template_code: form.template_code, name: form.name.trim(), currency_code: form.currency_code });
+      notifications.success(t("pos.profileSaved", { defaultValue: "Profile saved. It applies from each user's next transaction." }));
+      onSaved();
+    } catch (error) {
+      setProblem(error.message);
+    } finally {
+      setPending(false);
+    }
+  };
+  return (
+    <Modal open onOpenChange={(open) => !open && onClose()} pending={pending} title={t("pos.fromTemplate")}>
+      <form noValidate onSubmit={submit} className="space-y-4">
+        {problem && <ErrorState message={problem} />}
+        {templates === null ? (
+          <LoadingState />
+        ) : !templates.length ? (
+          <p className="text-sm text-slate-500">{t("pos.noTemplates")}</p>
+        ) : (
+          <>
+            <FilterSelect label={t("pos.template")} placeholder={t("pos.pickTemplate")} value={form.template_code} onChange={pick} options={templates.map((x) => ({ value: x.code, label: x.name, description: x.description }))} />
+            {chosen?.description && <p className="text-xs text-slate-500">{chosen.description}</p>}
+            <TextField name="name" maxLength={FIELD_LIMITS.name} label={t("pos.name", { defaultValue: "Name" })} value={form.name} onChange={(event) => set("name", event.target.value)} />
+            {currencies.length > 1 && (
+              <FilterSelect label={t("pos.currency", { defaultValue: "Currency" })} value={form.currency_code} onChange={(code) => set("currency_code", code)} placeholder={t("pos.mainCurrency", { defaultValue: "Main wallet's currency" })} options={currencies.map((code) => ({ value: code, label: code }))} />
+            )}
+          </>
+        )}
+        <div className="flex justify-end gap-3 pt-2">
+          <Button variant="secondary" disabled={pending} onClick={onClose}>
+            {t("common.cancel")}
+          </Button>
+          <Button type="submit" pending={pending} disabled={!form.template_code || !form.name.trim()} reason={t("pos.templateNeeded")}>
+            {t("pos.createFromTemplate")}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

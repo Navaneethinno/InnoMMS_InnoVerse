@@ -30,6 +30,7 @@ import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { receiptToTransaction } from "@/Utils/Lib/receiptTransaction";
 import { isSuperAgent } from "@/Utils/Lib/roles";
 import PosReceipt from "@/Components/Common/Payments/PosReceipt";
+import AgentCards from "./AgentCards";
 import { Balance, BalanceEye } from "@/Components/Common/Balance";
 
 // Cash In / Out for agents and super agents (Agents, stores and POS, phases 2-3).
@@ -639,6 +640,7 @@ export default function AgentCash() {
         </form>
         {floatCard}
       </div>
+      <AgentCards />
     </div>
   );
 }

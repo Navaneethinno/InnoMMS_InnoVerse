@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ArrowRightLeft,
+  Copy,
   KeyRound,
   Clock,
   MapPin,
@@ -48,7 +49,8 @@ import { sanitizePin } from "@/Utils/Lib/pinRules";
 import { isOwner, isOwnMoney, roleName, staffRole } from "@/Utils/Lib/roles";
 import { cn } from "@/Utils/Lib/utils";
 import StoreMap, { UseMyLocation, validPoint } from "./StoreMap";
-import PosProfiles, { ProfileDialog } from "./PosProfiles";
+import PosProfiles, { ProfileDialog, TemplateDialog } from "./PosProfiles";
+import Products from "./Products";
 import PosShifts, { ShiftDialog } from "./PosShifts";
 import StoreHoursEditor, { hoursText, rulesToWeek, weekToRules, weekValid } from "./StoreHours";
 import { PageHeading } from "@/Components/Common/PageTitle";
@@ -922,7 +924,7 @@ export default function Stores() {
   // ?tab=wallets&move=<acct_num>: the dashboard's "Move money" on a store wallet.
   const [params, setParams] = useSearchParams();
   const [tab, setTab] = useState(() =>
-    ["wallets", "users", "profiles", "shifts"].includes(params.get("tab"))
+    ["wallets", "users", "profiles", "shifts", "products"].includes(params.get("tab"))
       ? params.get("tab")
       : "stores",
   );
@@ -1045,6 +1047,7 @@ export default function Stores() {
           },
         ]
       : []),
+    ...(canSeeUsers ? [{ key: "products", label: t("catalogue.tab") }] : []),
     ...(managesProfiles
       ? [
           { key: "profiles", label: t("pos.profilesTab", { defaultValue: "Terminal profiles" }) },
@@ -1087,6 +1090,11 @@ export default function Stores() {
             >
               <Plus size={16} />{" "}
               {t("stores.add", { defaultValue: "Add a store" })}
+            </Button>
+          )}
+          {managesProfiles && tab === "profiles" && (
+            <Button variant="secondary" onClick={() => setDialog({ kind: "template" })} className="px-4 py-2.5">
+              <Copy size={16} /> {t("pos.fromTemplate")}
             </Button>
           )}
           {managesProfiles && tab === "profiles" && (
@@ -1369,6 +1377,7 @@ export default function Stores() {
           </>
         ))}
 
+      {tab === "products" && canSeeUsers && <Products owner={owner} stores={stores} currencies={[...new Set(mainWallets.map((w) => w.currency_code).filter(Boolean))]} />}
       {tab === "profiles" && (
         <PosProfiles profiles={profiles} onEdit={(profile) => setDialog({ kind: "profile", profile })} onChanged={loadAll} />
       )}
@@ -1452,6 +1461,16 @@ export default function Stores() {
           profiles={profiles ?? []}
           shifts={shifts ?? []}
           managerMode={managerMode}
+          onClose={() => setDialog(null)}
+          onSaved={() => {
+            setDialog(null);
+            loadAll();
+          }}
+        />
+      )}
+      {dialog?.kind === "template" && (
+        <TemplateDialog
+          currencies={[...new Set(mainWallets.map((w) => w.currency_code).filter(Boolean))]}
           onClose={() => setDialog(null)}
           onSaved={() => {
             setDialog(null);

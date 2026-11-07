@@ -38,3 +38,14 @@ export const replyToCase = async ({ id, body, files }) => (await portalPost(CASE
 
 // A file of one of the merchant's own cases, as a Blob.
 export const downloadCaseFile = async (path) => (await portalDownload(CASE.FILE, { path })).blob;
+
+const { DISPUTE } = API_ENDPOINTS;
+// Dispute a transaction of yours by its RRN: { rrn, title, body } -> the new case.
+export const raiseDispute = async ({ rrn, title, body }) => (await portalPost(DISPUTE.RAISE, { rrn, title, body })).data;
+// Disputes others raised about your transactions, paged by the server.
+export const listDisputesAgainst = async ({ state = "", page = 1, limit = 20 } = {}) => {
+  const reply = (await portalPost(DISPUTE.AGAINST, { state, page, limit })).data ?? {};
+  return { total: reply.total ?? 0, items: reply.disputes ?? reply.cases ?? reply.items ?? [] };
+};
+// Your answer on a dispute against you: a note to staff, with uploaded files.
+export const respondToDispute = async ({ id, body, files }) => (await portalPost(DISPUTE.RESPOND, { id, body, files })).data;

@@ -415,6 +415,163 @@ function Thread({ id, labels, onBack, onChanged }) {
 // conversation. Cases waiting for the merchant come first; a badge in the
 // menu counts them. On a wide screen the list and the open case sit side by
 // side; on a narrow one, one at a time.
+// Dispute a card transaction of yours by its RRN (case/dispute/raise).
+function RaiseDisputeForm({ onClose, onRaised }) {
+  const { raiseDispute } = useCasesActions();
+  const { t } = useTranslation();
+  const [form, setForm] = useState({ rrn: "", title: "", body: "" });
+  const [saving, setSaving] = useState(false);
+  const set = (key) => (value) => setForm((previous) => ({ ...previous, [key]: value }));
+  const ready = form.rrn.trim() && form.title.trim() && form.body.trim();
+  const submit = async () => {
+    setSaving(true);
+    try {
+      const kase = await raiseDispute({ rrn: form.rrn.trim(), title: form.title.trim(), body: form.body.trim() });
+      toast.success(t("disputes.raised"));
+      onRaised(kase);
+    } catch (failure) {
+      toast.error(failure.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <Modal open onOpenChange={(open) => !open && onClose()} pending={saving} size="lg" title={t("disputes.raiseTitle")} description={t("disputes.raiseHint")}>
+      <div className="grid gap-4">
+        <label className="block text-sm font-medium">
+          {t("disputes.rrn")}
+          <input dir="ltr" value={form.rrn} onChange={(event) => set("rrn")(event.target.value)} placeholder="123456789012" className={cn(fieldClass, "mt-2")} />
+        </label>
+        <label className="block text-sm font-medium">
+          {t("cases.subject")}
+          <input dir="auto" value={form.title} maxLength={MAX_TITLE} onChange={(event) => set("title")(event.target.value)} className={cn(fieldClass, "mt-2")} />
+        </label>
+        <label className="block text-sm font-medium">
+          {t("cases.message")}
+          <textarea dir="auto" value={form.body} maxLength={MAX_BODY} rows={5} onChange={(event) => set("body")(event.target.value)} className={cn(fieldClass, "mt-2 min-h-[7rem] resize-y")} />
+        </label>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="secondary" disabled={saving} onClick={onClose}>
+            {t("common.cancel", { defaultValue: "Cancel" })}
+          </Button>
+          <Button pending={saving} disabled={!ready} reason={t("disputes.fillAll")} onClick={() => void submit()}>
+            <Send size={16} /> {t("disputes.raise")}
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+// The merchant's answer to a dispute raised about its transaction: a note to staff.
+function RespondDialog({ dispute, onClose, onDone }) {
+  const { respondToDispute } = useCasesActions();
+  const { t } = useTranslation();
+  const picker = useCaseFiles();
+  const [body, setBody] = useState("");
+  const [saving, setSaving] = useState(false);
+  const submit = async () => {
+    setSaving(true);
+    try {
+      await respondToDispute({ id: dispute.id, body: body.trim(), files: picker.ready });
+      toast.success(t("disputes.responded"));
+      onDone();
+    } catch (failure) {
+      toast.error(failure.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <Modal open onOpenChange={(open) => !open && onClose()} pending={saving} size="lg" title={t("disputes.respondTitle")} description={t("disputes.respondHint")}>
+      <div className="grid gap-4">
+        <textarea dir="auto" value={body} maxLength={MAX_BODY} rows={5} onChange={(event) => setBody(event.target.value)} className={cn(fieldClass, "min-h-[7rem] resize-y")} />
+        <div>
+          <FileChips picker={picker} />
+          <AttachButton picker={picker} disabled={saving} />
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" disabled={saving} onClick={onClose}>
+            {t("common.cancel", { defaultValue: "Cancel" })}
+          </Button>
+          <Button pending={saving} disabled={!body.trim() || picker.uploading} reason={picker.uploading ? t("disputes.uploading") : t("disputes.writeNote")} onClick={() => void submit()}>
+            <Send size={16} /> {t("disputes.respond")}
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+// Disputes others raised about the merchant's transactions, paged by the server.
+function DisputesAgainst() {
+  const { listDisputesAgainst } = useCasesActions();
+  const { t } = useTranslation();
+  const [pages, setPages] = useState(1);
+  const [state, setState] = useState({ loading: true, items: [], total: 0, error: "" });
+  const [responding, setResponding] = useState(null);
+  const load = useCallback(async () => {
+    setState((previous) => ({ ...previous, loading: true, error: "" }));
+    try {
+      const reply = await listDisputesAgainst({ state: "", page: 1, limit: LIMIT * pages });
+      setState({ loading: false, items: reply.items, total: reply.total, error: "" });
+    } catch (error) {
+      setState((previous) => ({ ...previous, loading: false, error: error.message }));
+    }
+  }, [listDisputesAgainst, pages]);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  return (
+    <div className="overflow-hidden panel shadow-sm">
+      {state.error && <ErrorState message={state.error} onRetry={() => void load()} />}
+      {state.loading && !state.items.length ? (
+        <div className="flex justify-center py-16">
+          <Spinner className="h-6 w-6" />
+        </div>
+      ) : !state.items.length && !state.error ? (
+        <p className="px-6 py-16 text-center text-sm text-slate-500">{t("disputes.noneAgainst")}</p>
+      ) : (
+        <ul className="divide-y divide-slate-100">
+          {state.items.map((d) => (
+            <li key={d.id} className="flex flex-wrap items-start justify-between gap-3 px-5 py-4">
+              <div className="min-w-0">
+                <p dir="auto" className="text-sm font-semibold text-ink">{d.title}</p>
+                <p className="mt-0.5 text-xs text-slate-500">{[d.case_number, d.rrn, formatShortDate(d.opened_at ?? d.created_at)].filter(Boolean).join(" · ")}</p>
+                {d.state && (
+                  <span className="mt-1.5 inline-block">
+                    <StatePill state={d.state} />
+                  </span>
+                )}
+              </div>
+              <Button size="sm" variant="secondary" disabled={d.can_respond === false} reason={t("disputes.cannotRespond")} onClick={() => setResponding(d)} className="px-3 py-2">
+                {t("disputes.respond")}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {state.items.length < state.total && (
+        <div className="border-t border-slate-100 p-3 text-center">
+          <Button variant="secondary" pending={state.loading} onClick={() => setPages((value) => value + 1)} className="h-10 w-full py-0">
+            {t("cases.more")}
+          </Button>
+        </div>
+      )}
+      {responding && (
+        <RespondDialog
+          dispute={responding}
+          onClose={() => setResponding(null)}
+          onDone={() => {
+            setResponding(null);
+            void load();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function Cases() {
   const { countCases, listCases } = useCasesActions();
   const { t } = useTranslation();
@@ -428,12 +585,13 @@ export default function Cases() {
   const [count, setCount] = useState({ support_open: 0, support_limit: 5 });
   const [openId, setOpenId] = useState(null);
   const [creating, setCreating] = useState(false);
+  const [disputing, setDisputing] = useState(false);
 
   const load = useCallback(
     async (quiet = false) => {
       if (!quiet) setState((previous) => ({ ...previous, loading: true, error: "" }));
       try {
-        const [reply, counted] = await Promise.all([listCases({ state: tab === "ALL" ? "" : tab, page: 1, limit: LIMIT * pages }), countCases().catch(() => null)]);
+        const [reply, counted] = await Promise.all([listCases({ state: tab === "ALL" || tab === "AGAINST" ? "" : tab, page: 1, limit: LIMIT * pages }), countCases().catch(() => null)]);
         setState({ loading: false, cases: reply.cases ?? [], total: reply.total ?? 0, error: "" });
         if (counted) setCount(counted);
         dispatch(userUpdated({ casesAction: counted?.action_needed ?? reply.action_needed ?? 0 }));
@@ -500,13 +658,16 @@ export default function Cases() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <SegmentedTabs
-            items={["OPEN", "CLOSED", "ALL"].map((key) => ({ key, label: t(`cases.tab.${key}`) }))}
+            items={["OPEN", "CLOSED", "ALL", "AGAINST"].map((key) => ({ key, label: t(`cases.tab.${key}`) }))}
             value={tab}
             onChange={(key) => {
               setTab(key);
               setPages(1);
             }}
           />
+          <Button variant="secondary" onClick={() => setDisputing(true)} className="h-9 px-3 py-0 text-xs">
+            {t("disputes.raise")}
+          </Button>
           <span title={atLimit ? t("cases.limitReached", { max: count.support_limit ?? 5 }) : undefined}>
             <Button disabled={atLimit || !categories.length} onClick={() => setCreating(true)} className="h-9 px-3 py-0 text-xs">
               <MessageSquarePlus size={15} /> {t("cases.new")}
@@ -522,7 +683,9 @@ export default function Cases() {
         </div>
       )}
 
-      {!wide && thread ? (
+      {tab === "AGAINST" ? (
+        <DisputesAgainst />
+      ) : !wide && thread ? (
         <div className="overflow-hidden panel shadow-sm">{thread}</div>
       ) : (
         <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
@@ -549,6 +712,17 @@ export default function Cases() {
         </div>
       )}
 
+      {disputing && (
+        <RaiseDisputeForm
+          onClose={() => setDisputing(false)}
+          onRaised={(kase) => {
+            setDisputing(false);
+            setTab("OPEN");
+            setOpenId(kase?.id ?? null);
+            void load(true);
+          }}
+        />
+      )}
       {creating && (
         <NewCaseForm
           categories={categories}

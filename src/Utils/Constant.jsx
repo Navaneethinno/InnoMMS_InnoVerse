@@ -67,6 +67,8 @@ const terminalPath = channelPath("terminal");
 const posProfilePath = channelPath("pos_profile");
 const posShiftPath = channelPath("pos_shift");
 const casePath = channelPath("case");
+const disputePath = channelPath("case/dispute");
+const cataloguePath = channelPath("catalogue");
 // A group's calls, keyed by the call's name in capitals: { LIST: ".../list" }.
 const callsOf = (path, calls) => Object.fromEntries(calls.map((call) => [call.toUpperCase(), path(call)]));
 export const API_ENDPOINTS = {
@@ -186,6 +188,9 @@ export const API_ENDPOINTS = {
     FLOAT: agentPath("float"),
     SIGNUPS: agentPath("signups"),
     AGENTS: agentPath("agents"),
+    // Instant cards the agent holds, and issuing one to a customer.
+    CARDS: agentPath("cards"),
+    CARD_ISSUE: agentPath("card_issue"),
   },
   // Assisted sign-up: the self sign-up calls, signed in as the agent.
   ASSISTED_CUSTOMER_INDIVIDUAL: onboardingEndpoints(
@@ -214,7 +219,11 @@ export const API_ENDPOINTS = {
     SETTINGS_SET: terminalPath("settings_set"),
   },
   // What a store user may do on a terminal (profiles) and when (shifts).
-  POS_PROFILE: callsOf(posProfilePath, ["txn_types", "list", "add", "edit", "status", "delete"]),
+  POS_PROFILE: callsOf(posProfilePath, ["txn_types", "list", "add", "edit", "status", "delete", "templates", "from_template"]),
+  // The merchant's products and their prices (owner writes, store managers read).
+  CATALOGUE: callsOf(cataloguePath, ["product_list", "product_add", "product_edit", "price_list", "price_set"]),
+  // Card disputes: raise one on a transaction, and those others raised on yours.
+  DISPUTE: callsOf(disputePath, ["raise", "against", "respond"]),
   POS_SHIFT: callsOf(posShiftPath, ["list", "add", "edit", "status", "delete"]),
 };
 // Until the API says otherwise (the `session` block of sign-in and refresh): a

@@ -31,3 +31,9 @@ export const setPosShiftActive = (id, active) =>
   portalPost(POS_SHIFT.STATUS, { id, active });
 // Only one no user holds (user_count 0); otherwise pos.shift_in_use.
 export const deletePosShift = (id) => portalPost(POS_SHIFT.DELETE, { id });
+
+// Profile templates the bank offers: [{ code, name, description, currency_code,
+// daily_debit_limit, daily_credit_limit, transactions: [...] }].
+export const loadPosTemplates = () => listOf(POS_PROFILE.TEMPLATES);
+// A new profile copied from a template: { template_code, name, currency_code }.
+export const posProfileFromTemplate = async (body) => (await portalPost(POS_PROFILE.FROM_TEMPLATE, body)).data;
