@@ -1377,7 +1377,7 @@ export default function Stores() {
           </>
         ))}
 
-      {tab === "products" && canSeeUsers && <Products owner={owner} stores={stores} currencies={[...new Set(mainWallets.map((w) => w.currency_code).filter(Boolean))]} />}
+      {tab === "products" && canSeeUsers && <Products stores={stores} currencies={[...new Set(mainWallets.map((w) => w.currency_code).filter(Boolean))]} />}
       {tab === "profiles" && (
         <PosProfiles profiles={profiles} onEdit={(profile) => setDialog({ kind: "profile", profile })} onChanged={loadAll} />
       )}

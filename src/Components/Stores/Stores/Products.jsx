@@ -1,7 +1,7 @@
 import { FIELD_LIMITS } from "@/Utils/Constant";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Package, Pencil, Plus, Search, Tag } from "lucide-react";
+import { Check, Package, Pencil, Plus, Search, Tag } from "lucide-react";
 import Button from "@/Components/Common/Button";
 import CheckboxPill from "@/Components/Common/CheckboxPill";
 import DatePicker from "@/Components/Common/DatePicker";
@@ -16,16 +16,76 @@ import { formatDate, formatMoney } from "@/Utils/Lib/format";
 import { notifications } from "@/Utils/Lib/notifications";
 import { StatusPill } from "./posShared";
 
-// The product catalogue (Stores > Products). The owner adds and edits products
-// and sets their prices, for one store or all stores (store_id 0); a store
-// manager reads only (each product's `actions` say so). The server searches
-// and pages. A product's parent must have no parent itself (one level), and
-// a product that has variants cannot get a parent.
+// The product catalogue (Stores > Products): products and their prices, for one
+// store or all stores (store_id 0). The list's `can_add` and each product's
+// `actions` say what this user may do. The server searches and pages, and
+// refuses a parent for a product that has variants.
 const ALL_STORES = 0;
 const PAGE_SIZE = 50;
-const PARENT_LIMIT = 200;
+const PARENT_LIMIT = 20;
 
-function ProductDialog({ product, currencies, onClose, onSaved }) {
+// Picks a product's main product from the server's search; the list sits in the
+// dialog so a long catalogue never loads at once. `currentLabel` names the
+// parent already set, which the first page of results may not contain.
+function ParentPicker({ productId, value, currentLabel, onChange }) {
+  const { loadProducts } = useCatalogueActions();
+  const { t } = useTranslation();
+  const [search, setSearch] = useState("");
+  const [reply, setReply] = useState(null);
+  const [problem, setProblem] = useState("");
+  const [picked, setPicked] = useState(currentLabel);
+  useEffect(() => {
+    let live = true;
+    const timer = setTimeout(() => {
+      loadProducts({ search: search.trim(), page: 1, limit: PARENT_LIMIT, parentsOnly: true })
+        .then((next) => {
+          if (!live) return;
+          setProblem("");
+          setReply(next);
+        })
+        .catch((error) => {
+          if (!live) return;
+          setReply({ items: [], total: 0 });
+          setProblem(error.message);
+        });
+    }, 300);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [loadProducts, search]);
+  const label = (p) => `${p.name} (${p.code})`;
+  const items = (reply?.items ?? []).filter((p) => p.id !== productId);
+  const choose = (id, text) => {
+    setPicked(text);
+    onChange(id);
+  };
+  const row = (id, text, key) => (
+    <li key={key}>
+      <button type="button" aria-pressed={value === id} onClick={() => choose(id, text)} className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-start text-sm hover:bg-ink/10">
+        <Check size={14} className={value === id ? "shrink-0" : "invisible shrink-0"} />
+        <span className="min-w-0 truncate">{text}</span>
+      </button>
+    </li>
+  );
+  return (
+    <div className="sm:col-span-2">
+      <p className="mb-2 text-sm font-medium">
+        {t("catalogue.parent")}: <span className="font-semibold">{value ? picked : t("catalogue.noParent")}</span>
+      </p>
+      <input type="search" aria-label={t("catalogue.parentSearch")} value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("catalogue.parentSearch")} className="field-control w-full" />
+      {problem && <p className="mt-2 text-xs text-red-600">{problem}</p>}
+      <ul className="mt-2 max-h-40 overflow-y-auto rounded-xl border border-slate-200 p-1">
+        {row("", t("catalogue.noParent"), "none")}
+        {items.map((p) => row(String(p.id), label(p), p.id))}
+      </ul>
+      {reply && !problem && !items.length && <p className="mt-2 text-xs text-slate-500">{t("catalogue.parentNone")}</p>}
+      {reply && reply.total > reply.items.length && <p className="mt-2 text-xs text-slate-500">{t("catalogue.parentNarrow", { count: reply.items.length })}</p>}
+    </div>
+  );
+}
+
+function ProductDialog({ product, products, currencies, onClose, onSaved }) {
   const { saveProduct } = useCatalogueActions();
   const { t } = useTranslation();
   const editing = Boolean(product?.id);
@@ -38,16 +98,8 @@ function ProductDialog({ product, currencies, onClose, onSaved }) {
     active: product ? product.status !== "INACTIVE" : true,
     parent_id: product?.parent_id ? String(product.parent_id) : "",
   }));
-  // Possible parents: products with no parent of their own, not this one.
-  const { loadProducts } = useCatalogueActions();
-  const [all, setAll] = useState([]);
-  useEffect(() => {
-    loadProducts({ page: 1, limit: PARENT_LIMIT })
-      .then((reply) => setAll(reply.items))
-      .catch(() => setAll([]));
-  }, [loadProducts]);
-  const parents = all.filter((p) => !p.parent_id && p.id !== product?.id).map((p) => ({ value: String(p.id), label: `${p.name} (${p.code})` }));
-  const hasVariants = editing && all.some((p) => p.parent_id === product.id);
+  const currentParent = (products ?? []).find((p) => p.id === product?.parent_id);
+  const currentLabel = currentParent ? `${currentParent.name} (${currentParent.code})` : `#${product?.parent_id ?? ""}`;
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
   const set = (key, value) => setForm((previous) => ({ ...previous, [key]: value }));
@@ -76,12 +128,11 @@ function ProductDialog({ product, currencies, onClose, onSaved }) {
           <TextField name="name" label={t("catalogue.name")} value={form.name} maxLength={FIELD_LIMITS.name} onChange={(event) => set("name", event.target.value)} />
           <TextField name="category" label={t("catalogue.category")} value={form.category} maxLength={FIELD_LIMITS.name} onChange={(event) => set("category", event.target.value)} />
           <TextField name="unit" label={t("catalogue.unit")} placeholder={t("catalogue.unitPlaceholder")} value={form.unit} maxLength={FIELD_LIMITS.name} onChange={(event) => set("unit", event.target.value)} />
-          <FilterSelect label={t("catalogue.parent")} value={form.parent_id} disabled={hasVariants} onChange={(value) => set("parent_id", value)} options={[{ value: "", label: t("catalogue.noParent") }, ...parents]} />
+          <ParentPicker productId={product?.id} value={form.parent_id} currentLabel={currentLabel} onChange={(value) => set("parent_id", value)} />
           {!editing && currencies.length > 1 && (
             <FilterSelect label={t("pos.currency", { defaultValue: "Currency" })} value={form.currency_code} onChange={(code) => set("currency_code", code)} options={currencies.map((code) => ({ value: code, label: code }))} />
           )}
         </div>
-        {hasVariants && <p className="text-xs text-slate-500">{t("catalogue.hasVariants")}</p>}
         {editing && <CheckboxPill label={t("catalogue.active")} checked={form.active} onChange={(event) => set("active", event.target.checked)} />}
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="secondary" disabled={pending} onClick={onClose}>
@@ -186,12 +237,13 @@ function PricesDialog({ product, stores, onClose }) {
   );
 }
 
-export default function Products({ owner, stores, currencies }) {
+export default function Products({ stores, currencies }) {
   const { loadProducts } = useCatalogueActions();
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState(null);
   const [total, setTotal] = useState(0);
+  const [canAdd, setCanAdd] = useState(false);
   const [page, setPage] = useState(1);
   const [problem, setProblem] = useState("");
   const [dialog, setDialog] = useState(null);
@@ -202,6 +254,7 @@ export default function Products({ owner, stores, currencies }) {
           setProblem("");
           setPage(nextPage);
           setTotal(reply.total);
+          setCanAdd(reply.canAdd);
           setProducts((previous) => (nextPage === 1 ? reply.items : [...(previous ?? []), ...reply.items]));
         })
         .catch((error) => {
@@ -224,9 +277,11 @@ export default function Products({ owner, stores, currencies }) {
           <Search size={15} className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("catalogue.search")} className="field-control w-full ps-9" />
         </label>
-        <Button onClick={() => setDialog({ kind: "product", product: null })} disabled={!owner} reason={readOnly} className="px-4 py-2.5">
-          <Plus size={16} /> {t("catalogue.addProduct")}
-        </Button>
+        {canAdd && (
+          <Button onClick={() => setDialog({ kind: "product", product: null })} className="px-4 py-2.5">
+            <Plus size={16} /> {t("catalogue.addProduct")}
+          </Button>
+        )}
       </div>
       {problem && (
         <div className="mb-4">
@@ -268,6 +323,7 @@ export default function Products({ owner, stores, currencies }) {
       {dialog?.kind === "product" && (
         <ProductDialog
           product={dialog.product}
+          products={products}
           currencies={currencies}
           onClose={() => setDialog(null)}
           onSaved={() => {

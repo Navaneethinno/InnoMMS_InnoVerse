@@ -4,12 +4,13 @@ import { portalPost } from "@/Services/api/portalRequest";
 const { CATALOGUE } = API_ENDPOINTS;
 // The merchant's products, paged by the server: { items: [{ id, code, name,
 // category, unit, parent_id, currency_code, status, price, actions: { edit,
-// price_set } }], total, page, limit } (limit 1-200).
-export const loadProducts = async ({ search = "", page = 1, limit = 50 } = {}) => {
-  const data = (await portalPost(CATALOGUE.PRODUCT_LIST, { search, page, limit })).data ?? {};
-  return { items: data.items ?? [], total: data.total ?? 0 };
+// price_set } }], can_add, total, page, limit } (limit 1-200). `parentsOnly`
+// returns only main products, for the parent picker.
+export const loadProducts = async ({ search = "", page = 1, limit = 50, parentsOnly = false } = {}) => {
+  const data = (await portalPost(CATALOGUE.PRODUCT_LIST, { search, page, limit, ...(parentsOnly && { parents_only: true }) })).data ?? {};
+  return { items: data.items ?? [], total: data.total ?? 0, canAdd: data.can_add === true };
 };
-// Owner only. Without `id` adds { code, name, category, unit, parent_id,
+// Without `id` adds { code, name, category, unit, parent_id,
 // currency_code }; with `id` edits { id, name, category, unit, parent_id, active }.
 export const saveProduct = async (product) => (await portalPost(product.id ? CATALOGUE.PRODUCT_EDIT : CATALOGUE.PRODUCT_ADD, product)).data;
 // A product's prices, newest first: [{ id, product_id, store_id (null = all
