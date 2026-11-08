@@ -10,13 +10,11 @@ import TextField from "@/Components/Common/TextField";
 import { ShowMore } from "@/Components/Common/ListControls";
 import { useListControls } from "@/Hooks/Common/useListControls";
 import { useAgentActions } from "@/Hooks/Agents/useAgentActions";
-import { newReference } from "@/Utils/Lib/format";
+import { formatDate, newReference } from "@/Utils/Lib/format";
 import { notifications } from "@/Utils/Lib/notifications";
 
 // Instant cards the agent holds (agent/cards) and issuing one to a customer
 // (agent/card_issue): the customer gives their one-time POS code.
-const inventoryIdOf = (card) => card.inventory_id ?? card.id;
-
 function IssueDialog({ card, onClose, onIssued }) {
   const { issueAgentCard } = useAgentActions();
   const { t } = useTranslation();
@@ -24,25 +22,48 @@ function IssueDialog({ card, onClose, onIssued }) {
   const [reference] = useState(newReference);
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
+  const [issued, setIssued] = useState(null);
   const submit = async (event) => {
     event.preventDefault();
     setPending(true);
     setProblem("");
     try {
-      const reply = await issueAgentCard({ inventory_id: inventoryIdOf(card), payment_code: code.trim(), client_reference: reference });
+      const reply = await issueAgentCard({ inventory_id: card.inventory_id, payment_code: code.trim(), client_reference: reference });
       notifications.success(reply?.message || t("agentCards.issued"));
-      onIssued();
+      setIssued(reply?.data ?? {});
     } catch (error) {
       setProblem(error.message);
     } finally {
       setPending(false);
     }
   };
+  if (issued)
+    return (
+      <Modal open onOpenChange={(open) => !open && onIssued()} title={t("agentCards.issuedTitle")}>
+        <dl className="grid gap-2 text-sm">
+          {[
+            ["agentCards.cardNumber", issued.pan_masked],
+            ["agentCards.product", issued.product_name ?? issued.product_code],
+            ["agentCards.nameOnCard", issued.name_on_card],
+            ["agentCards.expiry", issued.expiry],
+            ["agentCards.status", issued.ops_status],
+          ].map(([key, value]) => (
+            <div key={key} className="flex justify-between gap-3">
+              <dt className="text-slate-500">{t(key)}</dt>
+              <dd className="font-semibold text-slate-800">{value || "—"}</dd>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-5 flex justify-end">
+          <Button onClick={onIssued}>{t("agentCards.done")}</Button>
+        </div>
+      </Modal>
+    );
   return (
     <Modal open onOpenChange={(open) => !open && onClose()} pending={pending} title={t("agentCards.issueTitle")} description={t("agentCards.issueHint")}>
       <form noValidate onSubmit={submit} className="space-y-4">
         {problem && <ErrorState message={problem} />}
-        <p className="text-sm font-semibold text-slate-700">{card.pan_masked ?? card.product_name ?? card.product_code}</p>
+        <p className="text-sm font-semibold text-slate-700">{card.card_number} · {card.product_name}</p>
         <TextField name="payment_code" autoComplete="off" label={t("agentCards.code")} value={code} onChange={(event) => setCode(event.target.value)} />
         <div className="flex justify-end gap-3">
           <Button variant="secondary" disabled={pending} onClick={onClose}>
@@ -89,10 +110,10 @@ export default function AgentCards() {
       ) : (
         <ul className="divide-y divide-slate-100 panel shadow-sm">
           {list.visible.map((card) => (
-            <li key={inventoryIdOf(card)} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+            <li key={card.inventory_id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
               <div className="min-w-0 text-sm">
-                <p className="font-semibold text-slate-800">{card.pan_masked ?? card.product_name ?? card.product_code}</p>
-                <p className="text-xs text-slate-500">{[card.product_code, card.inventory_status ?? card.status, card.expiry].filter(Boolean).join(" · ")}</p>
+                <p className="font-semibold text-slate-800">{card.card_number}</p>
+                <p className="text-xs text-slate-500">{[card.product_name, card.product_code, card.assigned_at ? formatDate(card.assigned_at) : null].filter(Boolean).join(" · ")}</p>
               </div>
               <Button size="sm" onClick={() => setIssuing(card)} className="px-3 py-2">
                 {t("agentCards.issue")}

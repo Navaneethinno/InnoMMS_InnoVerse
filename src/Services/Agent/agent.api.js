@@ -65,11 +65,9 @@ export const assistedFlows = {
   }),
 };
 
-// The instant cards this agent holds (rows as the server gives them).
-export const loadAgentCards = async () => {
-  const { rows } = await portalPost(AGENT.CARDS, {});
-  return rows.length === 1 && Array.isArray(rows[0]?.cards) ? rows[0].cards : rows;
-};
+// The instant cards this agent holds, every one issuable: { cards:
+// [{ inventory_id, card_number (masked), product_code, product_name, assigned_at }], count }.
+export const loadAgentCards = async () => (await portalPost(AGENT.CARDS, {})).data?.cards ?? [];
 // Issues one held card to a customer, who gives their one-time POS code:
 // { inventory_id, payment_code, client_reference }.
 export const issueAgentCard = async (body) => portalPost(AGENT.CARD_ISSUE, body);

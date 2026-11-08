@@ -69,6 +69,7 @@ const posShiftPath = channelPath("pos_shift");
 const casePath = channelPath("case");
 const disputePath = channelPath("case/dispute");
 const cataloguePath = channelPath("catalogue");
+const bulkPayoutPath = channelPath("bulk_payout");
 // A group's calls, keyed by the call's name in capitals: { LIST: ".../list" }.
 const callsOf = (path, calls) => Object.fromEntries(calls.map((call) => [call.toUpperCase(), path(call)]));
 export const API_ENDPOINTS = {
@@ -223,7 +224,8 @@ export const API_ENDPOINTS = {
   // The merchant's products and their prices (owner writes, store managers read).
   CATALOGUE: callsOf(cataloguePath, ["product_list", "product_add", "product_edit", "price_list", "price_set"]),
   // Card disputes: raise one on a transaction, and those others raised on yours.
-  DISPUTE: callsOf(disputePath, ["raise", "against", "respond"]),
+  DISPUTE: { ...callsOf(disputePath, ["raise", "against", "respond"]), REASONS: casePath("dispute_reasons") },
+  BULK_PAYOUT: callsOf(bulkPayoutPath, ["template", "check", "add", "list", "get", "auth", "deauth", "cancel", "retry", "result_file"]),
   POS_SHIFT: callsOf(posShiftPath, ["list", "add", "edit", "status", "delete"]),
 };
 // Until the API says otherwise (the `session` block of sign-in and refresh): a

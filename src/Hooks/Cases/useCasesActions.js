@@ -1,6 +1,6 @@
-import { raiseDispute, listDisputesAgainst, respondToDispute, listCases, getCase, uploadCaseFile, countCases, listCaseCategories, openCase, withdrawCase, replyToCase, downloadCaseFile } from "@/Services/Cases/cases.api";
+import { disputeReasons, raiseDispute, listDisputesAgainst, respondToDispute, listCases, getCase, uploadCaseFile, countCases, listCaseCategories, openCase, withdrawCase, replyToCase, downloadCaseFile } from "@/Services/Cases/cases.api";
 
 // The calls this feature's screens make, through the hook layer (Component -> Hook -> Service).
 // One stable object, so it is safe in effect and callback dependencies.
-const actions = { raiseDispute, listDisputesAgainst, respondToDispute, listCases, getCase, uploadCaseFile, countCases, listCaseCategories, openCase, withdrawCase, replyToCase, downloadCaseFile };
+const actions = { disputeReasons, raiseDispute, listDisputesAgainst, respondToDispute, listCases, getCase, uploadCaseFile, countCases, listCaseCategories, openCase, withdrawCase, replyToCase, downloadCaseFile };
 export const useCasesActions = () => actions;

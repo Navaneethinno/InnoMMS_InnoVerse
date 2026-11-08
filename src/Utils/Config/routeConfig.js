@@ -10,6 +10,7 @@ import {
   QrCode,
   Receipt,
   Smartphone,
+  Upload,
   Zap,
   Bell,
   CreditCard,
@@ -40,6 +41,7 @@ export const navScreens = {
   // Term deposits and loans (the merchant's own; not for store users).
   deposits: { to: "/deposits", labelKey: "nav.deposits", icon: Vault },
   loans: { to: "/loans", labelKey: "nav.loans", icon: BadgePercent },
+  bulk_payouts: { to: "/bulk-payouts", labelKey: "nav.bulkPayouts", icon: Upload },
   statements: { to: "/statements", labelKey: "nav.statements", icon: FileText },
   notifications: {
     to: "/notifications",

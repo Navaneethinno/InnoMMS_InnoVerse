@@ -11,8 +11,6 @@ import FilterSelect from "@/Components/Common/FilterSelect";
 import LoadingState from "@/Components/Common/LoadingState";
 import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
-import { ShowMore } from "@/Components/Common/ListControls";
-import { useListControls } from "@/Hooks/Common/useListControls";
 import { useCatalogueActions } from "@/Hooks/Catalogue/useCatalogueActions";
 import { formatDate, formatMoney } from "@/Utils/Lib/format";
 import { notifications } from "@/Utils/Lib/notifications";
@@ -20,9 +18,12 @@ import { StatusPill } from "./posShared";
 
 // The product catalogue (Stores > Products). The owner adds and edits products
 // and sets their prices, for one store or all stores (store_id 0); a store
-// manager sees them read only. The server searches; the list shows a page at a
-// time (product_list takes no paging, so the whole match comes back).
+// manager reads only (each product's `actions` say so). The server searches
+// and pages. A product's parent must have no parent itself (one level), and
+// a product that has variants cannot get a parent.
 const ALL_STORES = 0;
+const PAGE_SIZE = 50;
+const PARENT_LIMIT = 200;
 
 function ProductDialog({ product, currencies, onClose, onSaved }) {
   const { saveProduct } = useCatalogueActions();
@@ -34,8 +35,19 @@ function ProductDialog({ product, currencies, onClose, onSaved }) {
     category: product?.category ?? "",
     unit: product?.unit ?? "",
     currency_code: product?.currency_code ?? currencies[0] ?? "",
-    active: product?.active ?? true,
+    active: product ? product.status !== "INACTIVE" : true,
+    parent_id: product?.parent_id ? String(product.parent_id) : "",
   }));
+  // Possible parents: products with no parent of their own, not this one.
+  const { loadProducts } = useCatalogueActions();
+  const [all, setAll] = useState([]);
+  useEffect(() => {
+    loadProducts({ page: 1, limit: PARENT_LIMIT })
+      .then((reply) => setAll(reply.items))
+      .catch(() => setAll([]));
+  }, [loadProducts]);
+  const parents = all.filter((p) => !p.parent_id && p.id !== product?.id).map((p) => ({ value: String(p.id), label: `${p.name} (${p.code})` }));
+  const hasVariants = editing && all.some((p) => p.parent_id === product.id);
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
   const set = (key, value) => setForm((previous) => ({ ...previous, [key]: value }));
@@ -45,7 +57,7 @@ function ProductDialog({ product, currencies, onClose, onSaved }) {
     setPending(true);
     setProblem("");
     try {
-      const common = { name: form.name.trim(), category: form.category.trim(), unit: form.unit.trim(), parent_id: product?.parent_id ?? null };
+      const common = { name: form.name.trim(), category: form.category.trim(), unit: form.unit.trim(), parent_id: form.parent_id ? Number(form.parent_id) : null };
       await saveProduct(editing ? { id: product.id, ...common, active: form.active } : { code: form.code.trim(), ...common, currency_code: form.currency_code });
       notifications.success(t("catalogue.productSaved"));
       onSaved();
@@ -64,10 +76,12 @@ function ProductDialog({ product, currencies, onClose, onSaved }) {
           <TextField name="name" label={t("catalogue.name")} value={form.name} maxLength={FIELD_LIMITS.name} onChange={(event) => set("name", event.target.value)} />
           <TextField name="category" label={t("catalogue.category")} value={form.category} maxLength={FIELD_LIMITS.name} onChange={(event) => set("category", event.target.value)} />
           <TextField name="unit" label={t("catalogue.unit")} placeholder={t("catalogue.unitPlaceholder")} value={form.unit} maxLength={FIELD_LIMITS.name} onChange={(event) => set("unit", event.target.value)} />
+          <FilterSelect label={t("catalogue.parent")} value={form.parent_id} disabled={hasVariants} onChange={(value) => set("parent_id", value)} options={[{ value: "", label: t("catalogue.noParent") }, ...parents]} />
           {!editing && currencies.length > 1 && (
             <FilterSelect label={t("pos.currency", { defaultValue: "Currency" })} value={form.currency_code} onChange={(code) => set("currency_code", code)} options={currencies.map((code) => ({ value: code, label: code }))} />
           )}
         </div>
+        {hasVariants && <p className="text-xs text-slate-500">{t("catalogue.hasVariants")}</p>}
         {editing && <CheckboxPill label={t("catalogue.active")} checked={form.active} onChange={(event) => set("active", event.target.checked)} />}
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="secondary" disabled={pending} onClick={onClose}>
@@ -82,7 +96,7 @@ function ProductDialog({ product, currencies, onClose, onSaved }) {
   );
 }
 
-function PricesDialog({ product, stores, owner, onClose }) {
+function PricesDialog({ product, stores, onClose }) {
   const { loadPrices, setPrice } = useCatalogueActions();
   const { t } = useTranslation();
   const [prices, setPrices] = useState(null);
@@ -99,7 +113,7 @@ function PricesDialog({ product, stores, owner, onClose }) {
   }, [loadPrices, product.id]);
   useEffect(load, [load]);
   const set = (key, value) => setForm((previous) => ({ ...previous, [key]: value }));
-  const storeName = (id) => (Number(id) === ALL_STORES ? t("catalogue.allStores") : (stores.find((s) => s.id === Number(id))?.name ?? `#${id}`));
+  const storeName = (id) => (id == null ? t("catalogue.allStores") : (stores.find((s) => s.id === Number(id))?.name ?? `#${id}`));
   const badPrice = form.price !== "" && !(/^\d+(\.\d+)?$/.test(form.price) && Number(form.price) > 0);
   const badDates = form.valid_from && form.valid_to && form.valid_to < form.valid_from;
   const submit = async (event) => {
@@ -133,12 +147,13 @@ function PricesDialog({ product, stores, owner, onClose }) {
                 <span className="text-slate-600">{formatMoney(row.price, product.currency_code)}</span>
                 <span className="w-full text-xs text-slate-500">
                   {t("catalogue.validRange", { from: row.valid_from ? formatDate(row.valid_from) : t("catalogue.open"), to: row.valid_to ? formatDate(row.valid_to) : t("catalogue.open") })}
+                  {row.created_by ? ` · ${row.created_by}` : ""}
                 </span>
               </li>
             ))}
           </ul>
         )}
-        {owner && (
+        {product.actions?.price_set && (
           <form noValidate onSubmit={submit} className="space-y-3 rounded-2xl border border-slate-200 p-4">
             <p className="text-sm font-semibold text-slate-700">{t("catalogue.setPrice")}</p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -176,15 +191,18 @@ export default function Products({ owner, stores, currencies }) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState(null);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [problem, setProblem] = useState("");
   const [dialog, setDialog] = useState(null);
-  const list = useListControls(products, { pageSize: 20 });
   const load = useCallback(
-    (text) =>
-      loadProducts({ search: text.trim() })
-        .then((rows) => {
+    (text, nextPage = 1) =>
+      loadProducts({ search: text.trim(), page: nextPage, limit: PAGE_SIZE })
+        .then((reply) => {
           setProblem("");
-          setProducts(rows);
+          setPage(nextPage);
+          setTotal(reply.total);
+          setProducts((previous) => (nextPage === 1 ? reply.items : [...(previous ?? []), ...reply.items]));
         })
         .catch((error) => {
           setProducts([]);
@@ -223,18 +241,18 @@ export default function Products({ owner, stores, currencies }) {
         </div>
       ) : (
         <ul className="divide-y divide-slate-100 panel shadow-sm">
-          {list.visible.map((product) => (
+          {products.map((product) => (
             <li key={product.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
               <div className="min-w-0">
                 <p className="truncate text-sm font-bold text-slate-800">{product.name}</p>
-                <p className="text-xs text-slate-500">{[product.code, product.category, product.unit, product.currency_code].filter(Boolean).join(" · ")}</p>
+                <p className="text-xs text-slate-500">{[product.code, product.category, product.unit, product.currency_code, product.price != null ? formatMoney(product.price, product.currency_code) : null].filter(Boolean).join(" · ")}</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <StatusPill status={product.active === false ? "INACTIVE" : "ACTIVE"} />
+                <StatusPill status={product.status} />
                 <Button variant="secondary" size="sm" onClick={() => setDialog({ kind: "prices", product })} className="px-3 py-2">
                   <Tag size={14} /> {t("catalogue.prices")}
                 </Button>
-                <Button variant="secondary" size="sm" disabled={!owner} reason={readOnly} onClick={() => setDialog({ kind: "product", product })} className="px-3 py-2">
+                <Button variant="secondary" size="sm" disabled={!product.actions?.edit} reason={readOnly} onClick={() => setDialog({ kind: "product", product })} className="px-3 py-2">
                   <Pencil size={14} /> {t("stores.editShort", { defaultValue: "Edit" })}
                 </Button>
               </div>
@@ -242,7 +260,11 @@ export default function Products({ owner, stores, currencies }) {
           ))}
         </ul>
       )}
-      <ShowMore list={list} className="mt-4" />
+      {products && products.length < total && (
+        <Button variant="secondary" onClick={() => void load(search, page + 1)} className="mt-4 w-full py-2.5">
+          {t("cases.more")}
+        </Button>
+      )}
       {dialog?.kind === "product" && (
         <ProductDialog
           product={dialog.product}
@@ -254,7 +276,7 @@ export default function Products({ owner, stores, currencies }) {
           }}
         />
       )}
-      {dialog?.kind === "prices" && <PricesDialog product={dialog.product} stores={stores ?? []} owner={owner} onClose={() => setDialog(null)} />}
+      {dialog?.kind === "prices" && <PricesDialog product={dialog.product} stores={stores ?? []} onClose={() => setDialog(null)} />}
     </>
   );
 }

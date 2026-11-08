@@ -13,7 +13,7 @@ import { useMediaQuery, WIDE_QUERY } from "@/Hooks/Layout/useMediaQuery";
 import { useCasesActions } from "@/Hooks/Cases/useCasesActions";
 import { useCaseChanged } from "@/Hooks/Live/useLiveUpdates";
 import { userUpdated } from "@/Redux/slices/authSlice";
-import { formatDateTime, formatShortDate } from "@/Utils/Lib/format";
+import { formatDateTime, formatMoney, formatShortDate } from "@/Utils/Lib/format";
 import { cn } from "@/Utils/Lib/utils";
 
 const LIMIT = 20;
@@ -417,16 +417,33 @@ function Thread({ id, labels, onBack, onChanged }) {
 // side; on a narrow one, one at a time.
 // Dispute a card transaction of yours by its RRN (case/dispute/raise).
 function RaiseDisputeForm({ onClose, onRaised }) {
-  const { raiseDispute } = useCasesActions();
+  const { disputeReasons, raiseDispute } = useCasesActions();
   const { t } = useTranslation();
-  const [form, setForm] = useState({ rrn: "", title: "", body: "" });
+  const [form, setForm] = useState({ rrn: "", reason_code: "", title: "", body: "" });
+  const [rules, setRules] = useState(null);
   const [saving, setSaving] = useState(false);
   const set = (key) => (value) => setForm((previous) => ({ ...previous, [key]: value }));
-  const ready = form.rrn.trim() && form.title.trim() && form.body.trim();
+  // Whether this reference may be disputed, and its reasons, once typing stops.
+  useEffect(() => {
+    const rrn = form.rrn.trim();
+    setRules(null);
+    if (rrn.length < 6) return undefined;
+    let live = true;
+    const timer = setTimeout(() => {
+      disputeReasons(rrn)
+        .then((reply) => live && setRules(reply ?? {}))
+        .catch((failure) => live && setRules({ can_dispute: false, why_not_message: failure.message }));
+    }, 400);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [form.rrn, disputeReasons]);
+  const whyNot = !form.rrn.trim() || !form.title.trim() || !form.body.trim() ? t("disputes.fillAll") : !rules ? t("disputes.checking") : !rules.can_dispute ? rules.why_not_message || t("disputes.notAllowed") : rules.reason_required && !form.reason_code ? t("disputes.pickReason") : "";
   const submit = async () => {
     setSaving(true);
     try {
-      const kase = await raiseDispute({ rrn: form.rrn.trim(), title: form.title.trim(), body: form.body.trim() });
+      const kase = await raiseDispute({ rrn: form.rrn.trim(), ...(form.reason_code ? { reason_code: form.reason_code } : {}), title: form.title.trim(), body: form.body.trim() });
       toast.success(t("disputes.raised"));
       onRaised(kase);
     } catch (failure) {
@@ -442,6 +459,8 @@ function RaiseDisputeForm({ onClose, onRaised }) {
           {t("disputes.rrn")}
           <input dir="ltr" value={form.rrn} onChange={(event) => set("rrn")(event.target.value)} placeholder="123456789012" className={cn(fieldClass, "mt-2")} />
         </label>
+        {rules && !rules.can_dispute && <p className="rounded-xl bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-800 dark:bg-amber-500/10 dark:text-amber-200">{rules.why_not_message || t("disputes.notAllowed")}</p>}
+        {rules?.can_dispute && Boolean(rules.reasons?.length) && <FilterSelect label={t("disputes.reason")} placeholder={t("disputes.pickReason")} value={form.reason_code} onChange={set("reason_code")} options={rules.reasons.map((r) => ({ value: r.code, label: r.name }))} />}
         <label className="block text-sm font-medium">
           {t("cases.subject")}
           <input dir="auto" value={form.title} maxLength={MAX_TITLE} onChange={(event) => set("title")(event.target.value)} className={cn(fieldClass, "mt-2")} />
@@ -454,7 +473,7 @@ function RaiseDisputeForm({ onClose, onRaised }) {
           <Button variant="secondary" disabled={saving} onClick={onClose}>
             {t("common.cancel", { defaultValue: "Cancel" })}
           </Button>
-          <Button pending={saving} disabled={!ready} reason={t("disputes.fillAll")} onClick={() => void submit()}>
+          <Button pending={saving} disabled={Boolean(whyNot)} reason={whyNot} onClick={() => void submit()}>
             <Send size={16} /> {t("disputes.raise")}
           </Button>
         </div>
@@ -510,19 +529,31 @@ function DisputesAgainst() {
   const [pages, setPages] = useState(1);
   const [state, setState] = useState({ loading: true, items: [], total: 0, error: "" });
   const [responding, setResponding] = useState(null);
+  const [tab, setTab] = useState("ALL");
   const load = useCallback(async () => {
     setState((previous) => ({ ...previous, loading: true, error: "" }));
     try {
-      const reply = await listDisputesAgainst({ state: "", page: 1, limit: LIMIT * pages });
+      const reply = await listDisputesAgainst({ state: tab === "ALL" ? "" : tab, page: 1, limit: LIMIT * pages });
       setState({ loading: false, items: reply.items, total: reply.total, error: "" });
     } catch (error) {
       setState((previous) => ({ ...previous, loading: false, error: error.message }));
     }
-  }, [listDisputesAgainst, pages]);
+  }, [listDisputesAgainst, pages, tab]);
   useEffect(() => {
     void load();
   }, [load]);
   return (
+    <>
+    <div className="mb-3">
+      <SegmentedTabs
+        items={["ALL", "OPEN", "CLOSED"].map((key) => ({ key, label: t(`cases.tab.${key}`) }))}
+        value={tab}
+        onChange={(key) => {
+          setTab(key);
+          setPages(1);
+        }}
+      />
+    </div>
     <div className="overflow-hidden panel shadow-sm">
       {state.error && <ErrorState message={state.error} onRetry={() => void load()} />}
       {state.loading && !state.items.length ? (
@@ -536,15 +567,13 @@ function DisputesAgainst() {
           {state.items.map((d) => (
             <li key={d.id} className="flex flex-wrap items-start justify-between gap-3 px-5 py-4">
               <div className="min-w-0">
-                <p dir="auto" className="text-sm font-semibold text-ink">{d.title}</p>
-                <p className="mt-0.5 text-xs text-slate-500">{[d.case_number, d.rrn, formatShortDate(d.opened_at ?? d.created_at)].filter(Boolean).join(" · ")}</p>
-                {d.state && (
-                  <span className="mt-1.5 inline-block">
-                    <StatePill state={d.state} />
-                  </span>
-                )}
+                <p dir="auto" className="text-sm font-semibold text-ink">{d.txn_type || d.case_number}</p>
+                <p className="mt-0.5 text-xs text-slate-500">{[d.case_number, d.rrn, d.amount != null ? formatMoney(d.amount, d.currency_code) : null, formatShortDate(d.opened_at), d.outcome].filter(Boolean).join(" · ")}</p>
+                <span className="mt-1.5 inline-block">
+                  <StatePill state={d.status} />
+                </span>
               </div>
-              <Button size="sm" variant="secondary" disabled={d.can_respond === false} reason={t("disputes.cannotRespond")} onClick={() => setResponding(d)} className="px-3 py-2">
+              <Button size="sm" variant="secondary" disabled={!d.can_respond} reason={t("disputes.cannotRespond")} onClick={() => setResponding(d)} className="px-3 py-2">
                 {t("disputes.respond")}
               </Button>
             </li>
@@ -569,6 +598,7 @@ function DisputesAgainst() {
         />
       )}
     </div>
+    </>
   );
 }
 

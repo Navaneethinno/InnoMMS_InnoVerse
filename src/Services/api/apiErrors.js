@@ -1,5 +1,3 @@
-import i18n from "@/Utils/I18n/i18n";
-
 export class ApiConfigurationError extends Error {
   constructor() {
     super("Merchant API contract is not configured");
@@ -42,16 +40,9 @@ class ApiRequestError extends Error {
   }
 }
 
-// Card answers carry `message_key` (card.rc_51, ...) and refused merchant
-// payments txn.merchant_blocked: the backend asks that these show the
-// portal's own text for the key, in the user's language, never the raw
-// `message`. Any other key keeps the API's message.
-const KEYED_MESSAGE = /^(card\.rc_\w+|txn\.merchant_blocked)$/;
-export function keyedMessage(payload) {
-  const key = payload?.message_key ?? payload?.data?.[0]?.message_key ?? payload?.data?.message_key ?? payload?.error_code;
-  if (typeof key !== "string" || !KEYED_MESSAGE.test(key) || !i18n.exists(key)) return payload?.message ?? "";
-  return i18n.t(key);
-}
+// The API's own text, already translated by the server. A refusal's catalog
+// key is the top-level `error_code`; portal replies have no `message_key`.
+export const keyedMessage = (payload) => payload?.message ?? "";
 
 export function toApiRequestError(payload, status, fallbackMessage) {
   const problems = payload?.data?.[0]?.problems ?? payload?.data?.problems;
