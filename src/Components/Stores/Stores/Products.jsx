@@ -99,7 +99,7 @@ function ProductDialog({ product, products, currencies, onClose, onSaved }) {
     parent_id: product?.parent_id ? String(product.parent_id) : "",
   }));
   const currentParent = (products ?? []).find((p) => p.id === product?.parent_id);
-  const currentLabel = currentParent ? `${currentParent.name} (${currentParent.code})` : `#${product?.parent_id ?? ""}`;
+  const currentLabel = currentParent ? `${currentParent.name} (${currentParent.code})` : (product?.parent_name || `#${product?.parent_id ?? ""}`);
   const [pending, setPending] = useState(false);
   const [problem, setProblem] = useState("");
   const set = (key, value) => setForm((previous) => ({ ...previous, [key]: value }));
@@ -128,7 +128,7 @@ function ProductDialog({ product, products, currencies, onClose, onSaved }) {
           <TextField name="name" label={t("catalogue.name")} value={form.name} maxLength={FIELD_LIMITS.name} onChange={(event) => set("name", event.target.value)} />
           <TextField name="category" label={t("catalogue.category")} value={form.category} maxLength={FIELD_LIMITS.name} onChange={(event) => set("category", event.target.value)} />
           <TextField name="unit" label={t("catalogue.unit")} placeholder={t("catalogue.unitPlaceholder")} value={form.unit} maxLength={FIELD_LIMITS.name} onChange={(event) => set("unit", event.target.value)} />
-          <ParentPicker productId={product?.id} value={form.parent_id} currentLabel={currentLabel} onChange={(value) => set("parent_id", value)} />
+          {!product?.has_variants && <ParentPicker productId={product?.id} value={form.parent_id} currentLabel={currentLabel} onChange={(value) => set("parent_id", value)} />}
           {!editing && currencies.length > 1 && (
             <FilterSelect label={t("pos.currency", { defaultValue: "Currency" })} value={form.currency_code} onChange={(code) => set("currency_code", code)} options={currencies.map((code) => ({ value: code, label: code }))} />
           )}
