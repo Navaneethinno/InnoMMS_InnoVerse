@@ -1,0 +1,17 @@
+# Merchant portal on Apache (copied into dist/ by Vite). Needs mod_headers and
+# "AllowOverride FileInfo" (or All) for this folder.
+
+# Security headers (PCI SSS web; the page's own Content-Security-Policy is a
+# <meta> tag written at build time by vite.config.js). A <meta> policy cannot
+# stop other sites from framing the merchant portal, so frame-ancestors is sent here.
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "frame-ancestors 'none'"
+  Header always set X-Frame-Options "DENY"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin"
+  Header always set Permissions-Policy "camera=(self), microphone=(), geolocation=(self), payment=(), usb=(), serial=(), bluetooth=(), fullscreen=(self)"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  <If "%{HTTPS} == 'on'">
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  </If>
+</IfModule>

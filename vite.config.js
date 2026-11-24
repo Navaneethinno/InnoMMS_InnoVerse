@@ -12,8 +12,42 @@ mkdirSync(wasmTo, { recursive: true });
 for (const file of ["vision_wasm_internal.js", "vision_wasm_internal.wasm", "vision_wasm_nosimd_internal.js", "vision_wasm_nosimd_internal.wasm"])
   cpSync(`${wasmFrom}/${file}`, `${wasmTo}/${file}`);
 
+// The Content-Security-Policy of the built portal (PCI SSS web): scripts only
+// from our own server (plus WebAssembly for the face detector), data only to
+// our API, so an injected script can't run or send data elsewhere. Not in
+// dev, where Vite's hot reload needs inline scripts. public/.htaccess sends
+// the headers a <meta> tag can't (frame-ancestors and the rest).
+function contentSecurityPolicy() {
+  let policy = "";
+  return {
+    name: "content-security-policy",
+    apply: "build",
+    configResolved(config) {
+      const base = config.env.VITE_API_BASE_URL;
+      if (!base) throw new Error("VITE_API_BASE_URL is not set: add it to .env");
+      const api = new URL(base).origin;
+      const socket = api.replace(/^http/, "ws");
+      policy = [
+        "default-src 'self'",
+        "script-src 'self' 'wasm-unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        `img-src 'self' data: blob: ${api}`,
+        "font-src 'self' data:",
+        `connect-src 'self' data: blob: ${api} ${socket}`,
+        "media-src 'self' data: blob:",
+        "worker-src 'self' blob:",
+        "frame-src blob: https://www.openstreetmap.org",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join("; ");
+    },
+    transformIndexHtml: () => [{ tag: "meta", attrs: { "http-equiv": "Content-Security-Policy", content: policy }, injectTo: "head-prepend" }],
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), contentSecurityPolicy()],
   build: {
     rollupOptions: {
       output: {
