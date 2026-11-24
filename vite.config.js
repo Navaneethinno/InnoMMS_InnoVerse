@@ -12,6 +12,25 @@ mkdirSync(wasmTo, { recursive: true });
 for (const file of ["vision_wasm_internal.js", "vision_wasm_internal.wasm", "vision_wasm_nosimd_internal.js", "vision_wasm_nosimd_internal.wasm"])
   cpSync(`${wasmFrom}/${file}`, `${wasmTo}/${file}`);
 
+// MediaPipe's task library posts usage logs to Google from the visitor's
+// browser each time a detector closes. The portal sends nothing to a third
+// party, so that address is swapped for one that fails on the device (the
+// library catches the failure and stops logging), and a build that still
+// contains the address is refused. Same as the customer portal.
+const LOG_URL = "https://odml.pa.googleapis.com/v1/log";
+const noUsageLogs = () => ({
+  name: "no-usage-logs",
+  transform(code, id) {
+    if (!id.includes("@mediapipe/tasks-vision") || !code.includes(LOG_URL)) return null;
+    return { code: code.replaceAll(LOG_URL, "data:,"), map: null };
+  },
+  generateBundle(_options, bundle) {
+    for (const file of Object.values(bundle)) {
+      if (file.type === "chunk" && file.code.includes(LOG_URL)) this.error(`${file.fileName} still sends usage logs to ${LOG_URL}`);
+    }
+  },
+});
+
 // The Content-Security-Policy of the built portal (PCI SSS web): scripts only
 // from our own server (plus WebAssembly for the face detector), data only to
 // our API, so an injected script can't run or send data elsewhere. Not in
@@ -50,7 +69,9 @@ function contentSecurityPolicy() {
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
 export default defineConfig({
-  plugins: [react(), contentSecurityPolicy()],
+  plugins: [react(), noUsageLogs(), contentSecurityPolicy()],
+  // Served as written (not pre-bundled) so the plugin above sees the library in development too.
+  optimizeDeps: { exclude: ["@mediapipe/tasks-vision"] },
   define: { "import.meta.env.VITE_APP_VERSION": JSON.stringify(version) },
   build: {
     rollupOptions: {
