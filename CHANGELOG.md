@@ -6,6 +6,7 @@ The release number is the `version` in `package.json`. It is shown in the portal
 
 The release number stays 1.1.0 until the GitLab pipeline is set up.
 
+- Uploads offer only the formats the server accepts (PDF, JPEG, PNG, WebP, GIF); TIFF is no longer offered, even when a form definition lists it.
 
 - The face check no longer tries to send MediaPipe usage logs to Google: the address is removed at build time and a build that still contains it is refused (as in the customer portal).
 - react-grid-layout 1.5.4 (1.5.2 shipped a stray binary and C source file in its npm package).

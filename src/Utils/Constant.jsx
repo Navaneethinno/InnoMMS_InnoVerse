@@ -266,7 +266,7 @@ export const METER_LENGTH = { min: 6, max: 20 };
 // Server-wide file limits for `file` fields. A document type can narrow
 // both (`types[].file_formats` / `max_file_size_kb`).
 export const FILE_UPLOAD = {
-  formats: ["pdf", "jpeg", "png", "tiff", "webp"],
+  formats: ["pdf", "jpeg", "png", "webp"],
   maxBytes: 10 * 1024 * 1024,
 };
 

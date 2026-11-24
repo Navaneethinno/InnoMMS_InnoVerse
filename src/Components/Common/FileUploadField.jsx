@@ -17,9 +17,16 @@ const MIME_BY_FORMAT = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
   png: "image/png",
-  tif: "image/tiff",
-  tiff: "image/tiff",
   webp: "image/webp",
+  gif: "image/gif",
+};
+// The formats the server accepts (it checks the file's content): PDF, JPEG,
+// PNG, WebP and GIF. A format a form definition names outside this list (e.g.
+// TIFF) is dropped, and a field left with none offers the server's list.
+const SERVER_FORMATS = ["pdf", "jpeg", "jpg", "png", "webp", "gif"];
+const serverFormats = (requested) => {
+  const kept = requested.map((f) => String(f).toLowerCase()).filter((f) => SERVER_FORMATS.includes(f));
+  return kept.length ? kept : SERVER_FORMATS;
 };
 
 const acceptFor = (formats) =>
@@ -30,7 +37,8 @@ const sizeLabel = (bytes) =>
 
 const baseName = (path) => String(path).split("/").pop();
 
-export default function FileUploadField({ value, onChange, upload, download, formats = [], maxBytes, capture, disabled = false, className }) {
+export default function FileUploadField({ value, onChange, upload, download, formats: requested = [], maxBytes, capture, disabled = false, className }) {
+  const formats = serverFormats(requested);
   const { t } = useTranslation();
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
