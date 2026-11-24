@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { cn } from "@/Utils/Lib/utils";
 import { useDocuments } from "@/Hooks/useDocuments";
+import { APP_VERSION } from "@/Utils/Constant";
 export default function Footer({ className }) {
   const { t } = useTranslation();
   const docs = useDocuments();
@@ -17,6 +18,7 @@ export default function Footer({ className }) {
         </nav>
       )}
       {t("footer.copyright", { year: new Date().getFullYear() })}
+      {APP_VERSION && <span className="ml-2" title="Version">v{APP_VERSION}</span>}
     </footer>
   );
 }

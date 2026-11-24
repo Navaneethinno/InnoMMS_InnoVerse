@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { cpSync, mkdirSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 
 // The face detector's runtime is served with the portal, never from a CDN. Taken
@@ -46,8 +46,12 @@ function contentSecurityPolicy() {
   };
 }
 
+// The release number is package.json's, so one place says which build is live.
+const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
+
 export default defineConfig({
   plugins: [react(), contentSecurityPolicy()],
+  define: { "import.meta.env.VITE_APP_VERSION": JSON.stringify(version) },
   build: {
     rollupOptions: {
       output: {

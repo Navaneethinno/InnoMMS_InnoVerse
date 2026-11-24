@@ -273,3 +273,6 @@ export const FILE_UPLOAD = {
 // The code that starts an application (sent to the contact being used) or
 // reopens one in progress (sent to its own email or phone).
 export const ONBOARDING_CODE = { length: 6, resendSeconds: 45 };
+
+// The release number, from package.json (set at build time by vite.config.js); shown in the footer.
+export const APP_VERSION = import.meta.env.VITE_APP_VERSION || "";
