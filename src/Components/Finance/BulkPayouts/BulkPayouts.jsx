@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { uploadProblem } from "@/Utils/Lib/uploadLimit";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, CheckCircle2, Download, FileCheck2, RotateCcw, Search, Send, Undo2, Upload, XCircle } from "lucide-react";
 import Button from "@/Components/Common/Button";
@@ -146,7 +147,13 @@ function UploadDialog({ wallets, onClose, onFiled }) {
               accept=".csv,.xlsx"
               className="field-control mt-2 w-full"
               onChange={(event) => {
-                setFile(event.target.files?.[0] ?? null);
+                const picked = event.target.files?.[0] ?? null;
+                const tooBig = uploadProblem(picked);
+                if (tooBig) {
+                  event.target.value = "";
+                  setProblem({ message: tooBig });
+                }
+                setFile(tooBig ? null : picked);
                 setChecked(null);
               }}
             />

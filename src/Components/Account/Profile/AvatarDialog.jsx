@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { uploadProblem } from "@/Utils/Lib/uploadLimit";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Upload } from "lucide-react";
@@ -88,7 +89,9 @@ export default function AvatarDialog({ open, onOpenChange, avatar, name, onChang
           onChange={(event) => {
             const file = event.target.files?.[0];
             event.target.value = "";
-            if (file) void run("upload", () => uploadAvatar(file));
+            const tooBig = uploadProblem(file);
+            if (tooBig) setProblem(tooBig);
+            else if (file) void run("upload", () => uploadAvatar(file));
           }}
         />
         <Button variant="secondary" className="w-full" pending={busy === "upload"} disabled={Boolean(busy)} reason={t("common.pleaseWait")} onClick={() => input.current?.click()}>
