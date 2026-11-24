@@ -23,7 +23,7 @@
     "dompurify": "^3.4.17",
     "i18next": "^26.4.1",
     "jspdf": "^4.2.1",
-    "lucide-react": "0.487.0",
+    "lucide-react": "1.77.0",
     "marked": "15.0.12",
     "qrcode.react": "^4.2.0",
     "react": "18.3.1",
