@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from "@/Utils/Constant";
+import { INST_PROFILE_ID, STORAGE_KEYS } from "@/Utils/Constant";
 import i18n from "@/Utils/I18n/i18n";
 import { setTabTitle } from "@/Services/api/environment";
 
@@ -38,6 +38,11 @@ const colourPair = (branding, dark) => {
 };
 const isDark = () => document.documentElement.classList.contains("dark");
 
+// E-TAKU (institution 5) has its own theme (etaku.css): yellow is the brand
+// colour in both themes, so it also takes the place of the dark colour.
+const ETAKU = INST_PROFILE_ID === 5;
+if (ETAKU) document.documentElement.classList.add("etaku");
+
 let current = null;
 function paint() {
   const [primary, secondary] = colourPair(current, isDark());
@@ -46,6 +51,11 @@ function paint() {
   const root = document.documentElement.style;
   root.setProperty("--color-primary", dark.join(" "));
   root.setProperty("--color-secondary", light.join(" "));
+  if (ETAKU) {
+    root.setProperty("--color-primary", light.join(" "));
+    root.setProperty("--color-on-secondary", dark.join(" "));
+    return true;
+  }
   // Text on the light colour (dark-mode buttons): dark or white, whichever
   // reads better against it.
   const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);

@@ -2,9 +2,9 @@ import { STORAGE_KEYS } from "@/Utils/Constant";
 // Selected API response language — confirmed backend behavior: the
 // `message` field in every response is translated per the requested locale
 // via an `x-api-lang` request header; `remark` (internal diagnostic) always
-// stays English regardless. English is the backend's own default, so the
-// header is omitted entirely for it rather than sent as "en".
-const DEFAULT_API_LANGUAGE = "en";
+// stays English regardless. The header is always sent, so the messages
+// match the app language (the backend default is Portuguese).
+const DEFAULT_API_LANGUAGE = "pt";
 const STORAGE_KEY = STORAGE_KEYS.apiLanguage;
 let selectedLanguage = null;
 
@@ -31,5 +31,5 @@ export function setApiLanguage(code) {
 // Spread into a request's headers.
 export function apiLanguageHeader() {
   const lang = getApiLanguage();
-  return lang && lang !== DEFAULT_API_LANGUAGE ? { "x-api-lang": lang } : {};
+  return { "x-api-lang": lang || DEFAULT_API_LANGUAGE };
 }

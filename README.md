@@ -56,3 +56,17 @@ React Router is kept on the explicitly requested v6. npm reports two moderate ad
 
 Pages and sections show `Components/Common/LoadingAnimation.jsx`, a spinner drawn in the theme colour so it follows the bank branding; motion is switched off by the global `prefers-reduced-motion` rule in `styles.css`.
 
+## Build and deploy (for the GitLab pipeline)
+
+| Item | Value |
+| --- | --- |
+| Node | 24 (`.nvmrc`) |
+| Package manager | npm (`package-lock.json`) |
+| Install | `npm ci` |
+| Build | `npm run build` |
+| Output folder | `dist/` (includes `.htaccess` with the security headers, copied from `public/`) |
+| Lint | `npm run lint` |
+| Tests | `npm test` (Vitest) |
+| API base URL | `VITE_API_BASE_URL`, read at build time from `.env` (also written into the page's Content-Security-Policy). UAT (105): `https://etakuapi.innovitegrasuite.com`. PCI laptop: `https://api.innoverse.internal`. |
+| Other build settings | `VITE_PORTAL_AUTHORIZATION` (the portal's client credential: the base64 part only, without `Basic `; the portal adds it), `VITE_INST_PROFILE_ID`, `VITE_DIGITAL_PRODUCT_ID`; set them as masked CI variables, never in the repo. |
+| Deploy on 105 | Copy the contents of `dist/` to the site's web root (folder path to be confirmed). Apache needs `mod_headers` and `AllowOverride FileInfo` for the `.htaccess`. No restart or cache clearing is needed (`index.html` is served no-cache; files under `assets/` have hashed names). |

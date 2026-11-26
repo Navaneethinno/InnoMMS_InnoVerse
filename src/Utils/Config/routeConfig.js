@@ -29,6 +29,9 @@ import {
 // The screens the portal has, by the key the API's menu uses. The menu itself
 // (which items, in what order, with what label) comes from the API; a key not
 // listed here is not shown, and a screen the API does not list is not offered.
+import { BanknoteArrowDown, CircleUserRound, HandCoins as EtakuHandCoins, House, ScanQrCode, Send, Smartphone as EtakuSmartphone } from "lucide-react";
+import { INST_PROFILE_ID } from "@/Utils/Constant";
+
 export const navScreens = {
   dashboard: {
     to: "/dashboard",
@@ -78,6 +81,15 @@ export const navScreens = {
     icon: MonitorSmartphone,
   },
 };
+
+// E-TAKU (institution 5): the sidebar uses the icons of the E-TAKU app design
+// (Figma) where the app has one; screens the app does not show keep theirs.
+if (INST_PROFILE_ID === 5) {
+  const etakuIcons = { dashboard: House, send: Send, agent: BanknoteArrowDown, airtime: EtakuSmartphone, my_code: ScanQrCode, profile: CircleUserRound };
+  Object.entries(etakuIcons).forEach(([key, icon]) => {
+    if (navScreens[key]) navScreens[key] = { ...navScreens[key], icon };
+  });
+}
 
 export const isScreenDenied = (menu, pathname) => screenDenied(navScreens, menu, pathname);
 

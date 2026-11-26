@@ -290,6 +290,13 @@ export default {
     "© {{year}} Innovitegra Solutions Private Limited",
   "auth.documentTitle": "Entrar \u00b7 {{brand}}",
   "auth.welcomeBadge": "O SEU NEGÓCIO, MAIS SIMPLES",
+  "etaku.slide1Title": "Receba pagamentos em segundos",
+  "etaku.slide1Accent": "em segundos",
+  "etaku.slide1Text": "Os seus clientes pagam com o telemóvel e o dinheiro chega logo à sua carteira.",
+  "etaku.slide2Title": "O seu negócio, sempre aberto",
+  "etaku.slide2Accent": "sempre aberto",
+  "etaku.slide2Text": "Acompanhe vendas, reembolsos e carteiras num só painel.",
+  "etaku.panelFoot": "O seu portal seguro E-TAKU Business",
   "auth.heroFirst": "O seu negócio.",
   "auth.heroAccent": "Um só painel.",
   "auth.heroDescription":

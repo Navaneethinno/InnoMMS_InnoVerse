@@ -3,9 +3,10 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en";
 import { setApiLanguage } from "@/Utils/Lib/apiLanguage";
-let language = "en";
+// Portuguese is the default; the backend answers in Portuguese too.
+let language = "pt";
 try {
-  language = localStorage.getItem(STORAGE_KEYS.language) || "en";
+  language = localStorage.getItem(STORAGE_KEYS.language) || "pt";
 } catch {
   /* Default locale. */
 }
@@ -28,10 +29,10 @@ const applyDirection = (lng) => {
   document.documentElement.lang = lng;
   document.documentElement.dir = i18n.dir(lng);
 };
-applyDirection(i18n.language || "en");
+applyDirection(i18n.language || "pt");
 // The API translates its messages by the x-api-lang header, so it always
 // follows the app language.
-setApiLanguage(i18n.language || "en");
+setApiLanguage(i18n.language || "pt");
 i18n.on("languageChanged", (lng) => {
   applyDirection(lng);
   setApiLanguage(lng);

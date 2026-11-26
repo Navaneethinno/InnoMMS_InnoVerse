@@ -12,7 +12,7 @@ import LoadingState from "@/Components/Common/LoadingState";
 import Modal from "@/Components/Common/Modal";
 import TextField from "@/Components/Common/TextField";
 import { useCatalogueActions } from "@/Hooks/Catalogue/useCatalogueActions";
-import { formatDate, formatMoney } from "@/Utils/Lib/format";
+import { formatDate, formatMoney, localIsoDay } from "@/Utils/Lib/format";
 import { notifications } from "@/Utils/Lib/notifications";
 import { StatusPill } from "./posShared";
 
@@ -217,11 +217,11 @@ function PricesDialog({ product, stores, onClose }) {
               <TextField name="price" inputMode="decimal" label={t("catalogue.price")} value={form.price} error={badPrice ? t("catalogue.priceRule") : undefined} onChange={(event) => set("price", event.target.value.replace(/[^\d.]/g, ""))} />
               <label className="block text-sm font-medium">
                 {t("catalogue.validFrom")}
-                <DatePicker className="mt-2" value={form.valid_from} onChange={(value) => set("valid_from", value)} />
+                <DatePicker className="mt-2" value={form.valid_from} min={localIsoDay()} onChange={(value) => set("valid_from", value)} />
               </label>
               <label className="block text-sm font-medium">
                 {t("catalogue.validTo")}
-                <DatePicker className="mt-2" value={form.valid_to} min={form.valid_from || undefined} onChange={(value) => set("valid_to", value)} />
+                <DatePicker className="mt-2" value={form.valid_to} min={form.valid_from || localIsoDay()} onChange={(value) => set("valid_to", value)} />
               </label>
             </div>
             {badDates && <p className="text-xs text-red-600">{t("catalogue.datesRule")}</p>}

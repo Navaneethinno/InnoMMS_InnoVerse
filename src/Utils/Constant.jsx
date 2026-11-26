@@ -2,7 +2,7 @@
  * Backend: the merchant-portal API, a separate service from the admin panel's
  * API. VITE_API_BASE_URL is the host root. Calls are POSTs with a JSON body
  * (uploads are multipart). Calls made before sign-in carry the portal's fixed
- * Basic credential (VITE_PORTAL_AUTHORIZATION, the full header value); signed-in
+ * Basic credential (VITE_PORTAL_AUTHORIZATION, the base64 part; "Basic " is added); signed-in
  * calls carry the merchant's token. VITE_INST_PROFILE_ID says which institution
  * this deployment serves.
  * Every API path lives in API_ENDPOINTS below, one group per area
@@ -14,8 +14,12 @@
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "")
   .replace(/\/+$/, "")
   .replace(/\/merchant\/(web|app)$/, "");
-export const PORTAL_AUTHORIZATION =
-  import.meta.env.VITE_PORTAL_AUTHORIZATION || "";
+// The portal's client credential for the calls made before sign-in. The
+// variable holds the base64 part only (GitLab CI variables cannot hold a
+// space); the "Basic " scheme is added here. A value that already starts
+// with "Basic " is used as it is.
+const portalCredential = String(import.meta.env.VITE_PORTAL_AUTHORIZATION || "").trim();
+export const PORTAL_AUTHORIZATION = !portalCredential ? "" : /^basic\s/i.test(portalCredential) ? portalCredential : `Basic ${portalCredential}`;
 // The digital product this portal runs under (its id), sent as
 // X-Digital-Product-Id on every call: the account opened at approval is of
 // this product's account type. Left out, the institution's only Active

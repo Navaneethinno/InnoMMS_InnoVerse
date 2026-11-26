@@ -3,6 +3,12 @@ import { Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/Utils/Lib/utils";
 import FieldError from "./FieldError";
+// Amounts (inputMode="decimal") keep digits and one dot with at most two
+// decimals, which is what the backend accepts.
+export const toAmountText = (value) => {
+  const [whole, ...rest] = String(value ?? "").replace(/,/g, ".").replace(/[^\d.]/g, "").split(".");
+  return rest.length ? `${whole}.${rest.join("").slice(0, 2)}` : whole;
+};
 export default function TextField({
   label,
   type = "text",
@@ -11,8 +17,18 @@ export default function TextField({
   className,
   endAdornment,
   autoComplete,
+  onChange,
   ...props
 }) {
+  const isAmount = props.inputMode === "decimal";
+  const handleChange =
+    isAmount && onChange
+      ? (event) => {
+          const clean = toAmountText(event.target.value);
+          if (clean !== event.target.value) event.target.value = clean;
+          onChange(event);
+        }
+      : onChange;
   // A secret that is not the sign-in password (a new password, a PIN) must
   // not be filled by the browser or a password manager: `off` is ignored for
   // password fields, `new-password` is not. A PIN is also hidden from
@@ -41,6 +57,7 @@ export default function TextField({
         <input
           {...props}
           autoComplete={fill}
+          onChange={handleChange}
           {...(isPin ? { "data-lpignore": "true", "data-1p-ignore": "true", "data-form-type": "other" } : {})}
           id={id}
           type={type === "password" && visible ? "text" : type}

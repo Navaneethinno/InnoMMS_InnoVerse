@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from "@/Utils/Constant";
+import { INST_PROFILE_ID, STORAGE_KEYS } from "@/Utils/Constant";
 
 // Light/dark theme: a `dark` class on <html> switches the colour variables
 // in styles.css. The merchant's choice is remembered; until they choose,
@@ -12,7 +12,9 @@ export function readStoredTheme() {
   }
 }
 
+// E-TAKU (institution 5) opens in dark mode until the user picks a theme.
 export function systemTheme() {
+  if (INST_PROFILE_ID === 5) return "dark";
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 

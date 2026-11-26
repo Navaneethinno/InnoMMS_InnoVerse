@@ -1,0 +1,77 @@
+/* E-TAKU theme (institution 5 only): html gets the `etaku` class in
+   Utils/Lib/branding.js. Colours and font from the E-TAKU APP DESIGN 2026
+   Figma file (dark and light tokens). Other institutions are unchanged.
+   Styling only: no layout changes. */
+@import "@fontsource-variable/manrope/wght.css";
+
+html.etaku {
+  --font-sans: "Manrope Variable", system-ui, -apple-system, sans-serif;
+  --font-display: "Manrope Variable", system-ui, -apple-system, sans-serif;
+  /* Brand: yellow in both themes, near-black text on it. */
+  --color-primary: 255 204 0; /* #FFCC00 */
+  --color-secondary: 255 204 0;
+  --color-on-secondary: 9 9 11; /* #09090B */
+  --color-on-button: 9 9 11;
+  /* Light tokens. */
+  --color-ink: 9 9 11;
+  --color-forest-or-lime: 255 204 0;
+  --chart-2: 255 204 0;
+  --color-paper: 247 248 250; /* Background #F7F8FA */
+  --color-surface: 255 255 255; /* Surface 1 */
+  --slate-50: 250 250 250; /* Soft · Search */
+  --slate-100: 239 241 246; /* Tile base · Cards */
+  --slate-200: 239 239 239; /* Divider */
+  --slate-300: 223 223 224; /* Avatar ring */
+  --slate-400: 185 186 188; /* Muted */
+  --slate-500: 121 121 121; /* Meta */
+  --slate-600: 112 114 125; /* Icon */
+  --slate-700: 47 47 47; /* Heading */
+  --slate-800: 40 41 46; /* Primary text */
+  --slate-900: 20 20 22;
+  --slate-950: 0 0 0;
+}
+html.etaku.dark {
+  --color-ink: 255 204 0;
+  --color-paper: 22 23 25; /* Background #161719 */
+  --color-surface: 30 30 32; /* Surface 2 · Cards */
+  --slate-50: 31 31 35; /* Surface 1 */
+  --slate-100: 40 41 46; /* Surface 3 */
+  --slate-200: 42 42 42; /* Border */
+  --slate-300: 59 59 59; /* Border faint */
+  --slate-400: 113 113 122; /* Muted · Inactive */
+  --slate-500: 142 142 142; /* Tertiary */
+  --slate-600: 164 164 164; /* Secondary */
+  --slate-700: 243 245 251; /* High · Headings */
+  --slate-800: 255 255 255; /* Primary */
+  --slate-900: 255 255 255;
+  --slate-950: 0 0 0;
+}
+/* Solid buttons are white-on-brand elsewhere; on the yellow use On Brand. */
+html.etaku .bg-forest.text-white,
+html.etaku .bg-forest.text-lime {
+  color: rgb(var(--color-on-secondary));
+}
+/* Pill shape for buttons and fields, as in the design. */
+html.etaku button.rounded-xl,
+html.etaku a.rounded-xl,
+html.etaku .field-control {
+  border-radius: 9999px;
+}
+html.etaku textarea.field-control {
+  border-radius: 1rem;
+}
+/* Brand panels: the design's near-black with a soft yellow glow (a yellow
+   gradient behind white text would not read). */
+html.etaku .brand-gradient,
+html.etaku.dark .brand-gradient {
+  background-color: rgb(22 23 25);
+  background-image:
+    radial-gradient(60% 50% at 85% 10%, rgb(255 204 0 / 0.18), transparent 70%),
+    radial-gradient(50% 40% at 10% 95%, rgb(255 204 0 / 0.1), transparent 70%);
+}
+/* The app frame tints the page with the brand colour; E-TAKU's pages use the
+   plain Background token instead. */
+html.etaku .bg-paper.bg-fixed,
+html.etaku .sticky.bg-paper {
+  background-image: none;
+}

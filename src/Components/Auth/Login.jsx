@@ -29,6 +29,8 @@ import { useLogin } from "@/Hooks/Auth/useLogin";
 import { usePortalPolicy } from "@/Hooks/Auth/usePortalPolicy";
 import { sanitizePin } from "@/Utils/Lib/pinRules";
 import BrandLogo from "@/Components/Common/BrandLogo";
+import EtakuHero from "./EtakuHero";
+import { INST_PROFILE_ID } from "@/Utils/Constant";
 import { useBrandingLogo } from "@/Hooks/Branding/useBrandingLogo";
 import { useBrandingLinks } from "@/Hooks/Branding/useBrandingLinks";
 import { useBrandingLoginBackground } from "@/Hooks/Branding/useBrandingLoginBackground";
@@ -115,6 +117,9 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-paper min-[880px]:grid min-[880px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {/* Brand panel: one hero message, vertically centred. */}
+      {INST_PROFILE_ID === 5 ? (
+        <EtakuHero />
+      ) : (
       <aside
         className="brand-gradient login-hero sticky isolate top-0 hidden h-screen flex-col overflow-hidden rounded-r-[32px] px-10 py-9 text-white min-[880px]:flex xl:px-16"
         // The bank's own picture, under a wash of its colour so the text stays readable.
@@ -229,6 +234,7 @@ export default function Login() {
           {t("auth.personalSpace")}
         </div>
       </aside>
+      )}
 
       {/* Sign-in form, centred on the same axis as the hero. */}
       <div className="flex min-h-screen min-w-0 flex-col px-5 sm:px-10">
